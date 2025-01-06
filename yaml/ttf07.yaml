@@ -1,17 +1,717 @@
+# NOTE: This is not fully functional yet.
+# Tested with my Tecalor TTF 07 cool (WPM3i), which should be the same as
+# Stiebel Eltron WPC 07 cool.
+# There is a good chance, that other TTF xx and WPC xx
+# heatpumps (cool and not cool) will work with this code.
+#
+#
+# WHAT IS WORKING
+# - Reading most of the sensors (temperatures, energy consumption, Betriebszustand)
+# - Setting Betriebsart (Programmschalter)
+#
+#
+# WHAT IS NOT WORKING
+# - Setting temperatures (e.g. WW Komfort temp)
+# - There are still serveral values / communication on the bus, which could not be decoded, yet 
+#
+#
+# WARNING: 
+# If the FEK is attached, all settings from ESPHome like Programmschalter will have no effect
+# It is highly recommended to remove the FEK! (open the wall mounted device and gently remove 
+# the plug holding the 4 cables)
+#
+#
+# @Kr0ner: 
+# Can not use wp_base.yaml (no FAN stuff, Programmschalter and Betriebszustand are different, ...) here, 
+# so putting the modified code directly here
+# Same for common.yaml (no WARMEERTRAG_2WE)
+# I included the files within my ESPHome top yaml file, so I can use a different folder structure
+# e.g. renamed your folder to git_OneESP32ToRuleThemAll_branch_mkaiser
+#
+#
+# TIP: if something is really wierd, try restarting the heatpump by switching it off and on again
+# happened to me a couple of times after testing some requests to the heatpump
+
+substitutions:
+  kessel_can_id: "0x180"
+  hk1_can_id: "0x301"
+  hk2_can_id: "0x302"
+  manager_can_id: "0x6a1"
+  espclient_can_id: "0x6a2"
+
+  interval_very_fast: 15s
+  interval_fast: 30s
+  interval_medium: 60s
+  interval_slow: 5min
+  interval_very_slow: 15min
+  interval_once_in_a_while: 1h  
+
 esphome:
   platformio_options:
+    build_unflags:
+      - "-std=gnu++11"
+      - "-fno-rtti"
     build_flags:
+      - "-std=gnu++17"  
       - "-DTTF_07_C"
+      - "-DESPCLIENT_ID=$espclient_can_id"
+      - "-DMANAGER_ID=$manager_can_id"
+      - "-DKESSEL_ID=$kessel_can_id"
+      - "-DHK1_ID=$hk1_can_id"
+      - "-DHK2_ID=$hk2_can_id"
 
+  #########################################
+  #                                       #
+  #   Obtain initial states               #
+  #                                       #
+  #########################################
+  on_boot:
+    priority: -100
+    then:
+      - lambda: |-
+          CallbackHandler::instance().addCallback(std::make_pair(Kessel,Property::kPROGRAMMSCHALTER),[](const SimpleVariant& value){
+            const auto stringValue{value.get<std::string>()};
+            const auto index = id(PROGRAMMSCHALTER).index_of(stringValue);
+            if(index.has_value()) {
+              id(PROGRAMMSCHALTER).publish_state(stringValue);
+            }
+          });
+          queueRequest(Kessel, Property::kPROGRAMMSCHALTER);
+
+          CallbackHandler::instance().addCallback(std::make_pair(Kessel,Property::kBETRIEBS_STATUS),[](const SimpleVariant& value){
+            const std::bitset<15U> status_bits{static_cast<std::uint16_t>(value)};
+            id(NHZ1).publish_state(status_bits.test(0) && !status_bits.test(1U));
+            id(NHZ2).publish_state(!status_bits.test(0) && status_bits.test(1U));
+            id(NHZ3).publish_state(status_bits.test(0) && status_bits.test(1U));
+            // 2U is unknown
+            id(VERDICHTER).publish_state(status_bits.test(3U));
+            id(WARMWASSERBEREITUNG).publish_state(status_bits.test(4U));
+            id(HEIZKREISPUMPE).publish_state(status_bits.test(5U));
+            id(PUFFERLADEPUMPE).publish_state(status_bits.test(6U));
+            // 7U is unknown
+            id(QUELLENPUMPE).publish_state(status_bits.test(8U));
+            id(KUEHLBETRIEB).publish_state(status_bits.test(9U));
+            // 10 to 15 are unknown
+          });
+          queueRequest(Kessel, Property::kBETRIEBS_STATUS);
+
+
+
+          // TODO REMOVEME after more testing 
+          // // test WW_KOMF_TEMP
+          // CallbackHandler::instance().addCallback(std::make_pair(Kessel,Property::kWW_KOMF_TEMP),[](const SimpleVariant& value){
+          //     id(SET_WW_KOMF_TEMP).publish_state(value);          });
+          // CallbackHandler::instance().addCallback(std::make_pair(Kessel,Property::kWW_KOMF_TEMP),[](const SimpleVariant& value){
+          //     id(WW_KOMF_TEMP).publish_state(value);                  });      
+          // CallbackHandler::instance().addCallback(std::make_pair(Kessel,Property::kWW_ECO_TEMP),[](const SimpleVariant& value){
+          //     id(SET_WW_ECO_TEMP).publish_state(value);          });
+          // CallbackHandler::instance().addCallback(std::make_pair(Kessel,Property::kWW_ECO_TEMP),[](const SimpleVariant& value){
+          //     id(WW_ECO_TEMP).publish_state(value);                  });                  
+
+globals:
+- id: g_last_valid_cop_ww_tag
+  type: float
+  initial_value: '0'  # Set to initial valid value if necessary
+
+- id: g_last_valid_cop_heiz_tag
+  type: float
+  initial_value: '0'  # Set to initial valid value if necessary
+
+#########################################
+#                                       #
+#   Intervals                           #
+#                                       #
+#########################################
+interval:
+  - interval: 250ms
+    then:
+      - lambda: |-
+          // Request sensor value one after another.
+          if(!request_queue.empty()) {
+            constexpr auto use_extended_id{false};
+            const auto request_element = request_queue.front();
+            request_queue.pop();
+            requestData(request_element.first, request_element.second);
+          }
+  - interval: "${interval_very_fast}"
+    then:
+      - lambda: |-
+          queueRequest(Kessel, Property::kBETRIEBS_STATUS);  
+          queueRequest(Kessel, Property::kPROGRAMMSCHALTER);  // PROGRAMMSCHALTER is only transmitted after an explicit request. 
+
+  - interval: $interval_medium
+    then:
+      - lambda: |-
+          // TODO Removeme after more testing 
+          // // Send current RAUMISTTEMP
+          // const auto room_temp = id(gRAUMISTTEMP);
+          // if(room_temp > 0.0f) {
+          //   ESP_LOGI("SET", "Sending cached room temperature %f to heatpump", room_temp);
+          //   sendData(HK1, Property::kRAUMISTTEMP, static_cast<std::uint16_t>(room_temp * 10.0f));
+          // }
+          // // Send current FEUCHTE
+          // const auto humidity = id(gFEUCHTE);
+          // if(humidity > 0.0) {
+          //   ESP_LOGI("SET", "Sending cached humidity %f to heatpump", humidity);
+          //   sendData(HK1, Property::kFEUCHTE, static_cast<std::uint16_t>(humidity * 10.0f));
+          // }
+  - interval: $interval_once_in_a_while
+    then:
+      - lambda: |-
+
+
+#########################################
+#                                       #
+#   Packages                            #
+#                                       #
+#########################################
 packages:
-  COMMON: !include { file: common.yaml}
-  
-  QUELLE_IST:                     !include { file: wp_temperature.yaml, vars: { property: "QUELLE_IST" }}
-  HKSOLLTEMP:                     !include { file: wp_temperature.yaml, vars: { property: "HKSOLLTEMP", update_interval: "never" }}
-  HKISTTEMP:                      !include { file: wp_temperature.yaml, vars: { property: "HKISTTEMP" }}
-  PUFFERISTTEMP:                  !include { file: wp_temperature.yaml, vars: { property: "PUFFERISTTEMP" }}
-  PUFFERSOLLTEMP:                 !include { file: wp_temperature.yaml, vars: { property: "PUFFERSOLLTEMP" }}
 
-  DRUCK_HEIZKREIS:                !include { file: wp_generic.yaml, vars: { property: "DRUCK_HEIZKREIS", interval: "never", unit: "bar"  , icon: "mdi:water-pressure", accuracy_decimals: "1" }}
-  QUELLENDRUCK:                   !include { file: wp_generic.yaml, vars: { property: "QUELLENDRUCK"   , interval: "never", unit: "bar"  , icon: "mdi:water-pressure", accuracy_decimals: "1" }}
-  VOLUMENSTROM:                   !include { file: wp_generic.yaml, vars: { property: "VOLUMENSTROM"   , interval: "never", unit: "l/min", icon: "mdi:flow"          , accuracy_decimals: "1" }}
+#########################################
+# General 
+#########################################
+# prettier-ignore
+  HEATPUMP_DATETIME: !include { file: wp_datetime.yaml , update_interval: "${interval_once_in_a_while}" }
+
+#########################################
+# Temperatures
+#########################################
+# prettier-ignore
+  AUSSENTEMP: !include { file: wp_temperature.yaml, vars: { property: "AUSSENTEMP" }} # transmitted automatically every 10 seconds
+
+# prettier-ignore
+  SPEICHERSOLLTEMP: !include { file: wp_temperature.yaml, vars: { property: "SPEICHERSOLLTEMP" }} # either WW Komfort temp or WW Eco temp depending on programmschalter
+# prettier-ignore
+  SPEICHERISTTEMP: !include { file: wp_temperature.yaml, vars: { property: "SPEICHERISTTEMP" }} # transmitted automatically every 10 seconds
+
+# prettier-ignore
+  WW_KOMF_TEMP: !include { file: wp_temperature.yaml, vars: { property: "WW_KOMF_TEMP" }} 
+# prettier-ignore
+  WW_ECO_TEMP: !include { file: wp_temperature.yaml, vars: { property: "WW_ECO_TEMP" }}
+
+# prettier-ignore
+  HKSOLLTEMP: !include { file: wp_temperature.yaml, vars: { property: "HKSOLLTEMP" }}
+# prettier-ignore
+  HKISTTEMP: !include { file: wp_temperature.yaml, vars: { property: "HKISTTEMP" }}
+
+# prettier-ignore
+  RUECKLAUFISTTEMP: !include { file: wp_temperature.yaml,  vars: { property: "RUECKLAUFISTTEMP" }} # transmitted automatically every 10 seconds
+# prettier-ignore
+  VORLAUFISTTEMP: !include { file: wp_temperature.yaml, vars: { property: "VORLAUFISTTEMP" }}
+# prettier-ignore
+  VORLAUFSOLLTEMP: !include { file: wp_temperature.yaml, vars: { property: "VORLAUFSOLLTEMP", target: "HK1" }} # returns 0 on request transmitted automatically on change
+
+# prettier-ignore
+  PUFFERISTTEMP: !include { file: wp_temperature.yaml, vars: { property: "PUFFERISTTEMP" }}
+# prettier-ignore
+  PUFFERSOLLTEMP: !include { file: wp_temperature.yaml, vars: { property: "PUFFERSOLLTEMP" }}
+
+# prettier-ignore
+  QUELLE_IST: !include { file: wp_temperature.yaml, vars: { property: "QUELLE_IST" }}
+
+# prettier-ignore
+# MAXRUECKLAUFTEMP: !include { file: wp_temperature.yaml, vars: { property: "MAXRUECKLAUFTEMP"  }}  // works, but not really necessary/ informative
+# prettier-ignore
+# MAXVORLAUFTEMP:  !include { file: wp_temperature.yaml, vars: { property: "MAXVORLAUFTEMP"  }} // works, but not really necessary/ informative
+
+#########################################
+# Binary Betriebszustand sensors 
+#########################################
+# prettier-ignore
+# TODO BIT_UNKOWN is for more debugging. Could not figure out the purpose of this bit, yet
+  BIT_UNKOWN: !include { file: wp_binary.yaml, vars: { name: "BIT_UNKOWN" }}
+# prettier-ignore
+  NHZ1: !include { file: wp_binary.yaml, vars: { name: "NHZ1" }}
+# prettier-ignore
+  NHZ2: !include { file: wp_binary.yaml, vars: { name: "NHZ2" }}
+# prettier-ignore
+  NHZ3: !include { file: wp_binary.yaml, vars: { name: "NHZ3" }}
+# prettier-ignore
+  VERDICHTER: !include { file: wp_binary.yaml, vars: { name: "VERDICHTER" }}
+# prettier-ignore
+  WARMWASSERBEREITUNG: !include { file: wp_binary.yaml, vars: { name: "WARMWASSERBEREITUNG" }}
+# prettier-ignore
+  HEIZKREISPUMPE: !include { file: wp_binary.yaml, vars: { name: "HEIZKREISPUMPE" }}
+# prettier-ignore
+  PUFFERLADEPUMPE: !include { file: wp_binary.yaml, vars: { name: "PUFFERLADEPUMPE" }}
+# prettier-ignore
+  QUELLENPUMPE: !include { file: wp_binary.yaml, vars: { name: "QUELLENPUMPE" }}
+# prettier-ignore
+  KUEHLBETRIEB: !include { file: wp_binary.yaml, vars: { name: "KUEHLBETRIEB" }}
+
+#########################################
+# general Kessel 
+#########################################
+# prettier-ignore
+  VERDICHTER_STARTS: !include { file: wp_generic_combined.yaml, vars: {sensor_name: "VERDICHTER_STARTS", scaled_property: "VERDICHTER_STARTS_K", property: "VERDICHTER_STARTS", unit: "", accuracy_decimals: "0", scaler: "1000", icon: "mdi:counter",}}
+
+# prettier-ignore
+  DRUCK_HEIZKREIS: !include { file: wp_generic.yaml, vars: {property: "DRUCK_HEIZKREIS", update_interval: "${interval_slow}",  unit: "bar",icon: "mdi:water-pressure",accuracy_decimals: "2" }} # sensor returns 0 when requested. Value is updated frequently by itself
+
+# prettier-ignore
+  QUELLENDRUCK: !include { file: wp_generic.yaml, vars: {property: "QUELLENDRUCK", update_interval: "${interval_slow}", unit: "bar",icon: "mdi:water-pressure",accuracy_decimals: "2" }} # sensor returns 0 when requested. Value is updated frequently by itself
+
+# prettier-ignore
+  DRUCK_HOCHDRUCK: !include { file: wp_generic.yaml, vars: {property: "DRUCK_HOCHDRUCK", update_interval: "${interval_slow}", unit: "bar",icon: "mdi:water-pressure",accuracy_decimals: "2" }} # sensor returns 0 when requested. Value is updated frequently by itself
+
+# prettier-ignore
+  HDSENSORMAX: !include { file: wp_generic.yaml, vars: {property: "HDSENSORMAX", update_interval: "${interval_slow}", unit: "bar",icon: "mdi:water-pressure",accuracy_decimals: "2" }} # sensor returns 0 when requested. Value is updated frequently by itself
+
+# prettier-ignore
+  DRUCK_NIEDERDRUCK: !include { file: wp_generic.yaml, vars: {property: "DRUCK_NIEDERDRUCK", update_interval: "${interval_slow}", unit: "bar",icon: "mdi:water-pressure",accuracy_decimals: "2" }} # sensor returns 0 when requested. Value is updated frequently by itself
+
+# prettier-ignore
+  VOLUMENSTROM: !include { file: wp_generic.yaml, vars: {property: "VOLUMENSTROM", target: "Kessel", update_interval: "${interval_slow}", unit: "l/min",icon: "mdi:flow",accuracy_decimals: "2" }} # sensor returns 0 when requested. Value is updated frequently by itself
+
+# prettier-ignore
+  HEIZGASTEMP: !include {file: wp_temperature.yaml, vars: { property: "HEIZGASTEMP", target: "Kessel", update_interval: "${interval_slow}" }}
+
+# prettier-ignore
+  QUELLENTEMP_MIN: !include {file: wp_temperature.yaml, vars: { property: "QUELLENTEMP_MIN", target: "Kessel", update_interval: "${interval_slow}" }} 
+
+# prettier-ignore
+  LEISTUNG_HEIZKREISPUMPE: !include {file: wp_generic.yaml, vars: {property: "LEISTUNG_HEIZKREISPUMPE", update_interval: "${interval_once_in_a_while}", unit: "%",icon: "mdi:water-percent", target: "Kessel",accuracy_decimals: "1" }}
+
+# prettier-ignore
+  LEISTUNG_SOLEPUMPE: !include {file: wp_generic.yaml, vars: {property: "LEISTUNG_SOLEPUMPE", update_interval: "${interval_once_in_a_while}", unit: "%",icon: "mdi:water-percent", target: "Kessel",accuracy_decimals: "1" }}
+
+# prettier-ignore
+  LEISTUNG_WARMWASSERPUMPE: !include {file: wp_generic.yaml, vars: {property: "LEISTUNG_WARMWASSERPUMPE", update_interval: "${interval_once_in_a_while}", unit: "%",icon: "mdi:water-percent", target: "Kessel",accuracy_decimals: "1" }}
+
+# prettier-ignore
+  EINPHASIGER_BETRIEB: !include { file: wp_generic.yaml, vars: { property: "EINPHASIGER_BETRIEB", update_interval: "${interval_once_in_a_while}" }}
+
+# prettier-ignore
+  VERDICHTER_STILLSTAND: !include {file: wp_generic.yaml, vars: {property: "VERDICHTER_STILLSTAND", update_interval: "${interval_once_in_a_while}", unit: "min", target: "Kessel" }}
+
+# prettier-ignore
+  REGLERDYNAMIK: !include {file: wp_generic.yaml, vars: {property: "REGLERDYNAMIK", update_interval: "${interval_once_in_a_while}", target: "Kessel" }}
+
+# prettier-ignore
+  KUEHLEN_EINGESCHALTET: !include {file: wp_generic.yaml, vars: {property: "KUEHLEN_EINGESCHALTET", update_interval: "${interval_slow}", target: "Kessel" }}
+
+
+#########################################
+# FEK
+#########################################
+# prettier-ignore
+  FEUCHTE: !include {file: wp_generic.yaml, vars:{property: "FEUCHTE",interval: never,unit: "%",icon: "mdi:water-percent",target: "HK1",accuracy_decimals: "1",},    }
+
+# prettier-ignore
+  RAUMISTTEMP: !include {file: wp_temperature.yaml, vars:{ property: "RAUMISTTEMP", target: "HK1", update_interval: "never" }} # transmitted automatically on change / ervery minute
+
+# prettier-ignore
+  RAUMEINFLUSS:  !include {file: wp_number.yaml, vars: { property: "RAUMEINFLUSS", target: "HK1" }}
+
+# prettier-ignore
+  EL_ENERGIEAUFNAHME_WW_TAG: !include {file: wp_daily_energy_combined.yaml, vars:{sensor_name: "EL_ENERGIEAUFNAHME_WW_TAG", property_wh: "EL_ENERGIEAUFNAHME_WW_TAG_WH", property_kwh: "EL_ENERGIEAUFNAHME_WW_TAG_KWH" }}
+
+# prettier-ignore
+  WAERMEERTRAG_WW_TAG: !include {file: wp_daily_energy_combined.yaml,vars:{sensor_name: "WAERMEERTRAG_WW_TAG", property_wh: "WAERMEERTRAG_WW_TAG_WH", property_kwh: "WAERMEERTRAG_WW_TAG_KWH" }}
+
+# prettier-ignore
+  EL_ENERGIEAUFNAHME_WW: !include {file: wp_generic_combined.yaml,vars:{sensor_name: "EL_ENERGIEAUFNAHME_WW", scaled_property: "EL_ENERGIEAUFNAHME_WW_SUM_KWH", property: "EL_ENERGIEAUFNAHME_WW_SUM_MWH", unit: "MWh",accuracy_decimals: "3",icon: "mdi:fire",device_class: energy}}
+
+# prettier-ignore
+  WAERMEERTRAG_WW: !include {file: wp_generic_combined.yaml, vars:{sensor_name: "WAERMEERTRAG_WW", scaled_property: "WAERMEERTRAG_WW_SUM_KWH", property: "WAERMEERTRAG_WW_SUM_MWH", unit: "MWh",accuracy_decimals: "3",icon: "mdi:fire",device_class: energy}}
+
+# prettier-ignore
+  EL_ENERGIEAUFNAHME_HEIZ_TAG: !include {file: wp_daily_energy_combined.yaml, vars: {sensor_name: "EL_ENERGIEAUFNAHME_HEIZ_TAG", property_wh: "EL_ENERGIEAUFNAHME_HEIZ_TAG_WH", property_kwh: "EL_ENERGIEAUFNAHME_HEIZ_TAG_KWH" }}
+
+# prettier-ignore
+  WAERMEERTRAG_HEIZ_TAG: !include {file: wp_daily_energy_combined.yaml,vars:{sensor_name: "WAERMEERTRAG_HEIZ_TAG", property_wh: "WAERMEERTRAG_HEIZ_TAG_WH", property_kwh: "WAERMEERTRAG_HEIZ_TAG_KWH" }}
+
+# prettier-ignore
+  EL_ENERGIEAUFNAHME_HEIZ: !include {file: wp_generic_combined.yaml,vars:{sensor_name: "EL_ENERGIEAUFNAHME_HEIZ", scaled_property: "EL_ENERGIEAUFNAHME_HEIZ_SUM_KWH", property: "EL_ENERGIEAUFNAHME_HEIZ_SUM_MWH", unit: "MWh",accuracy_decimals: "3",icon: "mdi:fire" }}
+
+# prettier-ignore
+  WAERMEERTRAG_HEIZ: !include {file: wp_generic_combined.yaml,vars:{sensor_name: "WAERMEERTRAG_HEIZ", scaled_property: "WAERMEERTRAG_HEIZ_SUM_KWH", property: "WAERMEERTRAG_HEIZ_SUM_MWH", unit: "MWh",accuracy_decimals: "3",icon: "mdi:fire" }}
+
+
+
+#########################################
+# Debug stuff
+#########################################
+
+# # prettier-ignore
+#   UNKNOWN1: !include {file: wp_generic.yaml, vars: {property: "UNKNOWN1", update_interval: 60s, target: "Kessel" }}
+# # prettier-ignore
+#   UNKNOWN2: !include {file: wp_generic.yaml, vars: {property: "UNKNOWN2", update_interval: 60s, target: "Kessel" }}
+# # prettier-ignore
+#   UNKNOWN3: !include {file: wp_generic.yaml, vars: {property: "UNKNOWN3", update_interval: 60s, target: "Kessel" }}
+# # prettier-ignore
+#   UNKNOWN4: !include {file: wp_generic.yaml, vars: {property: "UNKNOWN4", update_interval: 60s, target: "HK1" }}
+# # prettier-ignore
+#   UNKNOWN5: !include {file: wp_generic.yaml, vars: {property: "UNKNOWN5", update_interval: 60s, target: "HK1" }}
+# # prettier-ignore
+#   UNKNOWN6: !include {file: wp_generic.yaml, vars: {property: "UNKNOWN6", update_interval: 60s, target: "HK1" }}
+# # prettier-ignore
+#   UNKNOWN7: !include {file: wp_generic.yaml, vars: {property: "UNKNOWN7", update_interval: 60s, target: "Kessel" }}
+# # prettier-ignore
+#   UNKNOWN8: !include {file: wp_generic.yaml, vars: {property: "UNKNOWN8", update_interval: 60s, target: "Kessel" }}
+# # prettier-ignore
+#   UNKNOWN9: !include {file: wp_generic.yaml, vars: {property: "UNKNOWN9", update_interval: 60s, target: "HK1" }}
+# # prettier-ignore
+#   UNKNOWN10: !include {file: wp_generic.yaml, vars: {property: "UNKNOWN10", update_interval: 60s, target: "Kessel" }}
+# # prettier-ignore
+#   UNKNOWN11: !include {file: wp_generic.yaml, vars: {property: "UNKNOWN11", update_interval: 60s, target: "HK1" }}
+# # prettier-ignore
+#   UNKNOWN12: !include {file: wp_generic.yaml, vars: {property: "UNKNOWN12", update_interval: 60s, target: "HK1" }}   # UNKNOWN 12 cannot be requested read (Kessel or HK1)...
+# # prettier-ignore
+#   UNKNOWN14: !include {file: wp_generic.yaml, vars: {property: "UNKNOWN14", update_interval: 60s, target: "HK1" }} # Req to Kessel or HK1 returns p.value=32768 (raw: 0x8000) 
+# # prettier-ignore
+#   UNKNOWN15: !include {file: wp_generic.yaml, vars: {property: "UNKNOWN15", update_interval: 60s, target: "Kessel" }}
+# # prettier-ignore
+#   UNKNOWN18: !include {file: wp_generic.yaml, vars: {property: "UNKNOWN18", update_interval: 60s, target: "HK1" }} # Req to Kessel or HK1 returns p.value=32768 (raw: 0x8000) 
+# # prettier-ignore
+#   UNKNOWN19: !include {file: wp_generic.yaml, vars: {property: "UNKNOWN19", update_interval: 60s, target: "Kessel" }}
+# # prettier-ignore
+#   UNKNOWN20: !include {file: wp_generic.yaml, vars: {property: "UNKNOWN20", update_interval: 60s, target: "Kessel" }}
+# # prettier-ignore
+#   UNKNOWN21: !include {file: wp_generic.yaml, vars: {property: "UNKNOWN21", update_interval: 60s, target: "Kessel" }}
+# # prettier-ignore
+#   UNKNOWN22: !include {file: wp_generic.yaml, vars: {property: "UNKNOWN22", update_interval: 60s, target: "Kessel" }}
+# # prettier-ignore
+#   UNKNOWN23: !include {file: wp_generic.yaml, vars: {property: "UNKNOWN23", update_interval: 60s, target: "Kessel" }}
+# # prettier-ignore
+#   UNKNOWN24: !include {file: wp_generic.yaml, vars: {property: "UNKNOWN24", update_interval: 60s, target: "Kessel" }}  # without request, often 0. Req to Kessel or HK1 returns p.value=32768 (raw: 0x8000) 
+# # prettier-ignore
+#   UNKNOWN25: !include {file: wp_generic.yaml, vars: {property: "UNKNOWN25", update_interval: 60s, target: "Kessel" }}
+# # prettier-ignore
+#   UNKNOWN26: !include {file: wp_generic.yaml, vars: {property: "UNKNOWN26", update_interval: 60s, target: "Kessel" }}
+# # prettier-ignore
+#   UNKNOWN27: !include {file: wp_generic.yaml, vars: {property: "UNKNOWN27", update_interval: 60s, target: "Kessel" }}
+# # prettier-ignore
+#   UNKNOWN28: !include {file: wp_generic.yaml, vars: {property: "UNKNOWN28", update_interval: 60s, target: "Kessel" }}
+# # prettier-ignore
+#   UNKNOWN30: !include {file: wp_generic.yaml, vars: {property: "UNKNOWN30", update_interval: 60s, target: "Kessel" }}
+
+
+
+# TODO setting temperatures needs more testing 
+# climate: 
+  # - platform: custom
+  #   lambda: |-
+  #     auto hot_water = new HotWater(id(SPEICHERISTTEMP),id(WW_ECO_TEMP), id(WARMWASSERVENTIL), Property::kWW_ECO_TEMP);
+  #     // TODO: not sure if WARMWASSERVENTIL is correct here 
+  #     App.register_component(hot_water);
+  #     return {hot_water};
+  #   climates:
+  #     name: "Wasser"
+  #     visual:
+  #       min_temperature: 30.0
+  #       max_temperature: 60.0
+  #       temperature_step:
+  #         target_temperature: 1.0
+  #         current_temperature: 0.1
+
+  # - platform: custom
+  #   lambda: |-
+  #     auto heating = new HeatingDayNight(id(RAUMISTTEMP),id(VERSTELLTE_RAUMSOLLTEMP), Property::kRAUMSOLLTEMP_I, Property::kKUEHL_RAUMSOLL_TAG);
+  #     App.register_component(heating);
+  #     return {heating};
+  #   climates:
+  #     name: "Heizen (Komfort)"
+  #     visual:
+  #       min_temperature: 15.0
+  #       max_temperature: 25.0
+  #       temperature_step:
+  #         target_temperature: 0.1
+  #         current_temperature: 0.1
+
+
+sensor:
+  - platform: template
+    name: "COP WW TAG"
+    state_class: "measurement"
+    # TODO test more with filters 
+    # filters:
+    #   - sliding_window_moving_average:
+    #       window_size: 1440   # 24h*60min in seconds
+    lambda: |-
+      // only accept values with at least 0,5kwH energy, to prevent unrealistic values 
+      if (id(WAERMEERTRAG_WW_TAG).state && id(EL_ENERGIEAUFNAHME_WW_TAG).state && id(WAERMEERTRAG_WW_TAG).state > 0.5 && id(EL_ENERGIEAUFNAHME_WW_TAG).state > 0.5)
+      {
+        id(g_last_valid_cop_ww_tag) = id(WAERMEERTRAG_WW_TAG).state / id(EL_ENERGIEAUFNAHME_WW_TAG).state;
+      }
+      return id(g_last_valid_cop_ww_tag);
+
+  - platform: template
+    name: "COP WW"
+    state_class: "measurement"
+    lambda: |-
+      // no need to check for division by 0, because both sensors are never reset to 0
+      return id(WAERMEERTRAG_WW).state/id(EL_ENERGIEAUFNAHME_WW).state; 
+
+  - platform: template
+    name: "COP HEIZ TAG"
+    state_class: "measurement"
+    # TODO test more with filters 
+    # filters:
+    #   - sliding_window_moving_average:
+    #       window_size: 1440   # 24h*60min in seconds
+    lambda: |-
+      // only accept values with at least 0,5kwH energy, to prevent unrealistic values 
+      if (id(WAERMEERTRAG_HEIZ_TAG).state && id(EL_ENERGIEAUFNAHME_HEIZ_TAG).state && id(WAERMEERTRAG_HEIZ_TAG).state > 0.5 && id(EL_ENERGIEAUFNAHME_HEIZ_TAG).state > 0.5)
+      {
+        id(g_last_valid_cop_heiz_tag) = id(WAERMEERTRAG_HEIZ_TAG).state / id(EL_ENERGIEAUFNAHME_HEIZ_TAG).state;
+      }
+      return id(g_last_valid_cop_heiz_tag);
+
+  - platform: template
+    name: "COP HEIZ"
+    state_class: "measurement"
+    lambda: |-
+      // no need to check for division by 0, because both sensors are never reset to 0
+      return id(WAERMEERTRAG_HEIZ).state/id(EL_ENERGIEAUFNAHME_HEIZ).state; 
+
+  # TODO remove after more testing / merging to thermostat
+  # - platform: template
+  #   name: WW_KOMF_TEMP
+  #   id: WW_KOMF_TEMP
+  #   unit_of_measurement: "°C"
+  #   icon: "mdi:thermometer-lines"
+  #   device_class: "temperature"
+  #   state_class: "measurement"
+  #   accuracy_decimals: 1
+  #   update_interval: ${interval_medium}
+  #   lambda: |-
+  #       ESP_LOGI("WW_KOMF_TEMP", "WW_KOMF_TEMP update");
+  #       queueRequest(Kessel, Property::kWW_KOMF_TEMP);
+  #       return {};
+
+  # - platform: template
+  #   name: WW_ECO_TEMP
+  #   id: WW_ECO_TEMP
+  #   unit_of_measurement: "°C"
+  #   icon: "mdi:thermometer-lines"
+  #   device_class: "temperature"
+  #   state_class: "measurement"
+  #   accuracy_decimals: 1
+  #   update_interval: ${interval_medium}
+  #   lambda: |-
+  #       ESP_LOGI("WW_ECO_TEMP", "WW_ECO_TEMP update");
+  #       queueRequest(Kessel, Property::kWW_ECO_TEMP);
+  #       return {};        
+
+
+select:
+  - platform: template
+    name: "PROGRAMMSCHALTER"
+    id: PROGRAMMSCHALTER
+    options:
+      - "Notbetrieb"
+      - "Bereitschaft"
+      - "Programm"
+      - "Komfort"
+      - "Eco"
+      - "Warmwasser"
+      - "Unbekannt"
+    initial_option: "Unbekannt"
+    optimistic: true
+    setup_priority: 100
+    set_action:
+      then:
+        - lambda: |-
+            const auto betriebsartId = Mapper::instance().getBetriebsartId(x);
+
+            ESP_LOGI("template", "Updating PROGRAMMSCHALTER to %s betriebsartId=0x%0x", x.c_str(), betriebsartId.value());
+
+            if(betriebsartId.has_value()) {
+              sendData(Kessel, Property::kPROGRAMMSCHALTER, betriebsartId.value());
+            }
+
+# TODO Remove after testing / merging to thermostat
+# number:
+#   - platform: template
+#     name: SET_WW_KOMF_TEMP
+#     id: SET_WW_KOMF_TEMP
+#     min_value: 25
+#     max_value: 60
+#     step: 1
+#     initial_value: 45
+#     optimistic: true
+#     set_action:
+#       - lambda: |-
+#           // doing in reverse: uin616_T raw --> int --> /10 --> float
+#           int16_t intVal = static_cast<int16_t>(10*x);
+#           uint16_t uintVal = static_cast<uint16_t>(intVal);
+#           uint16_t uintValShifted = uintVal<<4;
+#           ESP_LOGI("SET_WW_KOMF_TEMP", "x=%f\t intVal=%i, uintVal=0x%X, uintValShifted=0x%X", x, intVal, uintVal, uintValShifted);
+#           if(x != NAN) {
+#             sendData(Kessel, Property::kWW_KOMF_TEMP, uintValShifted);
+#             queueRequest(Kessel, Property::kWW_KOMF_TEMP);
+#           }
+
+
+#   - platform: template
+#     name: SET_WW_ECO_TEMP
+#     id: SET_WW_ECO_TEMP
+#     min_value: 25
+#     max_value: 60
+#     step: 1
+#     initial_value: 45
+#     optimistic: true
+#     set_action:
+#       - lambda: |-
+#           // doing in reverse: uin616_T raw --> int --> /10 --> float
+#           int16_t intVal = static_cast<int16_t>(10*x);
+#           uint16_t uintVal = static_cast<uint16_t>(intVal);
+#           uint16_t uintValShifted = uintVal<<4;
+#           ESP_LOGI("SET_WW_ECO_TEMP", "x=%f\t intVal=%i, uintVal=0x%X, uintValShifted=0x%X", x, intVal, uintVal, uintValShifted);
+#           if(x != NAN) {
+#             sendData(Kessel, Property::kWW_ECO_TEMP, uintValShifted);
+#             queueRequest(Kessel, Property::kWW_ECO_TEMP);
+#           }          
+
+
+
+
+#########################################
+#                                       #
+#   CANbus configuration                #
+#                                       #
+#########################################
+canbus:
+  - id: wp_can
+    can_id: $espclient_can_id
+    use_extended_id: false
+    bit_rate: 20kbps
+    on_frame:
+    - can_id: 0
+      can_id_mask: 0
+      then:
+        - lambda: |-
+            ESP_LOGD("CAN", "Can message received with CANId 0x%04lx", can_id);
+            const auto [property, value] = processCanMessage(x);
+            const auto canMember = getCanMemberByCanId(can_id);
+            if(canMember) {
+              auto callback = CallbackHandler::instance().getCallback(std::make_pair(canMember->get(),property));
+              callback(value);
+            } else {
+              ESP_LOGD("CAN", "No CANMember with CANId 0x%04lx available.", can_id);
+            }
+
+
+
+# canbus:
+#   - id: wp_can
+#     can_id: 680
+#     use_extended_id: false
+#     bit_rate: 20kbps
+#     on_frame:
+
+#       #########################################
+#       #                                       #
+#       #   KESSEL messages                     #
+#       #                                       #
+#       #########################################
+#       - can_id: 0x180 # Kessel
+#         then:
+#           - lambda: |-
+#               const auto property_value_pair = processCanMessage(Kessel, x);     
+#               // dbgPrint("KSL", Kessel, property_value_pair);
+
+#               Property property{property_value_pair.first};
+#               SimpleVariant value{property_value_pair.second};
+
+
+#               auto callback = CallbackHandler::instance().getCallback(std::make_pair(Kessel,property));
+#               callback(value);
+
+#               switch(property) {
+#                   case Property::kPROGRAMMSCHALTER:
+#                   {
+#                     const auto stringValue{value.get<std::string>()};
+#                     const auto index = id(PROGRAMMSCHALTER).index_of(stringValue);
+
+#                     // ESP_LOGI("kPROGRAMMSCHALTER", "stringValue= %s", std::string(stringValue).c_str());
+
+#                     if(index.has_value()) {
+#                       id(PROGRAMMSCHALTER).publish_state(stringValue);
+#                     }
+#                     break;
+#                   }
+#                   case Property::kBETRIEBS_STATUS:
+#                   {
+#                     BetriebszustandStatus bSts (static_cast<uint16_t>(value));
+#                     bSts.printDbg();  // DEBUG 
+#                     id(BIT_UNKOWN).publish_state(bSts.getBitUnkown());
+#                     id(VERDICHTER).publish_state(bSts.getVerdichter());
+#                     id(WARMWASSER).publish_state(bSts.getWarmWasser());
+#                     id(HEIZKREISPUMPE).publish_state(bSts.getHeizkreispumpe());
+#                     id(PUFFERLADEPUMPE).publish_state(bSts.getPufferLadepumpe());
+#                     id(QUELLENPUMPE).publish_state(bSts.getQuellenpumpe());
+#                     id(KUEHLBETRIEB).publish_state(bSts.getKuehlbetrieb());
+
+#                     break;
+#                   }
+#                 default:
+#                   break;
+#               }
+
+#       #########################################
+#       #                                       #
+#       #   HK1 messages                        #
+#       #                                       #
+#       #########################################
+#       - can_id: 0x301
+#         then:
+#           - lambda: |-
+#               const auto property_value_pair = processCanMessage(HK1, x);
+
+#               Property property{property_value_pair.first};
+#               SimpleVariant value{property_value_pair.second};
+
+#               auto callback = CallbackHandler::instance().getCallback(std::make_pair(HK1,property));
+#               callback(value);
+
+#       #########################################
+#       #                                       #
+#       #   HK2 messages                        #
+#       #                                       #
+#       #########################################
+#       - can_id: 0x302
+#         then:
+#           - lambda: |-
+#               const auto property_value_pair = processCanMessage(HK2, x);
+
+#               Property property{property_value_pair.first};
+#               SimpleVariant value{property_value_pair.second};
+
+#               auto callback = CallbackHandler::instance().getCallback(std::make_pair(HK2,property));
+#               callback(value);
+
+#       #########################################
+#       #                                       #
+#       #   Message requests                    #
+#       #                                       #
+#       #########################################
+#       - can_id: 0x6a1
+#         then:
+#           - lambda: |-
+#               const auto property_value_pair = processCanMessage(Anfrage, x);
+
+#               Property property{property_value_pair.first};
+#               SimpleVariant value{property_value_pair.second};
+
+#               auto callback = CallbackHandler::instance().getCallback(std::make_pair(Anfrage,property));
+#               callback(value);
+
+
+#       #########################################
+#       #                                       #
+#       #  FEK                                  #
+#       #                                       #
+#       #########################################
+#       - can_id: 0x401
+#         then:
+#           - lambda: |-
+#               const auto property_value_pair = processCanMessage(FEK, x);
+
+
+#       - can_id: 0 # listen to all messages
+#         can_id_mask: 0
+#         then: 
+#           - lambda: |-
+#              // const auto property_value_pair = processCanMessage(UNDEFINED, x);            
