@@ -149,7 +149,7 @@ struct Property : public detail::Property {
     PROPERTY(WAERMEERTRAG_2WE_HEIZ_TAG_WH, 0x0926);
     PROPERTY(WAERMEERTRAG_2WE_HEIZ_TAG_KWH, 0x0927, Type::et_double_val);
     PROPERTY(WAERMEERTRAG_2WE_HEIZ_SUM_KWH, 0x0928);
-    PROPERTY(WAERMEERTRAG_2WE_HEIZ_SUM_MWH, 0x0929, Type::et_double_val);    
+    PROPERTY(WAERMEERTRAG_2WE_HEIZ_SUM_MWH, 0x0929, Type::et_double_val);
     PROPERTY(HEIZ_KUEHL_LEISTUNG, 0xc0ee, Type::et_cent_val);
     PROPERTY(ABLUFTFEUCHTE, 0xc0ef);
     PROPERTY(LEISTUNG_AUSLEGUNG_HEIZUNG, 0xc0f1);
@@ -199,10 +199,10 @@ struct Property : public detail::Property {
     PROPERTY(DRUCK_NIEDERDRUCK, 0x07A5, Type::et_dec_val);
     PROPERTY(ANLAGENFROST, 0x0A00, Type::et_dec_val);
     PROPERTY(BETRIEBS_STATUS, 0x0A20, Type::et_default);
-    PROPERTY(WW_ECO_TEMP, 0x0A06, Type::et_dec_val)
+    PROPERTY(WW_ECO_TEMP, 0x0A06, Type::et_dec_val);
     // QUELLENMEDIUM: 0 for ETHYLEN, other values are KALIUMKARBONAT,
     // ABLUFTMODUL [0, 30, 60, 120, 180], Wasser, Grundwasserstation
-    PROPERTY(QUELLENMEDIUM, 0xFDAE,Type::et_byte); 
+    PROPERTY(QUELLENMEDIUM, 0xFDAE, Type::et_byte);
     PROPERTY(REGLERDYNAMIK, 0xFDB0, Type::et_little_endian);
     // 1   min -> 256
     // 10  min -> 2560
