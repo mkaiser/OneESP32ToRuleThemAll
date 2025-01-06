@@ -77,5 +77,5 @@ canbus:
 
 
 packages:
-  ttf07: !include git_OneESP32ToRuleThemAll_kr0ner/yaml/ttf07.yaml
+  ttf07: !include OneESP32ToRuleThemAll/yaml/ttf07.yaml
 
