@@ -1,0 +1,82 @@
+esphome:
+  name: "ttf07-kr0ner-branch"
+  friendly_name: "ttf07-kr0ner-branch"
+  
+  # omitting common.yaml and putting the stuff in here
+  # This way I can use my preferred folder name
+  includes: 
+    - git_OneESP32ToRuleThemAll_kr0ner/src/callback_handler.h
+    - git_OneESP32ToRuleThemAll_kr0ner/src/communication.h
+    # - git_OneESP32ToRuleThemAll_kr0ner/src/custom_climate.h
+    - git_OneESP32ToRuleThemAll_kr0ner/src/mapper.h
+    - git_OneESP32ToRuleThemAll_kr0ner/src/mapper.cpp
+    - git_OneESP32ToRuleThemAll_kr0ner/src/property.h
+    - git_OneESP32ToRuleThemAll_kr0ner/src/property.cpp
+    - git_OneESP32ToRuleThemAll_kr0ner/src/simple_variant.h
+    - git_OneESP32ToRuleThemAll_kr0ner/src/type.h
+    - git_OneESP32ToRuleThemAll_kr0ner/src/type.cpp
+    # - git_OneESP32ToRuleThemAll_kr0ner/src/canmember.h
+
+esp32:
+  board: esp32-c3-devkitm-1
+  framework:
+    type: arduino
+
+# Enable logging
+logger:
+  level: INFO
+  # logs:
+  #   canbus: INFO
+# Enable Home Assistant API
+api:
+  encryption:
+    key: "84cBM3C0PDTQYmNZzjhwaMmaH/I/efWMi5bx457AUF4="
+
+ota:
+  - platform: esphome
+    password: "7a21986c2d3838d33152e0a0a2cfeff7"
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Ttf07-Test Fallback Hotspot"
+    password: "2pDjtdMbKVAJ"
+
+captive_portal:
+    
+
+time:
+  - platform: homeassistant
+    id: homeassistant_time
+
+  # an installed FEK interferes with these sensors. Will have to another way...
+  # entity_room_temperature: "sensor.temperatur_haus_mittel"
+  # entity_humidity: "sensor.luftfeuchtigkeit_haus_mittel"
+
+
+# Adapt your CAN bus setup here (how you connected the CAN transceiver to your ESP)
+canbus:
+  - id: !extend wp_can
+    platform: esp32_can
+    tx_pin: GPIO7   # modify to your needs if using internal CAN controller
+    rx_pin: GPIO6   # modify to your needs if using internal CAN controller
+
+    # if using a MCP2515 CAN controller, swap & modify the lines above with this,and 
+    # add the uncomment & modify the following spi section
+    # platform: mcp2515
+    # spi_id: McpSpi
+    # cs_pin: GPIO15
+
+# spi:
+#   id: McpSpi
+#   clk_pin: GPIO14
+#   mosi_pin: GPIO13
+#   miso_pin: GPIO4
+
+
+packages:
+  ttf07: !include git_OneESP32ToRuleThemAll_kr0ner/yaml/ttf07.yaml
+
