@@ -1,0 +1,17 @@
+name: Dispatch Build
+
+on:
+  repository_dispatch:
+    types: [build]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Run build
+        uses: kr0ner/workflows/.github/workflows/build.yml@main
+        with:
+          files: esphome/ttf07-kr0ner-branch.yaml 
