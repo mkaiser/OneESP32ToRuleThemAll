@@ -87,8 +87,8 @@ Mapper::Mapper() {
 
 #if defined(TTF_07_C)
     betriebsartMap = {{0x0000, "Notbetrieb"}, {0x0100, "Bereitschaft"}, {0x0200, "Programm"},
-                      {0x0300, "Komfort"}, {0x0400, "Eco"},   {0x0500, "Warmwasser"}};
-#else       
+                      {0x0300, "Komfort"},    {0x0400, "Eco"},          {0x0500, "Warmwasser"}};
+#else
     betriebsartMap = {{0x0000, "Notbetrieb"},    {0x0100, "Bereitschaft"}, {0x0300, "Tagbetrieb"},
                       {0x0400, "Absenkbetrieb"}, {0x0500, "Warmwasser"},   {0x0B00, "Automatik"},
                       {0x0E00, "Handbetrieb"}};
