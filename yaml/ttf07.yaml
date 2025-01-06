@@ -218,9 +218,6 @@ packages:
 # Binary Betriebszustand sensors 
 #########################################
 # prettier-ignore
-# TODO BIT_UNKOWN is for more debugging. Could not figure out the purpose of this bit, yet
-  BIT_UNKOWN: !include { file: wp_binary.yaml, vars: { name: "BIT_UNKOWN" }}
-# prettier-ignore
   NHZ1: !include { file: wp_binary.yaml, vars: { name: "NHZ1" }}
 # prettier-ignore
   NHZ2: !include { file: wp_binary.yaml, vars: { name: "NHZ2" }}
@@ -288,6 +285,7 @@ packages:
   REGLERDYNAMIK: !include {file: wp_generic.yaml, vars: {property: "REGLERDYNAMIK", update_interval: "${interval_once_in_a_while}", target: "Kessel" }}
 
 # prettier-ignore
+# TODO find difference between KUEHLBETRIEB and KUEHLEN_EINGESCHALTET
   KUEHLEN_EINGESCHALTET: !include {file: wp_generic.yaml, vars: {property: "KUEHLEN_EINGESCHALTET", update_interval: "${interval_slow}", target: "Kessel" }}
 
 
