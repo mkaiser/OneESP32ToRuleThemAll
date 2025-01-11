@@ -9,9 +9,9 @@ esp32:
 
 # Enable logging
 logger:
-  level: DEBUG
+  level: INFO # INFO or DEBUG
   logs:
-    canbus: INFO # DEBUG
+    canbus: INFO # INFO or DEBUG
 
 # Enable Home Assistant API
 api:
@@ -32,10 +32,6 @@ wifi:
     password: "VubEYmSN9lOy"
 
 captive_portal:
-
-
-substitutions:
-  SOURCE_DIR: "git_OneESP32ToRuleThemAll_kr0ner"
 
 
 time:
@@ -65,5 +61,8 @@ canbus:
 #   mosi_pin: GPIO13
 #   miso_pin: GPIO4
 
+substitutions:
+  SOURCE_DIR: "git_OneESP32ToRuleThemAll_kr0ner"
+
 packages:
-  ttf07: !include git_OneESP32ToRuleThemAll_kr0ner/yaml/ttf07.yaml
+  ttf07: !include git_OneESP32ToRuleThemAll_kr0ner/yaml/ttf07.yaml # why can't I use $SOURCE_DIR here?
