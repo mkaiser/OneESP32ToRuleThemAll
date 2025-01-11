@@ -46,6 +46,7 @@ substitutions:
   interval_very_slow: 15min
   interval_once_in_a_while: 1h  
 
+
 esphome:
   platformio_options:
     build_unflags:
@@ -60,6 +61,18 @@ esphome:
       - "-DHK1_ID=$hk1_can_id"
       - "-DHK2_ID=$hk2_can_id"
 
+  includes:
+    - $SOURCE_DIR/src/callback_handler.h
+    - $SOURCE_DIR/src/communication.h
+    # - $SOURCE_DIR/src/custom_climate.h
+    - $SOURCE_DIR/src/mapper.h
+    - $SOURCE_DIR/src/mapper.cpp
+    - $SOURCE_DIR/src/property.h
+    - $SOURCE_DIR/src/property.cpp
+    - $SOURCE_DIR/src/simple_variant.h
+    - $SOURCE_DIR/src/type.h
+    - $SOURCE_DIR/src/type.cpp
+    
   #########################################
   #                                       #
   #   Obtain initial states               #
