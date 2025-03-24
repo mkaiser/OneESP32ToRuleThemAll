@@ -6,7 +6,9 @@ esphome:
     priority: -100
     then:
       - lambda: |-
-          CallbackHandler::instance().addCallback(std::make_pair(Kessel,Property::kPROGRAMMSCHALTER),[](const SimpleVariant& value){
+          CallbackHandler::instance().addCallbacks({std::make_pair(Kessel,Property::kPROGRAMMSCHALTER),
+                                                    std::make_pair(Manager,Property::kPROGRAMMSCHALTER)},
+                                                    [](const SimpleVariant& value){
             const auto stringValue{value.get<std::string>()};
             const auto index = id(PROGRAMMSCHALTER).index_of(stringValue);
             if(index.has_value()) {
@@ -14,8 +16,10 @@ esphome:
             }
           });
           queueRequest(Kessel, Property::kPROGRAMMSCHALTER);
-
-          CallbackHandler::instance().addCallback(std::make_pair(Kessel,Property::kBETRIEBS_STATUS),[](const SimpleVariant& value){
+  
+          CallbackHandler::instance().addCallbacks({std::make_pair(Kessel,Property::kBETRIEBS_STATUS),
+                                                    std::make_pair(Manager,Property::kBETRIEBS_STATUS)},
+                                                    [](const SimpleVariant& value){          
             const std::bitset<15U> status_bits{static_cast<std::uint16_t>(value)};
             id(NHZ1).publish_state(status_bits.test(0) && !status_bits.test(1U));
             id(NHZ2).publish_state(!status_bits.test(0) && status_bits.test(1U));
@@ -36,8 +40,8 @@ interval:
   - interval: "${interval_very_fast}"
     then:
       - lambda: |-
-          queueRequest(Kessel, Property::kBETRIEBS_STATUS);  // BETRIEBS_STATUS is only transmitted after an explicit request. 
-          queueRequest(Kessel, Property::kPROGRAMMSCHALTER);  // PROGRAMMSCHALTER is only transmitted after an explicit request. 
+          // queueRequest(Kessel, Property::kBETRIEBS_STATUS);  // BETRIEBS_STATUS is only transmitted after an explicit request. 
+          // queueRequest(Kessel, Property::kPROGRAMMSCHALTER);  // PROGRAMMSCHALTER is only transmitted after an explicit request. 
 
 
 #########################################
