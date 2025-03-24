@@ -12,7 +12,7 @@ esphome:
     - "$SOURCE_DIR/src/util.h"
   platformio_options:
     build_flags:
-      - "-std=gnu++17"
+      - "-std=gnu++2a"
       - "-DESPCLIENT_ID=$espclient_can_id"
       - "-DMANAGER_ID=$manager_can_id"
       - "-DKESSEL_ID=$kessel_can_id"
