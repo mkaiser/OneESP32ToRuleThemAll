@@ -35,13 +35,22 @@ esphome:
             // 10 to 15 are unknown
           });
           queueRequest(Kessel, Property::kBETRIEBS_STATUS);
+          
+
+          // fix for wrong mapping of VORLAUFIST_temp to HK1 (not Kessel) in common.yaml:
+          // remove wrong callback for HK1
+          CallbackHandler::instance().eraseCallback(std::make_pair(HK1, Property::kVORLAUFISTTEMP));
+          // add right callback for Kessel
+          auto callback= [](const SimpleVariant& value){
+              id(VORLAUFISTTEMP).publish_state(value);
+          };
+          CallbackHandler::instance().addCallback(std::make_pair(Kessel,Property::kVORLAUFISTTEMP),callback);          
 
 interval:
   - interval: "${interval_very_fast}"
     then:
       - lambda: |-
-          // queueRequest(Kessel, Property::kBETRIEBS_STATUS);  // BETRIEBS_STATUS is only transmitted after an explicit request. 
-          // queueRequest(Kessel, Property::kPROGRAMMSCHALTER);  // PROGRAMMSCHALTER is only transmitted after an explicit request. 
+           queueRequest(Kessel, Property::kBETRIEBS_STATUS);  // BETRIEBS_STATUS is only transmitted after an explicit request. 
 
 
 #########################################

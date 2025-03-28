@@ -48,6 +48,22 @@ class CallbackHandler {
         }
     }
 
+    void eraseCallback(const std::pair<CanMember, Property> key) {
+        ESP_LOGI("CallbackHandler", "eraseCallback()");
+        ESP_LOGI("CallbackHandler", "eraseCallback()");
+        ESP_LOGI("CallbackHandler", "eraseCallback()");
+        ESP_LOGI("CallbackHandler", "eraseCallback()");
+        ESP_LOGI("CallbackHandler", "eraseCallback()");
+        auto result = callbacks.erase(key);
+        if (result > 0) {
+            ESP_LOGI("CallbackHandler", "eraseCallback: Successfully erased callback for %s %s (0x%04x)", key.first.name.c_str(),
+                 std::string(key.second.name).c_str(), key.second.id);
+        } else {
+            ESP_LOGI("CallbackHandler", "eraseCallback: No callback found to erase for %s %s (0x%04x)", key.first.name.c_str(),
+                 std::string(key.second.name).c_str(), key.second.id);
+        }
+    }
+
     /**
      * @brief Obtains the callback that has been registered for a specific \c Property and
      *        \c CanMember. If no callback could be found, it will return an empty lambda.
