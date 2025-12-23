@@ -1,36 +1,193 @@
+# General notes (Tecalor TTF* [C], (maybe) compatible with Stiebel Eltron WPF* )
+# This configuration was created for a TTF07c heatpump. 
+# 
+# NOTES
+# - The FEK needs to be de-attached, because if connected, the FEK will take over control of the heatpump and set temperatures. 
+# - My heatpump has an external pump (Heizkreispumpe). This has a constant power consumption of 41W (displayed on the device itself).
+#   Set $static_leistung_heizkreispumpe in your heatpump.yaml to the power consumption of your pump, if applicable (else just 0).
+# - HA Energy dashboard (>2025.12). Add as "individual devices", the prefix of the sensors might differ (mine is "heatpump_")
+#     - Wärmepumpe: 
+#         - Device energy consumption: Energie Summe (heatpump_energie_summe)
+#         - Device power consumption: Leistung Summe (heatpump_leistung_summe)
+#         - Display name: Wärmepumpe
+#         - Upstream Device: -
+#     - Warmwasser: 
+#         - Device energy consumption: El Energieaufnahme Warmwasser (heatpump_el_energieaufnahme_warmwasser)
+#         - Device power consumption: Leistung Warmwasserbereitung (heatpump_leistung_warmwasserbereitung)
+#         - Display name: Warmwasser
+#         - Upstream Device: Wärmepumpe
+#     - Heizung: 
+#         - Device energy consumption: El Energieaufnahme Heizen (heatpump_el_energieaufnahme_heizen)
+#         - Device power consumption: Leistung Heizen (heatpump_leistung_heizen)
+#         - Display name: Heizung
+#         - Upstream Device: Wärmepumpe
+#     - Heizkreispumpe: 
+#         - Device energy consumption: Energie ext. Heizkreispumpe (heatpump_energie_ext_heizkreispumpe)
+#         - Device power consumption: Leistung ext. Heizkreispumpe (heatpump_leistung_ext_heizkreispumpe)
+#         - Display name: Heizkreispumpe
+#         - Upstream Device: Heizung
+#
+# Working
+#  - Set 'Betriebszustand' (Komfort, Eco, Warmwasser, Bereitschaft, Notbetrieb)
+#  - Set temperatures for heating and hot water (Komfort and Eco modes)
+#  - Read many sensors (temperatures, pressures, energy consumption, operation times, status flags, etc.)
+#  - Control some settings like Verdichter Stillstand, Pumpenleistung (Heizkreis, Sole, Warmwasser), Reglerdynamik, Steigung HK1, Raumeinfluss
+#  - Power and energy readings of the heatpump (heating, hot water, total) and the external heating circuit pump --> HA dashboard compatible
+#
+# ToDo / open issues
+# - Create nice thermostats. Challenge: 
+#   There are basically two modes: ECO and Komfort. Each has its own setpoint for heating and hot water. The same for HK1 temperature
+#   I usually just have the heatpump in ECO mode and control the ECO temperatures. !env_var 
+#   If we have two thermostats, which can both switch between Eco and komfort, this will affect the other thermostate as well. 
+#
+# - naming: Is NHZ3 actually NHZ1_2?
+# - Kühlen was not tested, yet (its currently winter...)
+# - Test transmiting RAUMISTTEMP and RAUMFEUCHTE from HA to heatpump (code is currently commmented)
+ 
+
+substitutions:
+  kessel_can_id: "0x180"
+  hk1_can_id: "0x301"
+  hk2_can_id: "0x302"   # unused in TTF07C
+  manager_can_id: "0x100"
+  espclient_can_id: "0x680"
+
 esphome:
+  includes:
+    - OneESP32ToRuleThemAll/src/callback_handler.h
+    - OneESP32ToRuleThemAll/src/communication.h
+    - OneESP32ToRuleThemAll/src/mapper.h
+    - OneESP32ToRuleThemAll/src/mapper.cpp
+    - OneESP32ToRuleThemAll/src/property.h
+    - OneESP32ToRuleThemAll/src/property.cpp
+    - OneESP32ToRuleThemAll/src/simple_variant.h
+    - OneESP32ToRuleThemAll/src/type.h
+    - OneESP32ToRuleThemAll/src/type.cpp
+    - OneESP32ToRuleThemAll/src/util.h
   platformio_options:
     build_flags:
       - "-DTTF_07_C"
+      - "-DESPCLIENT_ID=$espclient_can_id"
+      - "-DMANAGER_ID=$manager_can_id"
+      - "-DKESSEL_ID=$kessel_can_id"
+      - "-DHK1_ID=$hk1_can_id"
+      - "-DHK2_ID=$hk2_can_id"
+      # Ensure the integration component is actually linked
+      # otherwise you may hit: undefined reference to vtable for esphome::integration::IntegrationSensor
+      - "-DUSE_INTEGRATION"
+      - "-DUSE_INTEGRATION_SENSOR"
   on_boot:
     priority: 100.0 # AFTER_CONNECTION
     then:
       - lambda: |-
-          CallbackHandler::instance().addCallback(std::make_pair(Kessel,Property::kPROGRAMMSCHALTER),[](const SimpleVariant& value){
+          CallbackHandler::instance().addCallback(std::make_pair(WPM2,Property::kPROGRAMMSCHALTER),[](const SimpleVariant& value){
             const auto stringValue{value.get<std::string>()};
+            //ESP_LOGI("PROGRAMMSCHALTER", "mapped value %s", stringValue.c_str());
             const auto index = id(PROGRAMMSCHALTER).index_of(stringValue);
             if(index.has_value()) {
               id(PROGRAMMSCHALTER).publish_state(stringValue);
-            }
+            } 
           });
-          queueRequest(Kessel, Property::kPROGRAMMSCHALTER);
+          queueRequest(WPM2, Property::kPROGRAMMSCHALTER);
 
-          CallbackHandler::instance().addCallback(std::make_pair(Kessel,Property::kBETRIEBS_STATUS),[](const SimpleVariant& value){
-            const std::bitset<15U> status_bits{static_cast<std::uint16_t>(value)};
-            id(NHZ1).publish_state(status_bits.test(0) && !status_bits.test(1U));
-            id(NHZ2).publish_state(!status_bits.test(0) && status_bits.test(1U));
-            id(NHZ3).publish_state(status_bits.test(0) && status_bits.test(1U));
-            // 2U is unknown
-            id(VERDICHTER).publish_state(status_bits.test(3U));
-            id(WARMWASSERBEREITUNG).publish_state(status_bits.test(4U));
-            id(HEIZKREISPUMPE).publish_state(status_bits.test(5U));
-            id(PUFFERLADEPUMPE).publish_state(status_bits.test(6U));
-            // 7U is unknown
-            id(QUELLENPUMPE).publish_state(status_bits.test(8U));
-            id(KUEHLBETRIEB).publish_state(status_bits.test(9U));
-            // 10 to 15 are unknown
+          CallbackHandler::instance().addCallback(std::make_pair(WPM2,Property::kBETRIEBS_STATUS),[](const SimpleVariant& value){
+            const std::uint16_t v = static_cast<std::uint16_t>(value);
+            const std::bitset<16U> status_bits{v};
+
+            // for debug string sensor
+            const std::string s = status_bits.to_string();
+            id(DEBUG_BETRIEB).publish_state(s);
+            //ESP_LOGW("BETRIEBS_STATUS", "BETRIEBS_STATUS value= 0x%04lx str=%s", v, s.c_str());
+
+            id(HEIZKREISPUMPE).publish_state(status_bits.test(0U));
+            id(MISCHER_PUMPE).publish_state(status_bits.test(1U));
+            id(MISCHER_AUF).publish_state(status_bits.test(2U));
+            id(MISCHER_ZU).publish_state(status_bits.test(3U));
+            id(NHZ1).publish_state(status_bits.test(7U) && !status_bits.test(5U) && status_bits.test(4U));   // 0x0090   [7_4] 1001
+            id(NHZ2).publish_state(status_bits.test(7U) && status_bits.test(5U) && !status_bits.test(4U));   // 0x00A0   [7_4] 1010
+            id(NHZ3).publish_state(status_bits.test(7U) && status_bits.test(5U) && status_bits.test(4U));   // 0x00B0   [7_4] 1011
+            id(HEIZBETRIEB).publish_state(status_bits.test(7U));  //0x0080
+            id(QUELLENPUMPE).publish_state(status_bits.test(6U));   // 0x0040 
+            id(PUFFERLADEPUMPE).publish_state(status_bits.test(7U));  // 0x0080
+            id(ENTLEERUNG_HYD).publish_state(status_bits.test(9U));  // 0x0200
+            id(WARMWASSERBEREITUNG).publish_state(status_bits.test(9U) && status_bits.test(7U));  // 0x0280
+            id(KUEHLBETRIEB).publish_state(status_bits.test(13U));   // 0x2000
+            id(VERDICHTER).publish_state(status_bits.test(14U));  // 0x4000
           });
-          queueRequest(Kessel, Property::kBETRIEBS_STATUS);
+          queueRequest(WPM2, Property::kBETRIEBS_STATUS);
+
+
+#########################################
+#                                       #
+#   Time Synchronization                #
+#                                       #
+#########################################
+time:
+  - platform: sntp
+    id: sntp_time
+    on_time:
+      - seconds: 0
+        minutes: 0
+        hours: 3 # sync at 3 am should be ok even with switch from/to daylight saving time
+        then:
+          - lambda: |-
+              syncTime();
+
+#########################################
+#                                       #
+#   Buttons                             #
+#                                       #
+#########################################
+button:
+  - platform: template
+    name: Synchronize Time
+    on_press:
+      then:
+        - lambda: |-
+            syncTime();
+
+
+#########################################
+#                                       #
+#   Intervals                           #
+#                                       #
+#########################################
+interval:
+  - interval: 250ms
+    then:
+      - lambda: |-
+          // Request sensor value one after another.
+          if(!conditionalRequests.empty()) {
+            // find the next request of which the condition evaluates to true
+            auto it = std::find_if(conditionalRequests.begin(),conditionalRequests.end(),[](const auto& element){
+              return element._condition();
+            });
+            if(it != conditionalRequests.end()) {
+                requestData(it->_request.first, it->_request.second);
+                conditionalRequests.erase(it);
+            }
+          }
+  - interval: $interval_fast
+    then:
+    - lambda: |-
+        queueRequest(WPM2, Property::kBETRIEBS_STATUS);          
+        queueRequest(WPM2, Property::kPROGRAMMSCHALTER);
+
+  # - interval: $interval_medium
+  #   then:
+  #     - lambda: |-
+  #         // Send current RAUMISTTEMP
+  #         const auto room_temp = id(gRAUMISTTEMP);
+  #         if(room_temp > 0.0f) {
+  #           ESP_LOGI("SET", "Sending cached room temperature %f to heatpump", room_temp);
+  #           sendData(HK1, Property::kRAUMISTTEMP, static_cast<std::uint16_t>(room_temp * 10.0f));
+  #         }
+  #         // Send current RAUMFEUCHTE
+  #         const auto humidity = id(gRAUMFEUCHTE);
+  #         if(humidity > 0.0) {
+  #           ESP_LOGI("SET", "Sending cached humidity %f to heatpump", humidity);
+  #           sendData(HK1, Property::kRAUMFEUCHTE, static_cast<std::uint16_t>(humidity * 10.0f));
+  #         }
 
 #########################################
 #                                       #
@@ -48,8 +205,6 @@ select:
       - "Komfort"
       - "Eco"
       - "Warmwasser"
-      - "Unbekannt"
-    initial_option: "Unbekannt"
     optimistic: true
     setup_priority: 100
     set_action:
@@ -58,40 +213,356 @@ select:
             const auto betriebsartId = Mapper::instance().getBetriebsartId(x);
             if(betriebsartId.has_value()) {
               ESP_LOGI("ttf07.yaml:select", "Updating PROGRAMMSCHALTER to %s betriebsartId=0x%0x", x.c_str(), betriebsartId.value());
-              sendData(Kessel, Property::kPROGRAMMSCHALTER, betriebsartId.value());
+              sendData(WPM2, Property::kPROGRAMMSCHALTER, betriebsartId.value());
             }
 
+
+#########################################
+#                                       #
+#   Packages                            #
+#                                       #
+#########################################
 packages:
-  COMMON: !include { file: common.yaml }
+# Time
+  HEATPUMP_DATETIME:             !include { file: wp_datetime.yaml, sensor_name: "Zeitstempel"}
 
-  NHZ1:                     !include { file: wp_binary.yaml, vars: { name: "NHZ1" }}
-  NHZ2:                     !include { file: wp_binary.yaml, vars: { name: "NHZ2" }}
-  NHZ3:                     !include { file: wp_binary.yaml, vars: { name: "NHZ3" }}
-  VERDICHTER:               !include { file: wp_binary.yaml, vars: { name: "VERDICHTER" }}
-  WARMWASSERBEREITUNG:      !include { file: wp_binary.yaml, vars: { name: "WARMWASSERBEREITUNG" }}
-  HEIZKREISPUMPE:           !include { file: wp_binary.yaml, vars: { name: "HEIZKREISPUMPE" }}
-  PUFFERLADEPUMPE:          !include { file: wp_binary.yaml, vars: { name: "PUFFERLADEPUMPE" }}
-  QUELLENPUMPE:             !include { file: wp_binary.yaml, vars: { name: "QUELLENPUMPE" }}
-  KUEHLBETRIEB:             !include { file: wp_binary.yaml, vars: { name: "KUEHLBETRIEB" }}
+# General Info 
+  VERDICHTER_STARTS:             !include { file: wp_generic_combined.yaml, vars: { sensor_name: "Verdichterstarts", scaled_property: "VERDICHTER_STARTS_K", property: "VERDICHTER_STARTS", device_class: "", unit: "", accuracy_decimals: "0", scaler: "1000", icon: "mdi:counter" }}
+  FEHLERMELDUNG:                 !include { file: wp_generic.yaml, vars: { sensor_name: "Fehlermeldung", property: "FEHLERMELDUNG", icon: "mdi:alert-circle" }}
 
-  QUELLE_IST:               !include { file: wp_temperature.yaml, vars: { property: "QUELLE_IST" }}
-  HKISTTEMP:                !include { file: wp_temperature.yaml, vars: { property: "HKISTTEMP" }}
-  PUFFERISTTEMP:            !include { file: wp_temperature.yaml, vars: { property: "PUFFERISTTEMP" }}
-  PUFFERSOLLTEMP:           !include { file: wp_temperature.yaml, vars: { property: "PUFFERSOLLTEMP" }}
-  HKSOLLTEMP:               !include { file: wp_temperature.yaml, vars: { property: "HKSOLLTEMP"     , update_interval: "never" }}
-  HEIZGASTEMP:              !include { file: wp_temperature.yaml, vars: { property: "HEIZGASTEMP"    , update_interval: "${interval_slow}" }}
-  QUELLENTEMP_MIN:          !include { file: wp_temperature.yaml, vars: { property: "QUELLENTEMP_MIN", update_interval: "${interval_slow}" }} 
+# Betriebsstatus
+  HEIZKREISPUMPE:                !include { file: wp_binary.yaml, vars: { sensor_name: "Heizkreispumpe", property: "HEIZKREISPUMPE" }}
+  MISCHER_PUMPE:                 !include { file: wp_binary.yaml, vars: { sensor_name: "Mischer aktiv", property: "MISCHER_PUMPE" }}
+  MISCHER_AUF:                   !include { file: wp_binary.yaml, vars: { sensor_name: "Mischer auf", property: "MISCHER_AUF" }}
+  MISCHER_ZU:                    !include { file: wp_binary.yaml, vars: { sensor_name: "Mischer zu", property: "MISCHER_ZU" }}
+  PUFFERLADEPUMPE:               !include { file: wp_binary.yaml, vars: { sensor_name: "Pufferladepumpe", property: "PUFFERLADEPUMPE" }}
+  NHZ1:                          !include { file: wp_binary.yaml, vars: { sensor_name: "Nachheizregister 1", property: "NHZ1" }}
+  NHZ2:                          !include { file: wp_binary.yaml, vars: { sensor_name: "Nachheizregister 2", property: "NHZ2" }}
+  NHZ3:                          !include { file: wp_binary.yaml, vars: { sensor_name: "Nachheizregister 3", property: "NHZ3" }}
+  ENTLEERUNG_HYD:                !include { file: wp_binary.yaml, vars: { sensor_name: "Entleerung HYD", property: "ENTLEERUNG_HYD" }}
+  WARMWASSERBEREITUNG:           !include { file: wp_binary.yaml, vars: { sensor_name: "Warmwasserbereitung", property: "WARMWASSERBEREITUNG" }}
+  KUEHLBETRIEB:                  !include { file: wp_binary.yaml, vars: { sensor_name: "Kuehlbetrieb", property: "KUEHLBETRIEB" }}
+  VERDICHTER:                    !include { file: wp_binary.yaml, vars: { sensor_name: "Verdichter", property: "VERDICHTER" }}
+  HEIZBETRIEB:                   !include { file: wp_binary.yaml, vars: { sensor_name: "Heizbetrieb", property: "HEIZBETRIEB" }}
+  QUELLENPUMPE:                  !include { file: wp_binary.yaml, vars: { sensor_name: "Quellenpumpe", property: "QUELLENPUMPE" }}
+  # TODO: Sommerbetrieb?
 
-  DRUCK_HEIZKREIS:          !include { file: wp_generic.yaml, vars: { property: "DRUCK_HEIZKREIS"  , unit: "bar"  , icon: "mdi:water-pressure", accuracy_decimals: "1" }}
-  QUELLENDRUCK:             !include { file: wp_generic.yaml, vars: { property: "QUELLENDRUCK"     , unit: "bar"  , icon: "mdi:water-pressure", accuracy_decimals: "1" }}
-  DRUCK_HOCHDRUCK:          !include { file: wp_generic.yaml, vars: { property: "DRUCK_HOCHDRUCK"  , unit: "bar"  , icon: "mdi:water-pressure", accuracy_decimals: "2" }}
-  DRUCK_NIEDERDRUCK:        !include { file: wp_generic.yaml, vars: { property: "DRUCK_NIEDERDRUCK", unit: "bar"  , icon: "mdi:water-pressure", accuracy_decimals: "2" }}
-  VOLUMENSTROM:             !include { file: wp_generic.yaml, vars: { property: "VOLUMENSTROM"     , unit: "l/min", icon: "mdi:flow"          , accuracy_decimals: "1" }}
-  HDSENSORMAX:              !include { file: wp_generic.yaml, vars: { property: "HDSENSORMAX"      , unit: "bar"  , icon: "mdi:water-pressure", accuracy_decimals: "2" }}
-  LEISTUNG_HEIZKREISPUMPE:  !include { file: wp_generic.yaml, vars: { property: "LEISTUNG_HEIZKREISPUMPE" , update_interval: "${interval_once_in_a_while}", unit: "%", icon: "mdi:water-percent", accuracy_decimals: "1" }}
-  LEISTUNG_SOLEPUMPE:       !include { file: wp_generic.yaml, vars: { property: "LEISTUNG_SOLEPUMPE"      , update_interval: "${interval_once_in_a_while}", unit: "%", icon: "mdi:water-percent", accuracy_decimals: "1" }}
-  LEISTUNG_WARMWASSERPUMPE: !include { file: wp_generic.yaml, vars: { property: "LEISTUNG_WARMWASSERPUMPE", update_interval: "${interval_once_in_a_while}", unit: "%", icon: "mdi:water-percent", accuracy_decimals: "1" }}
-  EINPHASIGER_BETRIEB:      !include { file: wp_generic.yaml, vars: { property: "EINPHASIGER_BETRIEB"     , update_interval: "${interval_once_in_a_while}" }}
-  VERDICHTER_STILLSTAND:    !include { file: wp_generic.yaml, vars: { property: "VERDICHTER_STILLSTAND"   , update_interval: "${interval_once_in_a_while}", unit: "min" }}
-  REGLERDYNAMIK:            !include { file: wp_generic.yaml, vars: { property: "REGLERDYNAMIK"           , update_interval: "${interval_once_in_a_while}" }}
-  KUEHLEN_EINGESCHALTET:    !include { file: wp_generic.yaml, vars: { property: "KUEHLEN_EINGESCHALTET"   , update_interval: "${interval_slow}" }}
+
+# Temperatures
+  AUSSENTEMP:                    !include { file: wp_temperature.yaml, vars: { sensor_name: "Aussentemperatur", property: "AUSSENTEMP", update_interval: $interval_medium }}
+  SPEICHERSOLLTEMP:              !include { file: wp_temperature.yaml, vars: { sensor_name: "Speicher Soll Temperatur", property: "SPEICHERSOLLTEMP", update_interval: $interval_medium}}
+  SPEICHERISTTEMP:               !include { file: wp_temperature.yaml, vars: { sensor_name: "Speicher Ist Temperatur", property: "SPEICHERISTTEMP", update_interval: $interval_medium}}
+  RUECKLAUFISTTEMP:              !include { file: wp_temperature.yaml, vars: { sensor_name: "Ruecklauf Ist Temperatur", property: "RUECKLAUFISTTEMP", update_interval: $interval_medium}}
+  VORLAUFISTTEMPWP:              !include { file: wp_temperature.yaml, vars: { sensor_name: "Vorlauf Ist Temperatur WP", property: "VORLAUFISTTEMPWP", update_interval: $interval_medium}}
+  VORLAUFISTTEMPNHZ:             !include { file: wp_temperature.yaml, vars: { sensor_name: "Vorlauf Ist Temperatur NHZ", property: "VORLAUFISTTEMPNHZ", update_interval: $interval_medium, target: "MFG"}}
+  VORLAUFSOLLTEMP:               !include { file: wp_temperature.yaml, vars: { sensor_name: "Vorlauf Soll Temperatur", property: "VORLAUFSOLLTEMP", update_interval: $interval_medium, target: "HK1" }}
+  HKISTTEMP:                     !include { file: wp_temperature.yaml, vars: { sensor_name: "HK Ist Temperatur", property: "HKISTTEMP", update_interval: $interval_medium }}
+
+  HKSOLLTEMP:                    !include { file: wp_temperature.yaml, vars: { sensor_name: "HK Soll Temperatur", property: "HKSOLLTEMP", update_interval: $interval_medium }} 
+  PUFFERISTTEMP:                 !include { file: wp_temperature.yaml, vars: { sensor_name: "Puffer Ist Temperatur", property: "PUFFERISTTEMP", update_interval: $interval_medium }}
+  PUFFERSOLLTEMP:                !include { file: wp_temperature.yaml, vars: { sensor_name: "Puffer Soll Temperatur", property: "PUFFERSOLLTEMP", update_interval: $interval_medium }}
+  QUELLEISTTEMP:                 !include { file: wp_temperature.yaml, vars: { sensor_name: "Quelle Ist Temperatur", property: "QUELLEISTTEMP", update_interval: $interval_medium }}
+  QUELLENTEMP_MIN:               !include { file: wp_temperature.yaml, vars: { sensor_name: "Quelle Temperatur Minimum", property: "QUELLENTEMP_MIN", update_interval: $interval_medium }} 
+  HEIZGASTEMP:                   !include { file: wp_temperature.yaml, vars: { sensor_name: "Heizgastemperatur", property: "HEIZGASTEMP", update_interval: $interval_medium }}
+
+# FEK 
+  # RAUMISTTEMP:                       !include { file: wp_temperature.yaml, vars: { property: "RAUMISTTEMP", target: "HK1" }}
+  # RAUMFEUCHTE:                       !include { file: wp_generic.yaml, vars: { property: "RAUMFEUCHTE", interval: $interval_very_slow, unit: "%", icon: "mdi:water-percent", target: "HK1", accuracy_decimals: "1" }}
+
+# Energy daily
+  EL_ENERGIEAUFNAHME_WW_TAG:     !include { file: wp_daily_energy_combined.yaml, vars: { sensor_name: "El Energieaufnahme Warmwasser Tag", sensor_id: "EL_ENERGIEAUFNAHME_WW_TAG", property_wh: "EL_ENERGIEAUFNAHME_WW_TAG_WH", property_kwh: "EL_ENERGIEAUFNAHME_WW_TAG_KWH"}}
+  EL_ENERGIEAUFNAHME_HEIZ_TAG:   !include { file: wp_daily_energy_combined.yaml, vars: { sensor_name: "El Energieaufnahme Heizen Tag",     sensor_id: "EL_ENERGIEAUFNAHME_HEIZ_TAG", property_wh: "EL_ENERGIEAUFNAHME_HEIZ_TAG_WH", property_kwh: "EL_ENERGIEAUFNAHME_HEIZ_TAG_KWH"}}
+  WAERMEERTRAG_WW_TAG:           !include { file: wp_daily_energy_combined.yaml, vars: { sensor_name: "Wärmeertrag Warmwasser Tag",        sensor_id: "WAERMEERTRAG_WW_TAG",        property_wh: "WAERMEERTRAG_WW_TAG_WH", property_kwh: "WAERMEERTRAG_WW_TAG_KWH"}}
+  WAERMEERTRAG_HEIZ_TAG:         !include { file: wp_daily_energy_combined.yaml, vars: { sensor_name: "Wärmeertrag Heizen Tag",            sensor_id: "WAERMEERTRAG_HEIZ_TAG",      property_wh: "WAERMEERTRAG_HEIZ_TAG_WH", property_kwh: "WAERMEERTRAG_HEIZ_TAG_KWH"}}
+  
+# Energy sum
+  EL_ENERGIEAUFNAHME_WW_SUMME:   !include { file: wp_generic_combined.yaml, vars: { sensor_name: "El Energieaufnahme Warmwasser", sensor_id: "EL_ENERGIEAUFNAHME_WW_SUMME", scaled_property: "EL_ENERGIEAUFNAHME_WW_SUM_KWH",   property: "EL_ENERGIEAUFNAHME_WW_SUM_MWH",   device_class: "energy", unit: "MWh", accuracy_decimals: "3", icon: "mdi:fire" }}
+  EL_ENERGIEAUFNAHME_HEIZ_SUMME: !include { file: wp_generic_combined.yaml, vars: { sensor_name: "El Energieaufnahme Heizen",     sensor_id: "EL_ENERGIEAUFNAHME_HEIZ_SUMME", scaled_property: "EL_ENERGIEAUFNAHME_HEIZ_SUM_KWH", property: "EL_ENERGIEAUFNAHME_HEIZ_SUM_MWH", device_class: "energy", unit: "MWh", accuracy_decimals: "3", icon: "mdi:fire" }}
+  WAERMEERTRAG_WW_SUMME:         !include { file: wp_generic_combined.yaml, vars: { sensor_name: "Wärmeertrag Warmwasser",        sensor_id: "WAERMEERTRAG_WW_SUMME",         scaled_property: "WAERMEERTRAG_WW_SUM_KWH",         property: "WAERMEERTRAG_WW_SUM_MWH",         device_class: "energy", unit: "MWh", accuracy_decimals: "3", icon: "mdi:fire" }}
+  WAERMEERTRAG_HEIZ_SUMME:       !include { file: wp_generic_combined.yaml, vars: { sensor_name: "Wärmeertrag Heizen",            sensor_id: "WAERMEERTRAG_HEIZ_SUMME",       scaled_property: "WAERMEERTRAG_HEIZ_SUM_KWH",      property: "WAERMEERTRAG_HEIZ_SUM_MWH",       device_class: "energy", unit: "MWh", accuracy_decimals: "3", icon: "mdi:fire" }}
+
+# COP
+  COP_WW:                        !include { file: wp_cop.yaml, vars: { sensor_name: "COP Warmwasser", sensor_id: "COP_WW", id_heat_yield: "WAERMEERTRAG_WW_SUMME", id_electrical_energy: "EL_ENERGIEAUFNAHME_WW_SUMME"}}
+  COP_HEIZEN:                    !include { file: wp_cop.yaml, vars: { sensor_name: "COP Heizen", sensor_id: "COP_HEIZEN", id_heat_yield: "WAERMEERTRAG_HEIZ_SUMME", id_electrical_energy: "EL_ENERGIEAUFNAHME_HEIZ_SUMME"}}
+  COP_WW_TAG:                    !include { file: wp_cop.yaml, vars: { sensor_name: "COP Warmwasser Tag", sensor_id: "COP_WW_TAG", id_heat_yield: "WAERMEERTRAG_WW_TAG", id_electrical_energy: "EL_ENERGIEAUFNAHME_WW_TAG", window_size: "48"}}
+  COP_HEIZEN_TAG:                !include { file: wp_cop.yaml, vars: { sensor_name: "COP Heizen Tag", sensor_id: "COP_HEIZEN_TAG", id_heat_yield: "WAERMEERTRAG_HEIZ_TAG", id_electrical_energy: "EL_ENERGIEAUFNAHME_HEIZ_TAG", window_size: "48"}}
+
+# Pressures
+  DRUCK_HEIZKREIS:               !include { file: wp_generic.yaml, vars: { sensor_name: "Druck Heizkreis", property: "DRUCK_HEIZKREIS", unit: "bar", icon: "mdi:water-pressure", accuracy_decimals: "2" }}
+  DRUCK_HOCHDRUCK:               !include { file: wp_generic.yaml, vars: { sensor_name: "Druck Heizkreis max", property: "DRUCK_HOCHDRUCK", unit: "bar", icon: "mdi:water-pressure", accuracy_decimals: "2" }}
+  DRUCK_NIEDERDRUCK:             !include { file: wp_generic.yaml, vars: { sensor_name: "Druck Heizkreis min", property: "DRUCK_NIEDERDRUCK", unit: "bar", icon: "mdi:water-pressure", accuracy_decimals: "2" }}
+  QUELLENDRUCK:                  !include { file: wp_generic.yaml, vars: { sensor_name: "Druck Quelle", property: "QUELLENDRUCK", unit: "bar", icon: "mdi:water-pressure", accuracy_decimals: "2" }}
+  HDSENSORMAX:                   !include { file: wp_generic.yaml, vars: { sensor_name: "Druck Sensor max",  property: "HDSENSORMAX", unit: "bar", icon: "mdi:water-pressure", accuracy_decimals: "2" }}
+        
+# Flows      
+  VOLUMENSTROM:                  !include { file: wp_generic.yaml, vars: { sensor_name: "Volumenstrom", property: "VOLUMENSTROM", unit: "l/min", icon: "mdi:flow", accuracy_decimals: "2" }}
+        
+  # Power      
+  VERSORGUNGSSPANNUNG:           !include { file: wp_generic.yaml, vars: { sensor_name: "Versorgungsspannung", property: "VERSORGUNGSSPANNUNG", unit: "V", icon: "mdi:lightning-bolt", accuracy_decimals: "1", update_interval: "${interval_fast}", target: "MFG"}}
+  STROMAUFNAHME:                 !include { file: wp_generic.yaml, vars: { sensor_name: "Stromaufnahme", property: "STROMAUFNAHME", unit: "A", icon: "mdi:current-ac", accuracy_decimals: "1", update_interval: "${interval_fast}", target: "MFG"}}
+  LEISTUNG_VERDICHTER:           !include { file: wp_power.yaml,   vars: { sensor_name: "Leistung Verdichter", sensor_id: "LEISTUNG_VERDICHTER", id_current: "STROMAUFNAHME", id_voltage: "VERSORGUNGSSPANNUNG", property_current: "STROMAUFNAHME", property_voltage: "VERSORGUNGSSPANNUNG", target: "MFG" }}
+
+
+  # Betriebszeiten      
+  VD_HEIZEN:                     !include { file: wp_generic.yaml, vars: { sensor_name: "Betriebszeit Verdichter Heizen", property: "VD_HEIZEN", update_interval: "${interval_once_in_a_while}" }}
+  VD_WARMWASSER:                 !include { file: wp_generic.yaml, vars: { sensor_name: "Betriebszeit Verdichter Warmwasser", property: "VD_WARMWASSER", update_interval: "${interval_once_in_a_while}" }}
+  KUEHLEN:                       !include { file: wp_generic.yaml, vars: { sensor_name: "Betriebszeit Kuehlen", property: "VD_KUEHLEN", update_interval: "${interval_once_in_a_while}" }}
+  ZEIT_NHZ1:                     !include { file: wp_generic.yaml, vars: { sensor_name: "Betriebszeit Nachheizregister 1", property: "ZEIT_NHZ1", update_interval: "${interval_once_in_a_while}" }}
+  ZEIT_NHZ2:                     !include { file: wp_generic.yaml, vars: { sensor_name: "Betriebszeit Nachheizregister 2", property: "ZEIT_NHZ2", update_interval: "${interval_once_in_a_while}" }}
+  ZEIT_NHZ1_2:                   !include { file: wp_generic.yaml, vars: { sensor_name: "Betriebszeit Nachheizregister 1_2", property: "ZEIT_NHZ1_2", update_interval: "${interval_once_in_a_while}" }}
+
+  # Misc
+  EINPHASIGER_BETRIEB:           !include { file: wp_generic.yaml, vars: { sensor_name: "Einphasiger Betrieb", property: "EINPHASIGER_BETRIEB", update_interval: "${interval_once_in_a_while}" }}
+     
+# Settings      
+  HEIZ_KOMF_TEMP:                !include { file: wp_number.yaml, vars: { sensor_name: "Heizen Komfort Temperatur", property: "KOMF_TEMP", mode: "box", min: "20", max: "60", step: "1", icon: "mdi:valve", target: "HK1" }}
+  HEIZ_ECO_TEMP:                 !include { file: wp_number.yaml, vars: { sensor_name: "Heizen Eco Temperatur", property: "ECO_TEMP", mode: "box", min: "20", max: "60", step: "1", icon: "mdi:valve", target: "HK1" }}
+  WW_KOMF_TEMP:                  !include { file: wp_number.yaml, vars: { sensor_name: "WW Komfort Temperatur", property: "WW_KOMF_TEMP", mode: "box", min: "20", max: "60", step: "1", icon: "mdi:valve", target: "Kessel" }}
+  WW_ECO_TEMP:                   !include { file: wp_number.yaml, vars: { sensor_name: "WW Eco Temperatur", property: "WW_ECO_TEMP", mode: "box", min: "20", max: "60", step: "1", icon: "mdi:valve", target: "Kessel" }}
+     
+  PUMPENLEISTUNG_HEIZKREIS:      !include { file: wp_number.yaml, vars: { sensor_name: "Pumpenleistung Heizkreis", property: "PUMPENLEISTUNG_HEIZKREIS", mode: "box", min: "10", max: "100", step: "5", update_interval: "${interval_once_in_a_while}", unit: "%", icon: "mdi:water-percent", accuracy_decimals: "1" }}
+  PUMPENLEISTUNG_SOLE:           !include { file: wp_number.yaml, vars: { sensor_name: "Pumpenleistung Sole", property: "PUMPENLEISTUNG_SOLE", mode: "box", min: "10", max: "100", step: "5", update_interval: "${interval_once_in_a_while}", unit: "%", icon: "mdi:water-percent", accuracy_decimals: "1" }}
+  PUMPENLEISTUNG_WARMWASSER:     !include { file: wp_number.yaml, vars: { sensor_name: "Pumpenleistung Warmwasser", property: "PUMPENLEISTUNG_WARMWASSER", mode: "box", min: "10", max: "100", step: "5", update_interval: "${interval_once_in_a_while}", unit: "%", icon: "mdi:water-percent", accuracy_decimals: "1" }}
+       
+  VERDICHTER_STILLSTAND:         !include { file: wp_number.yaml, vars: { sensor_name: "Verdichter Stillstand", property: "VERDICHTER_STILLSTAND", mode: "box", min: "10", max: "120", step: "5", update_interval: "${interval_once_in_a_while}", unit: "min" }}
+  REGLERDYNAMIK:                 !include { file: wp_number.yaml, vars: { sensor_name: "Reglerdynamik", property: "REGLERDYNAMIK", mode: "box", min: "0", max: "25",update_interval: "${interval_once_in_a_while}" }}
+  STEIGUNG_HK1:                  !include { file: wp_number.yaml, vars: { sensor_name: "Steigung HK1", property: "STEIGUNG_HK1", mode: "box", icon: "mdi:valve", target: "HK1", min: "0", max: "5.0", step: "0.01"}}
+  RAUMEINFLUSS:                  !include { file: wp_number.yaml, vars: { sensor_name: "Raumeinfluss", property: "RAUMEINFLUSS", mode: "box", target: "HK1" }}
+
+
+# DEBUG 
+  TBD_TEMP_01: !include { file: wp_temperature.yaml, vars: { property: "TBD_TEMP_01", target: "MFG"}}
+  TBD_TEMP_03: !include { file: wp_temperature.yaml, vars: { property: "TBD_TEMP_03", target: "MFG"}}
+ 
+  TBD_02_WPM2: !include { file: wp_debug.yaml, vars: { property: "TBD_02", name_suffix: "WPM2", target: "WPM2"}}
+  TBD_02_MFG:  !include { file: wp_debug.yaml, vars: { property: "TBD_02", name_suffix: "MFG", target: "MFG"}}
+  TBD_04:      !include { file: wp_debug.yaml, vars: { property: "TBD_04", target: "MFG"}}
+  TBD_06_MFG:  !include { file: wp_debug.yaml, vars: { property: "TBD_06", name_suffix: "MFG", target: "MFG"}}
+  TBD_06_WPM2: !include { file: wp_debug.yaml, vars: { property: "TBD_06", name_suffix: "WPM2", target: "WPM2"}}
+  TBD_07_WPM2: !include { file: wp_debug.yaml, vars: { property: "TBD_07", name_suffix: "WPM2", target: "WPM2"}}
+  TBD_07_MFG:  !include { file: wp_debug.yaml, vars: { property: "TBD_07", name_suffix: "MFG", target: "MFG"}}
+  TBD_08_WPM2: !include { file: wp_debug.yaml, vars: { property: "TBD_08", name_suffix: "WPM2", target: "WPM2"}}
+  TBD_08_MFG:  !include { file: wp_debug.yaml, vars: { property: "TBD_08", name_suffix: "MFG", target: "MFG"}}
+  TBD_09:      !include { file: wp_debug.yaml, vars: { property: "TBD_09", target: "Manager"}}
+
+  TBD_10_MFG:  !include { file: wp_debug.yaml, vars: { property: "TBD_10", name_suffix: "MFG", target: "MFG"}}
+  TBD_10_WPM2: !include { file: wp_debug.yaml, vars: { property: "TBD_10", name_suffix: "WPM2", target: "WPM2"}}
+  TBD_10_Manager: !include { file: wp_debug.yaml, vars: { property: "TBD_10", name_suffix: "Manager", target: "Manager"}}
+  TBD_10_Kessel: !include { file: wp_debug.yaml, vars: { property: "TBD_10", name_suffix: "Kessel", target: "Kessel"}}
+
+  TBD_11: !include { file: wp_debug.yaml, vars: { property: "TBD_11", target: "Manager"}}
+  TBD_12: !include { file: wp_debug.yaml, vars: { property: "TBD_12", target: "WPM2"}} # also Manager?
+  TBD_13: !include { file: wp_debug.yaml, vars: { property: "TBD_13", target: "WPM2"}}
+  TBD_15: !include { file: wp_debug.yaml, vars: { property: "TBD_15", target: "Kessel"}}
+  TBD_16: !include { file: wp_debug.yaml, vars: { property: "TBD_16", target: "Manager"}}
+  TBD_17: !include { file: wp_debug.yaml, vars: { property: "TBD_17", target: "Kessel"}}
+  TBD_18: !include { file: wp_debug.yaml, vars: { property: "TBD_18", target: "Kessel"}}
+  TBD_19: !include { file: wp_debug.yaml, vars: { property: "TBD_19", target: "MFG"}}
+
+
+#########################################
+#                                       #
+#   Template Update Triggers            #
+#                                       #
+#########################################
+
+# trigger recalculation of LEISTUNG_*, when one of following sensors change
+binary_sensor:
+  - id: !extend HEIZKREISPUMPE
+    on_state:
+      then:
+        - component.update: LEISTUNG_EXT_HEIZKREISPUMPE
+        - component.update: LEISTUNG_SUMME
+
+  - id: !extend HEIZBETRIEB
+    on_state:
+      then:
+        - component.update: LEISTUNG_HEIZEN
+        - component.update: LEISTUNG_SUMME
+
+  - id: !extend WARMWASSERBEREITUNG
+    on_state:
+      then:
+        - component.update: LEISTUNG_WARMWASSERBEREITUNG
+        - component.update: LEISTUNG_SUMME
+
+
+text_sensor:
+# Remove after Sommerbetrieb and Kühlbetrieb were tested
+  - platform: template
+    name: DEBUG_BETRIEB
+    id: DEBUG_BETRIEB
+    entity_category: "diagnostic"
+
+
+#########################################
+#                                       #
+#   Home Assistant Sensors              #
+#                                       #
+#########################################
+# trigger recalculation of LEISTUNG_*, when one of following sensors change
+sensor:
+  - id: !extend LEISTUNG_VERDICHTER
+    on_value:
+      then:
+        - component.update: LEISTUNG_HEIZEN
+        - component.update: LEISTUNG_WARMWASSERBEREITUNG
+        - component.update: LEISTUNG_SUMME
+
+# TODO 
+#   - platform: homeassistant
+#     name: Temperature Sensor From Home Assistant
+#     id: ha_temperature_sensor
+#     entity_id: $entity_room_temperature
+#     on_value:
+#       then:
+#         - lambda: |-
+#             ESP_LOGI("SET", "Updating room temperature to %f", x);
+#             id(gRAUMISTTEMP) = x;
+
+#   - platform: homeassistant
+#     name: Humidity Sensor From Home Assistant
+#     id: ha_humidity_sensor
+#     entity_id: $entity_humidity
+#     on_value:
+#       then:
+#         - lambda: |-
+#             ESP_LOGI("SET", "Updating humidity to %f", x);
+#             id(gRAUMFEUCHTE) = x;
+
+#########################################
+#                                       #
+#   Template Sensors                    #
+#                                       #
+#########################################
+
+  - platform: template
+    name: "Leistung ext. Heizkreispumpe"
+    id: LEISTUNG_EXT_HEIZKREISPUMPE
+    update_interval: never
+    unit_of_measurement: "W"
+    device_class: power
+    state_class: "measurement"
+    lambda: |-
+      return id(HEIZKREISPUMPE).state ? $static_leistung_heizkreispumpe : 0;  // power in watt shown at the pumps display
+
+  - platform: integration
+    name: "Energie ext. Heizkreispumpe"
+    id: ENERGIE_EXT_HEIZKREISPUMPE
+    sensor: LEISTUNG_EXT_HEIZKREISPUMPE
+    time_unit: h
+    unit_of_measurement: "kWh"
+    device_class: energy
+    state_class: "total_increasing"
+    accuracy_decimals: 3
+    filters:
+      - multiply: 0.001
+
+  # corresponding energy is provided by: EL_ENERGIEAUFNAHME_HEIZ_SUMME (wich has a better accuracy)
+  - platform: template
+    name: "Leistung Heizen"
+    id: LEISTUNG_HEIZEN
+    update_interval: never
+    unit_of_measurement: "W"
+    device_class: power
+    state_class: "measurement"
+    lambda: |-
+      return id(LEISTUNG_EXT_HEIZKREISPUMPE).state + id(HEIZBETRIEB).state ? id(LEISTUNG_VERDICHTER).state : 0;
+
+  # corresponding energy is provided by: EL_ENERGIEAUFNAHME_WW_SUMME
+  - platform: template
+    name: "Leistung Warmwasserbereitung"
+    id: LEISTUNG_WARMWASSERBEREITUNG
+    update_interval: never
+    unit_of_measurement: "W"
+    device_class: power
+    state_class: "measurement"
+    lambda: |-
+      return id(WARMWASSERBEREITUNG).state ? id(LEISTUNG_VERDICHTER).state : 0;
+
+  - platform: template
+    name: "Leistung Summe"
+    id: LEISTUNG_SUMME
+    update_interval: never
+    unit_of_measurement: "W"
+    device_class: power
+    state_class: "measurement"
+    lambda: |-
+      return id(LEISTUNG_HEIZEN).state + id(LEISTUNG_WARMWASSERBEREITUNG).state;
+
+  - platform: template
+    name: "Energie Summe"
+    id: ENERGIE_SUMME
+    unit_of_measurement: "Wh"
+    device_class: energy
+    state_class: "total_increasing"
+    # use (estimated) Heizkreizpumpe and add EL_ENERGIEAUFNAHME_HEIZ_SUMME and EL_ENERGIEAUFNAHME_WW_SUMME for higher accuracy
+    lambda: |-
+      return id(ENERGIE_EXT_HEIZKREISPUMPE).state + id(EL_ENERGIEAUFNAHME_HEIZ_SUMME).state + id(EL_ENERGIEAUFNAHME_WW_SUMME).state;
+
+
+
+#########################################
+#                                       #
+#   Home Assistant Actions              #
+#                                       #
+#########################################
+api:
+  actions:
+    - action: can_send_raw_data
+      variables:
+        data: int[]
+      then:
+        - lambda: |-
+            if(data.size() != 7U) {
+              ESP_LOGE("ACTION", "Data is expected to have 7 elements, but has %zd .", data.size());
+              return;
+            }
+            ESP_LOGI("ACTION", "Sending data (0x%02x 0x%02x 0x%02x 0x%02x 0x%02x 0x%02x 0x%02x)", data[0], data[1], data[2], data[3], data[4], data[5], data[6]);
+            const auto use_extended_id{false};
+            std::vector<std::uint8_t> payload;
+            payload.resize(data.size());
+            std::transform(data.begin(),data.end(),payload.begin(),[](const auto in){ return static_cast<std::uint8_t>(in);});
+            id(wp_can).send_data(ESPClient.canId, use_extended_id, payload);
+    - action: can_send_value
+      variables:
+        property: int
+        target: string
+        raw_value: int
+      then:
+        - lambda: |-
+            Property mappedProperty(static_cast<std::uint16_t>(property));
+            const auto value{static_cast<std::uint16_t>(raw_value)};
+            if(const auto member = getCanMemberByName(target); member.has_value()) {
+              ESP_LOGI("ACTION", "Sending value %d for property %s (0x%04x) to %s", value, std::string(mappedProperty.name).c_str(), mappedProperty.id, target.c_str());
+              sendData(member.value(), mappedProperty, value);
+            } else {
+              ESP_LOGI("ACTION","No CanMember with name %s defined!", target.c_str());
+            }
+
+
+#########################################
+#                                       #
+#   CANbus configuration                #
+#                                       #
+#########################################
+canbus:
+  - id: wp_can
+    can_id: $espclient_can_id
+    use_extended_id: false
+    bit_rate: 20kbps
+    on_frame:
+    - can_id: 0
+      can_id_mask: 0
+      then:
+        - lambda: |-
+            const auto fromCanMember = getCanMemberByCanId(can_id);
+            ESP_LOGV("CAN", "Can message received from CANId 0x%04lx (%s)", can_id, fromCanMember ? fromCanMember->get().name.c_str() : "unknown member");
+
+            if(fromCanMember) { // only process message, from known CAN members
+              const auto [property, value] = processCanMessage(can_id, x);
+              auto callback = CallbackHandler::instance().getCallback(std::make_pair(fromCanMember->get(),property));
+              callback(value);
+            } else {
+              ESP_LOGW("CAN", "Ignoring message, because no CAN member with CANId 0x%04lx is known.", can_id);
+            }

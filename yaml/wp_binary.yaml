@@ -1,5 +1,8 @@
+defaults:
+  sensor_name: "${property}"
+
 binary_sensor:
   - platform: template
-    name: ${name}
-    id: ${name}
+    name: ${sensor_name}
+    id: ${property}
     trigger_on_initial_state: true

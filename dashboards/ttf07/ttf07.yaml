@@ -1,0 +1,157 @@
+views:
+  - title: Home
+    sections:
+      - type: grid
+        cards:
+          - type: heading
+            heading: Betriebszustand
+            heading_style: title
+          - type: entities
+            entities:
+              - entity: binary_sensor.heatpump_heizkreispumpe
+              - entity: binary_sensor.heatpump_verdichter
+              - entity: binary_sensor.heatpump_quellenpumpe
+              - entity: binary_sensor.heatpump_pufferladepumpe
+              - entity: binary_sensor.heatpump_heizbetrieb
+              - entity: binary_sensor.heatpump_warmwasserbereitung
+              - entity: binary_sensor.heatpump_kuehlbetrieb
+              - entity: binary_sensor.heatpump_mischer_aktiv
+              - entity: binary_sensor.heatpump_mischer_zu
+              - entity: binary_sensor.heatpump_mischer_auf
+              - entity: sensor.heatpump_debug_betrieb
+          - type: history-graph
+            entities:
+              - entity: binary_sensor.heatpump_heizkreispumpe
+              - entity: binary_sensor.heatpump_warmwasserbereitung
+              - entity: binary_sensor.heatpump_heizbetrieb
+              - entity: binary_sensor.heatpump_kuehlbetrieb
+              - entity: binary_sensor.heatpump_verdichter
+              - entity: binary_sensor.heatpump_quellenpumpe
+              - entity: binary_sensor.heatpump_pufferladepumpe
+      - type: grid
+        cards:
+          - type: heading
+            heading: Momentanleistung
+            heading_style: title
+          - type: entities
+            entities:
+              - entity: sensor.heatpump_leistung_ext_heizkreispumpe
+              - entity: sensor.heatpump_leistung_verdichter
+              - entity: sensor.heatpump_leistung_heizen
+              - entity: sensor.heatpump_leistung_warmwasserbereitung
+              - entity: sensor.heatpump_leistung_summe
+              - entity: sensor.heatpump_versorgungsspannung
+              - entity: sensor.heatpump_stromaufnahme
+      - type: grid
+        cards:
+          - type: heading
+            heading: Energie
+            heading_style: title
+          - type: entities
+            entities:
+              - entity: sensor.heatpump_warmeertrag_heizen_tag
+              - entity: sensor.heatpump_el_energieaufnahme_heizen_tag
+              - entity: sensor.heatpump_cop_heizen_tag
+              - entity: sensor.heatpump_warmeertrag_heizen
+              - entity: sensor.heatpump_el_energieaufnahme_heizen
+              - entity: sensor.heatpump_cop_heizen
+            title: Heizen
+          - type: entities
+            entities:
+              - entity: sensor.heatpump_warmeertrag_warmwasser_tag
+              - entity: sensor.heatpump_el_energieaufnahme_warmwasser_tag
+              - entity: sensor.heatpump_cop_warmwasser_tag
+              - entity: sensor.heatpump_warmeertrag_warmwasser
+              - entity: sensor.heatpump_el_energieaufnahme_warmwasser
+              - entity: sensor.heatpump_cop_warmwasser
+            title: Warmwasser
+      - type: grid
+        cards:
+          - type: heading
+            heading: Temperaturen
+            heading_style: title
+          - chart_type: line
+            period: 5minute
+            type: statistics-graph
+            entities:
+              - sensor.heatpump_vorlauf_soll_temperatur
+              - sensor.heatpump_vorlauf_ist_temperatur_nhz
+              - sensor.heatpump_vorlauf_ist_temperatur_wp
+              - sensor.heatpump_ruecklauf_ist_temperatur
+            stat_types:
+              - mean
+            days_to_show: 2
+            title: Vor- und Rücklauf
+          - chart_type: line
+            period: 5minute
+            type: statistics-graph
+            entities:
+              - sensor.heatpump_hk_ist_temperatur
+              - sensor.heatpump_hk_soll_temperatur
+            stat_types:
+              - mean
+            days_to_show: 1
+            title: Heizkreis
+          - chart_type: line
+            period: 5minute
+            type: statistics-graph
+            entities:
+              - sensor.heatpump_speicher_ist_temperatur
+              - sensor.heatpump_speicher_soll_temperatur
+            stat_types:
+              - mean
+            title: Warmwasserspeicher
+      - type: grid
+        cards:
+          - type: heading
+            heading: New section
+          - type: entities
+            entities:
+              - entity: sensor.heatpump_verdichterstarts
+              - entity: sensor.heatpump_fehlermeldung
+              - entity: sensor.heatpump_betriebszeit_verdichter_heizen
+              - entity: sensor.heatpump_betriebszeit_kuehlen
+              - entity: sensor.heatpump_betriebszeit_verdichter_warmwasser
+              - entity: sensor.heatpump_betriebszeit_nachheizregister_1
+              - entity: sensor.heatpump_betriebszeit_nachheizregister_2
+              - entity: sensor.heatpump_betriebszeit_nachheizregister_1_2
+      - type: grid
+        cards:
+          - type: heading
+            heading: Temperaturen
+            heading_style: title
+          - type: entities
+            entities:
+              - entity: select.heatpump_programmschalter
+              - entity: number.heatpump_heizen_komfort_temperatur
+              - entity: number.heatpump_ww_komfort_temperatur
+              - entity: number.heatpump_heizen_eco_temperatur
+              - entity: number.heatpump_heizen_komfort_temperatur
+      - type: grid
+        cards:
+          - type: heading
+            heading: Einstellungen
+            heading_style: title
+          - type: entities
+            entities:
+              - entity: number.heatpump_reglerdynamik
+              - entity: number.heatpump_verdichter_stillstand
+              - entity: number.heatpump_raumeinfluss
+              - entity: number.heatpump_steigung_hk1
+              - entity: number.heatpump_pumpenleistung_heizkreis
+              - entity: number.heatpump_pumpenleistung_sole
+              - entity: number.heatpump_pumpenleistung_warmwasser
+              - entity: number.heatpump_raumeinfluss
+    badges:
+      - type: entity
+        entity: sensor.heatpump_aussentemperatur
+      - type: entity
+        entity: sensor.temperatur_haus_mittel
+      - type: entity
+        entity: sensor.thermometer_flur_og_temperatur
+      - type: entity
+        entity: sensor.thermometer_bad_og_temperatur
+      - type: entity
+        entity: sensor.thermometer_wohnzimmer_temperatur
+      - type: entity
+        entity: sensor.thermometer_arbeitszimmer_temperatur

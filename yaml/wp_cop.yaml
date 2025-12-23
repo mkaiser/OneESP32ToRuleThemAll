@@ -1,0 +1,51 @@
+# mandatory inputs:
+# sensor_name
+# sensor_id
+# id_heat_yield
+# id_electrical_energy
+# window_size
+
+
+defaults:
+  accuracy_decimals: "2"
+  window_size : "1"   # choose 1 for total COP or values like 24 for daily COP
+
+sensor:
+  - platform: template
+    name: "${sensor_name}"
+    id: ${sensor_id}
+    state_class: "measurement"
+    accuracy_decimals: ${accuracy_decimals}
+    update_interval: never # Event-driven 
+    filters:
+      - median:
+          window_size: ${window_size} 
+    lambda: |-
+      if (id(${id_heat_yield}).has_state() && id(${id_electrical_energy}).has_state()) {
+        // sensors are available / have a valid state
+
+        const float heat_yield = id(${id_heat_yield}).state;
+        const float electrical_energy = id(${id_electrical_energy}).state;
+
+        // Don't use the values if they are zero (invalid value / don't divide by zero)
+        if (heat_yield != 0.0f && electrical_energy != 0.0f) {
+          return heat_yield / electrical_energy;
+        }
+      }
+
+      // Data invalid or unchanged: don't update the sensor.
+      return {};
+
+
+  # Trigger recalculation whenever one of the inputs updates.
+  - platform: template
+    id: !extend ${id_heat_yield}
+    on_value:
+      then:
+        - component.update: ${sensor_id}
+
+  - platform: template
+    id: !extend ${id_electrical_energy}
+    on_value:
+      then:
+        - component.update: ${sensor_id}

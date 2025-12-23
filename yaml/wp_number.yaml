@@ -5,12 +5,15 @@ defaults:
   max: "100"
   icon: "mdi:valve"
   unit: ""
+  mode: "slider"  # select between "auto", "slider", "box"+
+  sensor_name: "${property}"
 
 number:
   - platform: template
-    name: ${property}
+    name: ${sensor_name}
     id: ${property}
     icon: ${icon}
+    mode: ${mode}
     unit_of_measurement: ${unit}
     min_value: ${min}
     max_value: ${max}

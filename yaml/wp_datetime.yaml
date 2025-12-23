@@ -1,3 +1,6 @@
+defaults:
+  sensor_name: "HEATPUMP_DATETIME"
+
 esphome:
   on_boot:
     priority: 100.0 # AFTER_CONNECTION
@@ -54,6 +57,6 @@ esphome:
 
 text_sensor:
   - platform: template
-    name: "HEATPUMP_DATETIME"
+    name: ${sensor_name}
     id: HEATPUMP_DATETIME
     update_interval: never

@@ -1,0 +1,43 @@
+# Generic event-driven power sensor that multiplies a current and a voltage sensor.
+#
+# Typical use:
+# LEISTUNG_VERDICHTER:           !include { file: wp_power.yaml, vars: { sensor_name: "Leistung Verdichter", sensor_id: "LEISTUNG_VERDICHTER", id_current: "STROMAUFNAHME", id_voltage: "VERSORGUNGSSPANNUNG", property_current: "STROMAUFNAHME", property_voltage: "VERSORGUNGSSPANNUNG", target: "MFG" }}
+#
+
+# Mandatory vars:
+# - sensor_name
+# - sensor_id
+# - id_current
+# - id_voltage
+# - target
+# - property_current
+# - property_voltage
+
+defaults:
+
+  unit: "W"
+  update_interval: never
+
+sensor:
+  - platform: template
+    name: ${sensor_name}
+    id: ${sensor_id}
+    update_interval: ${update_interval} #never update time-based, callbacks for event-driven updatesare defined below
+    unit_of_measurement: ${unit}
+    device_class: power
+    state_class: "measurement"
+    lambda: |-
+      return id(${id_current}).state * id(${id_voltage}).state;
+
+esphome:
+  on_boot:
+    priority: 100.0 # AFTER_CONNECTION
+    then:
+      - lambda: |-
+          // Recalculate power whenever one of the inputs updates.
+          CallbackHandler::instance().addCallback(std::make_pair(${target}, Property::k${property_current}), [](const SimpleVariant&) {
+            id(${sensor_id}).update();
+          });
+          CallbackHandler::instance().addCallback(std::make_pair(${target}, Property::k${property_voltage}), [](const SimpleVariant&) {
+            id(${sensor_id}).update();
+          });

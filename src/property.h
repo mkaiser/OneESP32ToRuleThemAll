@@ -186,36 +186,67 @@ struct Property : public oe32trta::detail::Property {
 #endif
 
 #if defined(TTF_07_C)
-    PROPERTY(WW_KOMF_TEMP, 0x0013, Type::et_dec_val);
+    PROPERTY(KOMF_TEMP, 0x0005, Type::et_dec_val);  
+    PROPERTY(ECO_TEMP, 0x0008, Type::et_dec_val); 
+    PROPERTY(WW_KOMF_TEMP, 0x0013, Type::et_dec_val); 
     PROPERTY(WW_HYSTERESE, 0x0022, Type::et_dec_val);
     PROPERTY(PUFFERISTTEMP, 0x0078, Type::et_dec_val);
-    PROPERTY(QUELLE_IST, 0x01d4, Type::et_dec_val);
+    PROPERTY(QUELLEISTTEMP, 0x01d4, Type::et_dec_val);
     PROPERTY(PUFFERSOLLTEMP, 0x01d5, Type::et_dec_val);
     PROPERTY(MAXVORLAUFTEMP, 0x01e8, Type::et_dec_val);
     PROPERTY(HKSOLLTEMP, 0x01d7, Type::et_dec_val);
     PROPERTY(HDSENSORMAX, 0x01a2, Type::et_dec_val);
     PROPERTY(QUELLENTEMP_MIN, 0x01b0, Type::et_dec_val);
+    PROPERTY(ZEIT_NHZ1, 0x0259, Type::et_default); 
+    PROPERTY(ZEIT_NHZ2, 0x025A, Type::et_default);     
     PROPERTY(HEIZGASTEMP, 0x0265, Type::et_dec_val);
-    PROPERTY(DRUCK_HOCHDRUCK, 0x0268, Type::et_dec_val);
+    PROPERTY(DRUCK_HOCHDRUCK, 0x0268, Type::et_cent_val);
     PROPERTY(HKISTTEMP, 0x02ca, Type::et_dec_val);
     PROPERTY(VOLUMENSTROM, 0x0673, Type::et_cent_val);
     PROPERTY(DRUCK_HEIZKREIS, 0x0674, Type::et_cent_val);
     PROPERTY(QUELLENDRUCK, 0x0675, Type::et_cent_val);
-    PROPERTY(VORLAUFISTTEMP, 0x06a1, Type::et_dec_val);
+    PROPERTY(VORLAUFISTTEMPWP, 0x06a1, Type::et_dec_val);
     PROPERTY(KUEHLEN_EINGESCHALTET, 0x06Aa, Type::et_little_bool);
-    PROPERTY(LEISTUNG_HEIZKREISPUMPE, 0x070a, Type::et_byte);
-    PROPERTY(LEISTUNG_WARMWASSERPUMPE, 0x070b, Type::et_byte);
-    PROPERTY(LEISTUNG_SOLEPUMPE, 0x070c, Type::et_byte);
+    PROPERTY(PUMPENLEISTUNG_HEIZKREIS, 0x070a, Type::et_byte);
+    PROPERTY(PUMPENLEISTUNG_WARMWASSER, 0x070b, Type::et_byte);
+    PROPERTY(PUMPENLEISTUNG_SOLE, 0x070c, Type::et_byte);
     PROPERTY(EINPHASIGER_BETRIEB, 0x070e, Type::et_bool);
     PROPERTY(VERDICHTER_STARTS, 0x071d);
     PROPERTY(VERDICHTER_STARTS_K, 0x071c);
-    PROPERTY(DRUCK_NIEDERDRUCK, 0x07a5, Type::et_dec_val);
+    PROPERTY(DRUCK_NIEDERDRUCK, 0x07a5, Type::et_cent_val);
+    PROPERTY(VD_HEIZEN, 0x07FC, Type::et_default); 
+    PROPERTY(VD_KUEHLEN, 0x07FF, Type::et_default); 
+    PROPERTY(VD_WARMWASSER, 0x0802, Type::et_default); 
+    PROPERTY(ZEIT_NHZ1_2, 0x0805, Type::et_default);      
     PROPERTY(ANLAGENFROST, 0x0a00, Type::et_dec_val);
-    PROPERTY(BETRIEBS_STATUS, 0x0a20, Type::et_default);
     PROPERTY(WW_ECO_TEMP, 0x0a06, Type::et_dec_val);
+    PROPERTY(BETRIEBS_STATUS_alt, 0x0a20, Type::et_default);
+    PROPERTY(BETRIEBS_STATUS, 0x4E5E, Type::et_default); // from WPM2
     PROPERTY(QUELLENMEDIUM, 0xfdae, Type::et_byte);
     PROPERTY(REGLERDYNAMIK, 0xfdb0, Type::et_little_endian);
     PROPERTY(VERDICHTER_STILLSTAND, 0xfdb1, Type::et_little_endian);
+    PROPERTY(VORLAUFISTTEMPNHZ, 0xFDF5, Type::et_dec_val);// MFG
+    PROPERTY(VERSORGUNGSSPANNUNG, 0xFE0A, Type::et_default);  
+    PROPERTY(STROMAUFNAHME, 0xFE07, Type::et_dec_val);// from MFG
+
+    // TODO figure out what these are doing (transmitted frequently)
+    PROPERTY(TBD_TEMP_01, 0xfdf3, Type::et_dec_val); // MFG
+    PROPERTY(TBD_TEMP_03, 0xFE09, Type::et_dec_val); // from MFG
+    PROPERTY(TBD_02, 0xFE1C, Type::et_default); // from WPM2
+    PROPERTY(TBD_04, 0xFE4C, Type::et_default); // from MFG
+    PROPERTY(TBD_06, 0xFE1D, Type::et_default); // from WPM2 and MFG
+    PROPERTY(TBD_07, 0xFE1E, Type::et_default); // from WPM2
+    PROPERTY(TBD_08, 0xFE1B, Type::et_default); // WPM2 and MFG
+    PROPERTY(TBD_09, 0x06AF, Type::et_default); // from CAN_TBD
+    PROPERTY(TBD_10, 0x00FE, Type::et_default); // from Kessel and WPM2 
+    PROPERTY(TBD_11, 0x4E8B, Type::et_default); // from  CAN_TBD
+    PROPERTY(TBD_12, 0x1388, Type::et_default); // from CAN_TBD
+    PROPERTY(TBD_13, 0x080E, Type::et_default); // from WPM2
+    PROPERTY(TBD_15, 0x019a, Type::et_default); // from Kessel
+    PROPERTY(TBD_16, 0x067A, Type::et_default); // from CAN_TBD
+    PROPERTY(TBD_17, 0x01C0, Type::et_default); // from Kessel
+    PROPERTY(TBD_18, 0x068F, Type::et_default); // from Kessel
+    PROPERTY(TBD_19, 0xFDF4, Type::et_default); // from MFG
 #endif
 
 #if defined(WPL_13)

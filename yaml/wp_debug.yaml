@@ -1,0 +1,38 @@
+defaults:
+  icon: "mdi:blank"
+  accuracy_decimals: "0"
+  target: ""
+  unit: ""
+  name_suffix: ""
+  listen_only: true
+  extra_text_sensor: false
+  update_interval : "never"
+
+sensor:
+  - platform: template
+    name: ${property}${name_suffix}
+    id: ${property}${name_suffix}
+    icon: ${icon}
+    unit_of_measurement: ${unit}
+    update_interval: ${update_interval}
+    state_class: "measurement"
+    entity_category: "diagnostic"
+
+
+
+esphome:
+  on_boot:
+    priority: 100.0 # AFTER_CONNECTION
+    then:
+      - lambda: |-
+          CallbackHandler::instance().addCallback(std::make_pair(${target},Property::k${property}),[](const SimpleVariant& value){
+              id(${property}${name_suffix}).publish_state(value);
+          });
+          
+          // only request if not listen only
+          const auto listen_only_str = std::string{"${listen_only}"};
+          const bool listen_only = (listen_only_str == "true" || listen_only_str == "True" || listen_only_str == "1");
+            
+          if (!listen_only) {
+            queueRequest(${target}, Property::k${property});
+          }

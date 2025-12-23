@@ -28,18 +28,19 @@ static const CanMember Manager{MANAGER_ID, "Manager"};
 static const CanMember Kessel{KESSEL_ID, "Kessel"};
 static const CanMember HK1{HK1_ID, "HK1"};
 static const CanMember HK2{HK2_ID, "HK2"};
-static const CanMember FET{0x402, "FET"};    // TODO: make configurable and double check
-static const CanMember MFG{0x700, "MFG"};    // TODO: make configurable and double check
-static const CanMember WPM2{0x480, "WPM2"};  // TODO: make configurable and double check
+static const CanMember FET{0x402, "FET"};          // TODO: make configurable and double check
+static const CanMember MFG{0x700, "MFG"};          // TODO: make configurable and double check
+static const CanMember WPM2{0x480, "WPM2"};        // TODO: make configurable and double check
+static const CanMember CAN_TBD{0x601, "CAN_TBD"};  // TODO: this pops up several times for TTF07
 
-static const std::vector<std::reference_wrapper<const CanMember>> canMembers{Kessel,    HK1, HK2, Manager,
-                                                                             ESPClient, FET, MFG, WPM2};
+static const std::vector<std::reference_wrapper<const CanMember>> canMembers{Kessel, HK1, HK2,  Manager, ESPClient,
+                                                                             FET,    MFG, WPM2, CAN_TBD};
 
 using Request = std::pair<const CanMember, const Property>;
 struct ConditionalRequest {
-    ConditionalRequest(Request request) : _request(request){};
+    ConditionalRequest(Request request) : _request(request) {};
     ConditionalRequest(Request request, std::function<bool()> condition)
-        : _request(request), _condition(std::move(condition)){};
+        : _request(request), _condition(std::move(condition)) {};
 
     Request _request;
     std::function<bool()> _condition = []() {
@@ -185,7 +186,7 @@ void scheduleRequest(const CanMember& member, const Property& property, std::chr
  *        be converted to the correct type automatically, based the type that was defined for this
  *        entity in \c property.h
  */
-std::pair<Property, SimpleVariant> processCanMessage(const std::vector<std::uint8_t>& msg) {
+std::pair<Property, SimpleVariant> processCanMessage(const uint16_t fromCanId, const std::vector<std::uint8_t>& msg) {
     Property property{Property::kINDEX_NOT_FOUND};
     std::uint8_t byte1{0U};
     std::uint8_t byte2{0U};
@@ -207,16 +208,28 @@ std::pair<Property, SimpleVariant> processCanMessage(const std::vector<std::uint
 
     const auto value{static_cast<std::uint16_t>((byte1 << 8U) | byte2)};
     const auto canId{static_cast<std::uint16_t>(((msg[0U] & 0xfc) << 3) | (msg[1U] & 0x3f))};
+
+    const auto canMember = getCanMemberByCanId(canId);
+    const auto fromCanMember = getCanMemberByCanId(fromCanId);
+
+    // Build the full message string
+    std::ostringstream oss;
+    oss << "Message received from CanId 0x" << std::hex << std::uppercase << std::setfill('0') << std::setw(3)
+        << fromCanId << " (" << (fromCanMember ? fromCanMember->get().name : "unknown member") << ")"
+        << " Read/Write ID 0x" << std::setw(2) << static_cast<unsigned>(msg[0U]) << " 0x" << std::setw(2)
+        << static_cast<unsigned>(msg[1U]) << " (0x" << std::setw(3) << canId << ", "
+        << (canMember ? canMember->get().name.c_str() : "unknown member") << ") for property "
+        << std::string(property.name) << " (0x" << std::setw(4) << property.id << ") with raw value: " << std::dec
+        << value << std::hex << " (0x" << std::setw(4) << value << ")" << std::dec;
+
+    const std::string log_msg = oss.str();
+
     if (isRequest(msg)) {
-        ESP_LOGD("Communication", "Message is a request. Dropping it!");
-        ESP_LOGD("Communication",
-                 "Message received: Read/Write ID 0x%02x 0x%02x(0x%03x) for property %s (0x%04x) with raw value: %d",
-                 msg[0U], msg[1U], canId, std::string(property.name).c_str(), property.id, value);
+        ESP_LOGV("Communication", "Message is a request. Dropping it! message: %s", log_msg.c_str());
         return {Property::kINDEX_NOT_FOUND, value};
     }
-    ESP_LOGI("Communication",
-             "Message received: Read/Write ID 0x%02x 0x%02x(0x%03x) for property %s (0x%04x) with raw value: %d",
-             msg[0U], msg[1U], canId, std::string(property.name).c_str(), property.id, value);
+
+    ESP_LOGD("Communication", "%s", log_msg.c_str());
     return {property, GetValueByType(value, property.type)};
 }
 

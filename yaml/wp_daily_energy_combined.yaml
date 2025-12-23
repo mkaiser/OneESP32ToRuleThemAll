@@ -2,6 +2,8 @@ defaults:
   icon: "mdi:lightning-bolt"
   accuracy_decimals: "2"
   target: "Kessel"
+  # Defaults to sensor_name for backwards compatibility.
+  sensor_id: ${sensor_name}
 
 globals:
   - id: gOFFSET_${property_wh}
@@ -24,7 +26,7 @@ sensor:
 
   - platform: template
     name: ${sensor_name}
-    id: ${sensor_name}
+    id: ${sensor_id}
     unit_of_measurement: "kWh"
     icon: ${icon}
     accuracy_decimals: ${accuracy_decimals}
@@ -42,7 +44,7 @@ esphome:
             id(${property_wh}).publish_state(value.get<std::uint16_t>());
           });
           CallbackHandler::instance().addCallback(std::make_pair(${target},Property::k${property_kwh}),[](const SimpleVariant& value){
-            id(${sensor_name}).publish_state(value.get<std::uint16_t>() + id(${property_wh}).state);
+            id(${sensor_id}).publish_state(value.get<std::uint16_t>() + id(${property_wh}).state);
           });
           // initial queueing of the Wh and kWh value
           queueRequest(${target}, Property::k${property_wh});
@@ -68,5 +70,5 @@ time:
               // set the current Wh value as offset for the next day and convert Wh to kWh
               id(gOFFSET_${property_wh}) = id(${property_wh}).raw_state * 0.001;
           - sensor.template.publish:
-              id: ${sensor_name}
+              id: ${sensor_id}
               state: 0.0

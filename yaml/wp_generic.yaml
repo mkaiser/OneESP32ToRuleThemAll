@@ -6,10 +6,11 @@ defaults:
   unit: ""
   scaler: "1.0"
   name_suffix: ""
+  sensor_name: "${property}${name_suffix}"
 
 sensor:
   - platform: template
-    name: ${property}${name_suffix}
+    name: ${sensor_name}
     id: ${property}${name_suffix}
     icon: ${icon}
     unit_of_measurement: ${unit}
