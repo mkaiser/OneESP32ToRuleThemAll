@@ -37,8 +37,8 @@
 # ToDo / open issues
 # - Create nice thermostats. Challenge: 
 #   There are basically two modes: ECO and Komfort. Each has its own setpoint for heating and hot water. The same for HK1 temperature
-#   I usually just have the heatpump in ECO mode and control the ECO temperatures. !env_var 
-#   If we have two thermostats, which can both switch between Eco and komfort, this will affect the other thermostate as well. 
+#   I usually just have the heatpump in ECO mode and control the ECO temperatures.
+#   If we have two thermostats, which can both switch between Eco and komfort, this will affect the other thermostat as well. 
 #
 # - naming: Is NHZ3 actually NHZ1_2?
 # - Kühlen was not tested, yet (its currently winter...)
@@ -315,10 +315,10 @@ packages:
   EINPHASIGER_BETRIEB:           !include { file: wp_generic.yaml, vars: { sensor_name: "Einphasiger Betrieb", property: "EINPHASIGER_BETRIEB", update_interval: "${interval_once_in_a_while}" }}
      
 # Settings      
-  HEIZ_KOMF_TEMP:                !include { file: wp_number.yaml, vars: { sensor_name: "Heizen Komfort Temperatur", property: "KOMF_TEMP", mode: "box", min: "20", max: "60", step: "1", icon: "mdi:valve", target: "HK1" }}
-  HEIZ_ECO_TEMP:                 !include { file: wp_number.yaml, vars: { sensor_name: "Heizen Eco Temperatur", property: "ECO_TEMP", mode: "box", min: "20", max: "60", step: "1", icon: "mdi:valve", target: "HK1" }}
-  WW_KOMF_TEMP:                  !include { file: wp_number.yaml, vars: { sensor_name: "WW Komfort Temperatur", property: "WW_KOMF_TEMP", mode: "box", min: "20", max: "60", step: "1", icon: "mdi:valve", target: "Kessel" }}
-  WW_ECO_TEMP:                   !include { file: wp_number.yaml, vars: { sensor_name: "WW Eco Temperatur", property: "WW_ECO_TEMP", mode: "box", min: "20", max: "60", step: "1", icon: "mdi:valve", target: "Kessel" }}
+  HEIZ_KOMF_TEMP:                !include { file: wp_number.yaml, vars: { sensor_name: "Heizen Komfort Temperatur", property: "KOMF_TEMP", mode: "box", min: "20", max: "60", step: "0.5", icon: "mdi:valve", target: "HK1" }}
+  HEIZ_ECO_TEMP:                 !include { file: wp_number.yaml, vars: { sensor_name: "Heizen Eco Temperatur", property: "ECO_TEMP", mode: "box", min: "20", max: "60", step: "0.5", icon: "mdi:valve", target: "HK1" }}
+  WW_KOMF_TEMP:                  !include { file: wp_number.yaml, vars: { sensor_name: "WW Komfort Temperatur", property: "WW_KOMF_TEMP", mode: "box", min: "20", max: "60", step: "0.51", icon: "mdi:valve", target: "Kessel" }}
+  WW_ECO_TEMP:                   !include { file: wp_number.yaml, vars: { sensor_name: "WW Eco Temperatur", property: "WW_ECO_TEMP", mode: "box", min: "20", max: "60", step: "0.5", icon: "mdi:valve", target: "Kessel" }}
      
   PUMPENLEISTUNG_HEIZKREIS:      !include { file: wp_number.yaml, vars: { sensor_name: "Pumpenleistung Heizkreis", property: "PUMPENLEISTUNG_HEIZKREIS", mode: "box", min: "10", max: "100", step: "5", update_interval: "${interval_once_in_a_while}", unit: "%", icon: "mdi:water-percent", accuracy_decimals: "1" }}
   PUMPENLEISTUNG_SOLE:           !include { file: wp_number.yaml, vars: { sensor_name: "Pumpenleistung Sole", property: "PUMPENLEISTUNG_SOLE", mode: "box", min: "10", max: "100", step: "5", update_interval: "${interval_once_in_a_while}", unit: "%", icon: "mdi:water-percent", accuracy_decimals: "1" }}
@@ -466,8 +466,9 @@ sensor:
     unit_of_measurement: "W"
     device_class: power
     state_class: "measurement"
+    # Heizbetriebs means that the verdichter is running. It can be either Warmwasser or Heizen.
     lambda: |-
-      return id(LEISTUNG_EXT_HEIZKREISPUMPE).state + id(HEIZBETRIEB).state ? id(LEISTUNG_VERDICHTER).state : 0;
+      return id(LEISTUNG_EXT_HEIZKREISPUMPE).state + ( id(HEIZBETRIEB).state & !id(WARMWASSERBEREITUNG).state ) ? id(LEISTUNG_VERDICHTER).state : 0;
 
   # corresponding energy is provided by: EL_ENERGIEAUFNAHME_WW_SUMME
   - platform: template
