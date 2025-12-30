@@ -51,6 +51,9 @@ substitutions:
   hk2_can_id: "0x302"   # unused in TTF07C
   manager_can_id: "0x100"
   espclient_can_id: "0x680"
+  # WPM2: 0480
+  # MFG: 0x700
+
 
 esphome:
   includes:
@@ -315,18 +318,21 @@ packages:
   EINPHASIGER_BETRIEB:           !include { file: wp_generic.yaml, vars: { sensor_name: "Einphasiger Betrieb", property: "EINPHASIGER_BETRIEB", update_interval: "${interval_once_in_a_while}" }}
      
 # Settings      
-  HEIZ_KOMF_TEMP:                !include { file: wp_number.yaml, vars: { sensor_name: "Heizen Komfort Temperatur", property: "KOMF_TEMP", mode: "box", min: "20", max: "60", step: "0.5", icon: "mdi:valve", target: "HK1" }}
-  HEIZ_ECO_TEMP:                 !include { file: wp_number.yaml, vars: { sensor_name: "Heizen Eco Temperatur", property: "ECO_TEMP", mode: "box", min: "20", max: "60", step: "0.5", icon: "mdi:valve", target: "HK1" }}
-  WW_KOMF_TEMP:                  !include { file: wp_number.yaml, vars: { sensor_name: "WW Komfort Temperatur", property: "WW_KOMF_TEMP", mode: "box", min: "20", max: "60", step: "0.51", icon: "mdi:valve", target: "Kessel" }}
+  HEIZ_KOMF_TEMP:                !include { file: wp_number.yaml, vars: { sensor_name: "Heizen Komfort Temperatur", property: "KOMF_TEMP", mode: "box", min: "15", max: "30", step: "0.5", icon: "mdi:valve", target: "HK1" }}
+  HEIZ_ECO_TEMP:                 !include { file: wp_number.yaml, vars: { sensor_name: "Heizen Eco Temperatur", property: "ECO_TEMP", mode: "box", min: "15", max: "30", step: "0.5", icon: "mdi:valve", target: "HK1" }}
+  WW_KOMF_TEMP:                  !include { file: wp_number.yaml, vars: { sensor_name: "WW Komfort Temperatur", property: "WW_KOMF_TEMP", mode: "box", min: "20", max: "60", step: "0.5", icon: "mdi:valve", target: "Kessel" }}
   WW_ECO_TEMP:                   !include { file: wp_number.yaml, vars: { sensor_name: "WW Eco Temperatur", property: "WW_ECO_TEMP", mode: "box", min: "20", max: "60", step: "0.5", icon: "mdi:valve", target: "Kessel" }}
+  WW_HYSTERESE:                  !include { file: wp_number.yaml, vars: { sensor_name: "WW Hysterese", property: "WW_HYSTERESE", mode: "box", min: "1", max: "10", step: "1", icon: "mdi:valve", target: "Kessel" }}
      
   PUMPENLEISTUNG_HEIZKREIS:      !include { file: wp_number.yaml, vars: { sensor_name: "Pumpenleistung Heizkreis", property: "PUMPENLEISTUNG_HEIZKREIS", mode: "box", min: "10", max: "100", step: "5", update_interval: "${interval_once_in_a_while}", unit: "%", icon: "mdi:water-percent", accuracy_decimals: "1" }}
   PUMPENLEISTUNG_SOLE:           !include { file: wp_number.yaml, vars: { sensor_name: "Pumpenleistung Sole", property: "PUMPENLEISTUNG_SOLE", mode: "box", min: "10", max: "100", step: "5", update_interval: "${interval_once_in_a_while}", unit: "%", icon: "mdi:water-percent", accuracy_decimals: "1" }}
   PUMPENLEISTUNG_WARMWASSER:     !include { file: wp_number.yaml, vars: { sensor_name: "Pumpenleistung Warmwasser", property: "PUMPENLEISTUNG_WARMWASSER", mode: "box", min: "10", max: "100", step: "5", update_interval: "${interval_once_in_a_while}", unit: "%", icon: "mdi:water-percent", accuracy_decimals: "1" }}
        
   VERDICHTER_STILLSTAND:         !include { file: wp_number.yaml, vars: { sensor_name: "Verdichter Stillstand", property: "VERDICHTER_STILLSTAND", mode: "box", min: "10", max: "120", step: "5", update_interval: "${interval_once_in_a_while}", unit: "min" }}
-  REGLERDYNAMIK:                 !include { file: wp_number.yaml, vars: { sensor_name: "Reglerdynamik", property: "REGLERDYNAMIK", mode: "box", min: "0", max: "25",update_interval: "${interval_once_in_a_while}" }}
+  REGLERDYNAMIK:                 !include { file: wp_number.yaml, vars: { sensor_name: "Reglerdynamik", property: "REGLERDYNAMIK", mode: "box", min: "1", max: "30",update_interval: "${interval_once_in_a_while}" }}
   STEIGUNG_HK1:                  !include { file: wp_number.yaml, vars: { sensor_name: "Steigung HK1", property: "STEIGUNG_HK1", mode: "box", icon: "mdi:valve", target: "HK1", min: "0", max: "5.0", step: "0.01"}}
+    # Not available on TTF07 FUSSPUNKT_HK1:                 !include { file: wp_number.yaml, vars: { sensor_name: "Fußpunkt HK1", property: "FUSSPUNKT_HK1", unit: "°C", icon: "mdi:temperature-celsius", mode: "box", accuracy_decimals: "1", min: "0", max: "25", step: "0.5", target: "HK1" }}
+
   RAUMEINFLUSS:                  !include { file: wp_number.yaml, vars: { sensor_name: "Raumeinfluss", property: "RAUMEINFLUSS", mode: "box", target: "HK1" }}
 
 
@@ -376,7 +382,7 @@ binary_sensor:
 
   - id: !extend HEIZBETRIEB
     on_state:
-      then:
+      then:      
         - component.update: LEISTUNG_HEIZEN
         - component.update: LEISTUNG_SUMME
 
@@ -444,7 +450,7 @@ sensor:
     device_class: power
     state_class: "measurement"
     lambda: |-
-      return id(HEIZKREISPUMPE).state ? $static_leistung_heizkreispumpe : 0;  // power in watt shown at the pumps display
+      return id(HEIZKREISPUMPE).state ? $static_leistung_heizkreispumpe : 0;  // power in watt shown at the pumps display, set this value in your top.yaml 
 
   - platform: integration
     name: "Energie ext. Heizkreispumpe"
@@ -468,7 +474,7 @@ sensor:
     state_class: "measurement"
     # Heizbetriebs means that the verdichter is running. It can be either Warmwasser or Heizen.
     lambda: |-
-      return id(LEISTUNG_EXT_HEIZKREISPUMPE).state + ( id(HEIZBETRIEB).state & !id(WARMWASSERBEREITUNG).state ) ? id(LEISTUNG_VERDICHTER).state : 0;
+      return id(LEISTUNG_EXT_HEIZKREISPUMPE).state + ( ( id(HEIZBETRIEB).state && !id(WARMWASSERBEREITUNG).state ) ? id(LEISTUNG_VERDICHTER).state : 0 );
 
   # corresponding energy is provided by: EL_ENERGIEAUFNAHME_WW_SUMME
   - platform: template
@@ -491,10 +497,23 @@ sensor:
     lambda: |-
       return id(LEISTUNG_HEIZEN).state + id(LEISTUNG_WARMWASSERBEREITUNG).state;
 
+  - platform: integration
+    name: "Leistung Summe integrated"
+    id: ENERGIE_SUNMME_INTEGRATED
+    sensor: LEISTUNG_SUMME
+    time_unit: h
+    unit_of_measurement: "kWh"
+    device_class: energy
+    state_class: "total_increasing"
+    accuracy_decimals: 3
+    filters:
+      - multiply: 0.001
+
+
   - platform: template
     name: "Energie Summe"
     id: ENERGIE_SUMME
-    unit_of_measurement: "Wh"
+    unit_of_measurement: "kWh"
     device_class: energy
     state_class: "total_increasing"
     # use (estimated) Heizkreizpumpe and add EL_ENERGIEAUFNAHME_HEIZ_SUMME and EL_ENERGIEAUFNAHME_WW_SUMME for higher accuracy

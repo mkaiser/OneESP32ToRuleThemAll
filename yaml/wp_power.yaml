@@ -26,6 +26,7 @@ sensor:
     unit_of_measurement: ${unit}
     device_class: power
     state_class: "measurement"
+    accuracy_decimals: 0
     lambda: |-
       return id(${id_current}).state * id(${id_voltage}).state;
 
