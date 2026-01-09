@@ -29,12 +29,12 @@ static const CanMember Kessel{KESSEL_ID, "Kessel"};
 static const CanMember HK1{HK1_ID, "HK1"};
 static const CanMember HK2{HK2_ID, "HK2"};
 static const CanMember FET{0x402, "FET"};          // TODO: make configurable and double check
+static const CanMember FEK{0x601, "FEK"};          // TODO: make configurable and double check
 static const CanMember MFG{0x700, "MFG"};          // TODO: make configurable and double check
 static const CanMember WPM2{0x480, "WPM2"};        // TODO: make configurable and double check
-static const CanMember CAN_TBD{0x601, "CAN_TBD"};  // TODO: this pops up several times for TTF07
 
 static const std::vector<std::reference_wrapper<const CanMember>> canMembers{Kessel, HK1, HK2,  Manager, ESPClient,
-                                                                             FET,    MFG, WPM2, CAN_TBD};
+                                                                             FET,  FEK,  MFG, WPM2};
 
 using Request = std::pair<const CanMember, const Property>;
 struct ConditionalRequest {
@@ -217,7 +217,7 @@ std::pair<Property, SimpleVariant> processCanMessage(const uint16_t fromCanId, c
     oss << "Message received from CanId 0x" << std::hex << std::uppercase << std::setfill('0') << std::setw(3)
         << fromCanId << " (" << (fromCanMember ? fromCanMember->get().name : "unknown member") << ")"
         << " Read/Write ID 0x" << std::setw(2) << static_cast<unsigned>(msg[0U]) << " 0x" << std::setw(2)
-        << static_cast<unsigned>(msg[1U]) << " (0x" << std::setw(3) << canId << ", "
+        << static_cast<unsigned>(msg[1U]) << " (canId=0x" << std::setw(3) << canId << "/"
         << (canMember ? canMember->get().name.c_str() : "unknown member") << ") for property "
         << std::string(property.name) << " (0x" << std::setw(4) << property.id << ") with raw value: " << std::dec
         << value << std::hex << " (0x" << std::setw(4) << value << ")" << std::dec;
