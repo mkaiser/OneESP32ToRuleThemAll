@@ -228,7 +228,7 @@ select:
 #########################################
 packages:
 # Time
-  HEATPUMP_DATETIME:             !include { file: wp_datetime.yaml, sensor_name: "Zeitstempel"}
+  HEATPUMP_DATETIME:             !include { file: wp_datetime.yaml, vars: { sensor_name: "Zeitstempel", target: "WPM2" }}
 
 # General Info 
   VERDICHTER_STARTS:             !include { file: wp_generic_combined.yaml, vars: { sensor_name: "Verdichterstarts", scaled_property: "VERDICHTER_STARTS_K", property: "VERDICHTER_STARTS", device_class: "", unit: "", accuracy_decimals: "0", scaler: "1000", icon: "mdi:counter" }}
