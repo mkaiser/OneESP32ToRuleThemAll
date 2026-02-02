@@ -29,12 +29,12 @@ static const CanMember Kessel{KESSEL_ID, "Kessel"};
 static const CanMember HK1{HK1_ID, "HK1"};
 static const CanMember HK2{HK2_ID, "HK2"};
 static const CanMember FET{0x402, "FET"};          // TODO: make configurable and double check
-static const CanMember FEK{0x601, "FEK"};          // TODO: make configurable and double check
+static const CanMember FEK2{0x601, "FEK2"};          // TODO: make configurable and double check
 static const CanMember MFG{0x700, "MFG"};          // TODO: make configurable and double check
 static const CanMember WPM2{0x480, "WPM2"};        // TODO: make configurable and double check
 
 static const std::vector<std::reference_wrapper<const CanMember>> canMembers{Kessel, HK1, HK2,  Manager, ESPClient,
-                                                                             FET,  FEK,  MFG, WPM2};
+                                                                             FET, FEK2, MFG, WPM2};
 
 using Request = std::pair<const CanMember, const Property>;
 struct ConditionalRequest {
@@ -49,6 +49,34 @@ struct ConditionalRequest {
 };
 
 static std::list<ConditionalRequest> conditionalRequests;
+
+/**
+ * @brief List of properties that should not be logged to reduce log noise.
+ * Use property names defined in property.h, e.g., Property::kAUSSENTEMP, Property::kSTUNDE
+ */
+static const std::vector<std::uint16_t> PROPERTIES_NO_LOGGING = {
+    // Add property names here that should not be logged
+    // Property::kAUSSENTEMP,
+    Property::kSTUNDE,
+    Property::kWAERMEERTRAG_WW_TAG_WH,
+    Property::kWAERMEERTRAG_WW_TAG_KWH, 
+    Property::kWAERMEERTRAG_WW_SUM_KWH, 
+    Property::kWAERMEERTRAG_WW_SUM_MWH,
+    Property::kWAERMEERTRAG_HEIZ_TAG_WH,
+    Property::kWAERMEERTRAG_HEIZ_TAG_KWH,
+    Property::kWAERMEERTRAG_HEIZ_SUM_KWH,
+    Property::kWAERMEERTRAG_HEIZ_SUM_MWH
+};
+
+/**
+ * @brief Checks if a property should be logged.
+ *
+ * @param property The property to check.
+ * @return true if the property should be logged, false otherwise.
+ */
+bool filterLog(const Property& property) {
+    return std::find(PROPERTIES_NO_LOGGING.begin(), PROPERTIES_NO_LOGGING.end(), property.id) == PROPERTIES_NO_LOGGING.end();
+}
 
 /**
  * @brief Splits the given integer into single bytes.
@@ -207,9 +235,9 @@ std::pair<Property, SimpleVariant> processCanMessage(const uint16_t fromCanId, c
     }
 
     const auto value{static_cast<std::uint16_t>((byte1 << 8U) | byte2)};
-    const auto canId{static_cast<std::uint16_t>(((msg[0U] & 0xfc) << 3) | (msg[1U] & 0x3f))};
+    const auto msgId{static_cast<std::uint16_t>(((msg[0U] & 0xfc) << 3) | (msg[1U] & 0x3f))};
 
-    const auto canMember = getCanMemberByCanId(canId);
+    const auto canMemberByMsgId = getCanMemberByCanId(msgId);
     const auto fromCanMember = getCanMemberByCanId(fromCanId);
 
     // Build the full message string
@@ -217,19 +245,23 @@ std::pair<Property, SimpleVariant> processCanMessage(const uint16_t fromCanId, c
     oss << "Message received from CanId 0x" << std::hex << std::uppercase << std::setfill('0') << std::setw(3)
         << fromCanId << " (" << (fromCanMember ? fromCanMember->get().name : "unknown member") << ")"
         << " Read/Write ID 0x" << std::setw(2) << static_cast<unsigned>(msg[0U]) << " 0x" << std::setw(2)
-        << static_cast<unsigned>(msg[1U]) << " (canId=0x" << std::setw(3) << canId << "/"
-        << (canMember ? canMember->get().name.c_str() : "unknown member") << ") for property "
+        << static_cast<unsigned>(msg[1U]) << " (msgId=0x" << std::setw(3) << msgId << "/"
+        << (canMemberByMsgId ? canMemberByMsgId->get().name.c_str() : "unknown member") << ") for property "
         << std::string(property.name) << " (0x" << std::setw(4) << property.id << ") with raw value: " << std::dec
         << value << std::hex << " (0x" << std::setw(4) << value << ")" << std::dec;
 
     const std::string log_msg = oss.str();
 
     if (isRequest(msg)) {
-        ESP_LOGV("Communication", "Message is a request. Dropping it! message: %s", log_msg.c_str());
+        if (filterLog(property)) {
+            ESP_LOGV("processCanMessage", "Message is a request. Dropping it! message: %s", log_msg.c_str());
+        }
         return {Property::kINDEX_NOT_FOUND, value};
     }
 
-    ESP_LOGD("Communication", "%s", log_msg.c_str());
+    if (filterLog(property)) {
+        ESP_LOGD("processCanMessage", "%s", log_msg.c_str());
+    }
     return {property, GetValueByType(value, property.type)};
 }
 
@@ -254,6 +286,9 @@ void sendData(const CanMember& member, const Property property, const std::uint1
     const auto [IndexByte1, IndexByte2] = asBytes(property.id);
     const auto [ValueByte1, ValueByte2] = asBytes(value);
     std::vector<std::uint8_t> data{IdByte1, IdByte2, 0xfa, IndexByte1, IndexByte2, ValueByte1, ValueByte2};
+
+    ESP_LOGD("Communication", "sendData(member=%s, property=%s, value=%u", member.name.c_str(),
+            std::string(property.name).c_str(), value);
 
     id(wp_can).send_data(ESPClient.canId, use_extended_id, data);
     // Request the value again to make sure the sensor is updated, with a delay of 10s to allow the heatpump to react.

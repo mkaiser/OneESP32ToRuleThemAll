@@ -1,8 +1,11 @@
 # General notes (Tecalor TTF* [C], (maybe) compatible with Stiebel Eltron WPF* )
 # This configuration was created for a TTF07cool heatpump. 
+#
+# CHANGELOG
+# 2026-01-09: Fixed datetime (property targets needs to be WPM2 instead of Kessel for TTF07)
 # 
 # NOTES
-# - The FEK needs to be de-attached, because if connected, the FEK will take over control of the heatpump and set the target temperatures for
+# - The FEK2 needs to be de-attached, because if connected, the FEK2 will take over control of the heatpump and set the target temperatures for
 #   HK_SOLL. The heatpump stops controlling things in this case. 
 # - My heatpump has an external pump (Heizkreispumpe). This has a constant power consumption of 41W (displayed on the device itself).
 #   Set $static_leistung_heizkreispumpe in your heatpump.yaml to the power consumption of your pump, if applicable (else just 0).
@@ -50,7 +53,7 @@ substitutions:
   hk1_can_id: "0x301"
   hk2_can_id: "0x302"   # unused in my TTF07C
   manager_can_id: "0x100"
-  espclient_can_id: "0x680"
+  espclient_can_id: "0x680" # just works with this number
   # WPM2: 0480
   # MFG: 0x700
 
@@ -120,38 +123,21 @@ esphome:
           queueRequest(WPM2, Property::kBETRIEBS_STATUS);
 
 
-#########################################
-#                                       #
-#   Time Synchronization                #
-#                                       #
-#########################################
-time:
-  - platform: sntp
-    id: sntp_time
-    on_time:
-      - seconds: 0
-        minutes: 0
-        hours: 3 # sync at 3 am should be ok even with switch from/to daylight saving time
-        then:
-          - lambda: |-
-              syncTime();
-
 
 #########################################
 #                                       #
-#   Buttons                             #
+#   Global variables                    #
 #                                       #
 #########################################
-button:
-  - platform: template
-    name: Synchronize Time
-    on_press:
-      then:
-        - lambda: |-
-            syncTime();
-
-
-#########################################
+globals:
+  - id: gRAUMISTTEMP
+    type: float
+    initial_value: "0.0"
+  - id: gRAUMFEUCHTE
+    type: float
+    initial_value: "0.0"
+    
+    #########################################
 #                                       #
 #   Intervals                           #
 #                                       #
@@ -177,21 +163,27 @@ interval:
         queueRequest(WPM2, Property::kBETRIEBS_STATUS);          
         queueRequest(WPM2, Property::kPROGRAMMSCHALTER);
 
-  # - interval: $interval_medium
-  #   then:
-  #     - lambda: |-
-  #         // Send current RAUMISTTEMP
-  #         const auto room_temp = id(gRAUMISTTEMP);
-  #         if(room_temp > 0.0f) {
-  #           ESP_LOGI("SET", "Sending cached room temperature %f to heatpump", room_temp);
-  #           sendData(HK1, Property::kRAUMISTTEMP, static_cast<std::uint16_t>(room_temp * 10.0f));
-  #         }
+  - interval: $interval_fast
+    then:
+      - lambda: |-
+          // Send current RAUMISTTEMP
+          const auto room_temp = id(gRAUMISTTEMP);
+          if(room_temp > 0.0f) {
+            ESP_LOGI("SET", "Sending cached room temperature %f to heatpump", room_temp);
+            // sendData(FEK2, Property::kRAUMISTTEMP, static_cast<std::uint16_t>(room_temp * 10.0f));
+            // sendData(Kessel, Property::kRAUMISTTEMP, static_cast<std::uint16_t>(room_temp * 10.0f));
+            // sendData(WPM2, Property::kRAUMISTTEMP, static_cast<std::uint16_t>(room_temp * 10.0f));
+            // sendData(FEK2, Property::kRAUMISTTEMP, static_cast<std::uint16_t>(room_temp * 10.0f));
+            // sendData(Manager, Property::kRAUMISTTEMP, static_cast<std::uint16_t>(room_temp * 10.0f));
+            // sendData(MFG, Property::kRAUMISTTEMP, static_cast<std::uint16_t>(room_temp * 10.0f));
+          }
   #         // Send current RAUMFEUCHTE
   #         const auto humidity = id(gRAUMFEUCHTE);
   #         if(humidity > 0.0) {
   #           ESP_LOGI("SET", "Sending cached humidity %f to heatpump", humidity);
   #           sendData(HK1, Property::kRAUMFEUCHTE, static_cast<std::uint16_t>(humidity * 10.0f));
   #         }
+
 
 #########################################
 #                                       #
@@ -228,7 +220,7 @@ select:
 #########################################
 packages:
 # Time
-  HEATPUMP_DATETIME:             !include { file: wp_datetime.yaml, vars: { sensor_name: "Zeitstempel", target: "WPM2" }}
+  HEATPUMP_DATETIME:             !include { file: wp_datetime.yaml, vars: { sensor_name: "Zeitstempel"}}
 
 # General Info 
   VERDICHTER_STARTS:             !include { file: wp_generic_combined.yaml, vars: { sensor_name: "Verdichterstarts", scaled_property: "VERDICHTER_STARTS_K", property: "VERDICHTER_STARTS", device_class: "", unit: "", accuracy_decimals: "0", scaler: "1000", icon: "mdi:counter" }}
@@ -269,9 +261,6 @@ packages:
   QUELLENTEMP_MIN:               !include { file: wp_temperature.yaml, vars: { sensor_name: "Quelle Temperatur Minimum", property: "QUELLENTEMP_MIN", update_interval: $interval_medium }} 
   HEIZGASTEMP:                   !include { file: wp_temperature.yaml, vars: { sensor_name: "Heizgastemperatur", property: "HEIZGASTEMP", update_interval: $interval_medium }}
 
-# FEK 
-  # RAUMISTTEMP:                       !include { file: wp_temperature.yaml, vars: { property: "RAUMISTTEMP", target: "HK1" }}
-  # RAUMFEUCHTE:                       !include { file: wp_generic.yaml, vars: { property: "RAUMFEUCHTE", interval: $interval_very_slow, unit: "%", icon: "mdi:water-percent", target: "HK1", accuracy_decimals: "1" }}
 
 # Energy daily
   EL_ENERGIEAUFNAHME_WW_TAG:     !include { file: wp_daily_energy_combined.yaml, vars: { sensor_name: "El Energieaufnahme Warmwasser Tag", sensor_id: "EL_ENERGIEAUFNAHME_WW_TAG", property_wh: "EL_ENERGIEAUFNAHME_WW_TAG_WH", property_kwh: "EL_ENERGIEAUFNAHME_WW_TAG_KWH"}}
@@ -335,34 +324,44 @@ packages:
   RAUMEINFLUSS:                  !include { file: wp_number.yaml, vars: { sensor_name: "Raumeinfluss", property: "RAUMEINFLUSS", mode: "box", target: "HK1" }}
 
 
-# DEBUG 
-  TBD_TEMP_01: !include { file: wp_temperature.yaml, vars: { property: "TBD_TEMP_01", target: "MFG"}}
-  TBD_TEMP_03: !include { file: wp_temperature.yaml, vars: { property: "TBD_TEMP_03", target: "MFG"}}
+# DEBUG / Testing 
 
-  TBD_02_WPM2: !include { file: wp_debug.yaml, vars: { property: "TBD_02", name_suffix: "WPM2", target: "WPM2"}}
-  TBD_02_MFG:  !include { file: wp_debug.yaml, vars: { property: "TBD_02", name_suffix: "MFG", target: "MFG"}}
-  TBD_04:      !include { file: wp_debug.yaml, vars: { property: "TBD_04", target: "MFG"}}
-  TBD_06_MFG:  !include { file: wp_debug.yaml, vars: { property: "TBD_06", name_suffix: "MFG", target: "MFG"}}
-  TBD_06_WPM2: !include { file: wp_debug.yaml, vars: { property: "TBD_06", name_suffix: "WPM2", target: "WPM2"}}
-  TBD_07_WPM2: !include { file: wp_debug.yaml, vars: { property: "TBD_07", name_suffix: "WPM2", target: "WPM2"}}
-  TBD_07_MFG:  !include { file: wp_debug.yaml, vars: { property: "TBD_07", name_suffix: "MFG", target: "MFG"}}
-  TBD_08_WPM2: !include { file: wp_debug.yaml, vars: { property: "TBD_08", name_suffix: "WPM2", target: "WPM2"}}
-  TBD_08_MFG:  !include { file: wp_debug.yaml, vars: { property: "TBD_08", name_suffix: "MFG", target: "MFG"}}
-  TBD_09:      !include { file: wp_debug.yaml, vars: { property: "TBD_09", target: "Manager"}}
+# FEK2 emulation
+  FEK_RAUMISTTEMP_HK1:           !include { file: wp_debug.yaml, vars: {sensor_name: "FEK2 Raumtemperatur HK1", sensor_id: FEK_RAUMTEMPERATUR_HK1, listen_only: true,  property: "RAUMISTTEMP", target: "HK1" }}
+  # FEK_RAUMISTTEMP_WPM2:              !include { file: wp_debug.yaml, vars: {listen_only: true,  name_suffix: "WPM2",  property: "RAUMISTTEMP", target: "WPM2" }}
+  # FEK_RAUMISTTEMP_KESSEL:            !include { file: wp_debug.yaml, vars: {listen_only: true,  name_suffix: "KESSEL",  property: "RAUMISTTEMP", target: "Kessel" }}
+  # FEK_RAUMISTTEMP_Manager:           !include { file: wp_debug.yaml, vars: {listen_only: true,  name_suffix: "Manager",  property: "RAUMISTTEMP", target: "Manager" }}
+  # FEK_RAUMISTTEMP_MFG:               !include { file: wp_debug.yaml, vars: {listen_only: true,  name_suffix: "MFG",  property: "RAUMISTTEMP", target: "MFG" }}
+  # FEK_RAUMISTTEMP_FEK:               !include { file: wp_debug.yaml, vars: {listen_only: true,  name_suffix: "FEK2",  property: "RAUMISTTEMP", target: "FEK2" }}
 
-  TBD_10_MFG:  !include { file: wp_debug.yaml, vars: { property: "TBD_10", name_suffix: "MFG", target: "MFG"}}
-  TBD_10_WPM2: !include { file: wp_debug.yaml, vars: { property: "TBD_10", name_suffix: "WPM2", target: "WPM2"}}
-  TBD_10_Manager: !include { file: wp_debug.yaml, vars: { property: "TBD_10", name_suffix: "Manager", target: "Manager"}}
-  TBD_10_Kessel: !include { file: wp_debug.yaml, vars: { property: "TBD_10", name_suffix: "Kessel", target: "Kessel"}}
+  FEK_RAUMFEUCHTE_HK1:               !include { file: wp_debug.yaml, vars: { sensor_name: "FEK2 Raumfeuchte HK1", sensor_id: "FEK_RAUMFEUCHTE", property: "RAUMFEUCHTE", interval: $interval_very_slow, unit: "%", icon: "mdi:water-percent", target: "HK1", accuracy_decimals: "1" }}
 
-  TBD_11: !include { file: wp_debug.yaml, vars: { property: "TBD_11", target: "Manager"}}
-  TBD_12: !include { file: wp_debug.yaml, vars: { property: "TBD_12", target: "WPM2"}} # also Manager?
-  TBD_13: !include { file: wp_debug.yaml, vars: { property: "TBD_13", target: "WPM2"}}
-  TBD_15: !include { file: wp_debug.yaml, vars: { property: "TBD_15", target: "Kessel"}}
-  TBD_16: !include { file: wp_debug.yaml, vars: { property: "TBD_16", target: "Manager"}}
-  TBD_17: !include { file: wp_debug.yaml, vars: { property: "TBD_17", target: "Kessel"}}
-  TBD_18: !include { file: wp_debug.yaml, vars: { property: "TBD_18", target: "Kessel"}}
-  TBD_19: !include { file: wp_debug.yaml, vars: { property: "TBD_19", target: "MFG"}}
+
+  TBD_TEMP_01: !include { file: wp_temperature.yaml, vars: { sensor_name: "TBD_TEMP_01", sensor_id: "TBD_TEMP_01", property: "TBD_TEMP_01", target: "MFG"}}
+  TBD_TEMP_03: !include { file: wp_temperature.yaml, vars: { sensor_name: "TBD_TEMP_03", sensor_id: "TBD_TEMP_03", property: "TBD_TEMP_03", target: "MFG"}}
+
+  TBD_02_WPM2: !include { file: wp_debug.yaml, vars: { sensor_name: "TBD_02_WPM2", sensor_id: "TBD_02_WPM2", property: "TBD_02", target: "WPM2"}}
+  TBD_02_MFG:  !include { file: wp_debug.yaml, vars: { sensor_name: "TBD_02_MFG", sensor_id: "TBD_02_MFG", property: "TBD_02", target: "MFG"}}
+  TBD_04:      !include { file: wp_debug.yaml, vars: { sensor_name: "TBD_04", sensor_id: "TBD_04", property: "TBD_04", target: "MFG"}}
+  TBD_06_MFG:  !include { file: wp_debug.yaml, vars: { sensor_name: "TBD_06_MFG", sensor_id: "TBD_06_MFG", property: "TBD_06", target: "MFG"}}
+  TBD_06_WPM2: !include { file: wp_debug.yaml, vars: { sensor_name: "TBD_06_WPM2", sensor_id: "TBD_06_WPM2", property: "TBD_06", target: "WPM2"}}
+  TBD_07_WPM2: !include { file: wp_debug.yaml, vars: { sensor_name: "TBD_07_WPM2", sensor_id: "TBD_07_WPM2", property: "TBD_07", target: "WPM2"}}
+  TBD_07_MFG:  !include { file: wp_debug.yaml, vars: { sensor_name: "TBD_07_MFG", sensor_id: "TBD_07_MFG", property: "TBD_07", target: "MFG"}}
+  TBD_08_WPM2: !include { file: wp_debug.yaml, vars: { sensor_name: "TBD_08_WPM2", sensor_id: "TBD_08_WPM2", property: "TBD_08", target: "WPM2"}}
+  TBD_08_MFG:  !include { file: wp_debug.yaml, vars: { sensor_name: "TBD_08_MFG", sensor_id: "TBD_08_MFG", property: "TBD_08", target: "MFG"}}
+  TBD_09:      !include { file: wp_debug.yaml, vars: { sensor_name: "TBD_09", sensor_id: "TBD_09", property: "TBD_09", target: "Manager"}}
+  TBD_10_MFG:  !include { file: wp_debug.yaml, vars: { sensor_name: "TBD_10_MFG", sensor_id: "TBD_10_MFG", property: "TBD_10", target: "MFG"}}
+  TBD_10_WPM2: !include { file: wp_debug.yaml, vars: { sensor_name: "TBD_10_WPM2", sensor_id: "TBD_10_WPM2", property: "TBD_10", target: "WPM2"}}
+  TBD_10_Manager: !include { file: wp_debug.yaml, vars: { sensor_name: "TBD_10_Manager", sensor_id: "TBD_10_Manager", property: "TBD_10", target: "Manager"}}
+  TBD_10_Kessel: !include { file: wp_debug.yaml, vars: { sensor_name: "TBD_10_Kessel", sensor_id: "TBD_10_Kessel", property: "TBD_10", target: "Kessel"}}
+  TBD_11: !include { file: wp_debug.yaml, vars: { sensor_name: "TBD_11", sensor_id: "TBD_11", property: "TBD_11", target: "Manager"}}
+  TBD_12: !include { file: wp_debug.yaml, vars: { sensor_name: "TBD_12", sensor_id: "TBD_12", property: "TBD_12", target: "WPM2"}} # also Manager?
+  TBD_13: !include { file: wp_debug.yaml, vars: { sensor_name: "TBD_13", sensor_id: "TBD_13", property: "TBD_13", target: "WPM2"}}
+  TBD_15: !include { file: wp_debug.yaml, vars: { sensor_name: "TBD_15", sensor_id: "TBD_15", property: "TBD_15", target: "Kessel"}}
+  TBD_16: !include { file: wp_debug.yaml, vars: { sensor_name: "TBD_16", sensor_id: "TBD_16", property: "TBD_16", target: "Manager"}}
+  TBD_17: !include { file: wp_debug.yaml, vars: { sensor_name: "TBD_17", sensor_id: "TBD_17", property: "TBD_17", target: "Kessel"}}
+  TBD_18: !include { file: wp_debug.yaml, vars: { sensor_name: "TBD_18", sensor_id: "TBD_18", property: "TBD_18", target: "Kessel"}}
+  TBD_19: !include { file: wp_debug.yaml, vars: { sensor_name: "TBD_19", sensor_id: "TBD_19", property: "TBD_19", target: "MFG"}}
 
 
 #########################################
@@ -414,26 +413,25 @@ sensor:
         - component.update: LEISTUNG_WARMWASSERBEREITUNG
         - component.update: LEISTUNG_SUMME
 
-# TODO 
-#   - platform: homeassistant
-#     name: Temperature Sensor From Home Assistant
-#     id: ha_temperature_sensor
-#     entity_id: $entity_room_temperature
-#     on_value:
-#       then:
-#         - lambda: |-
-#             ESP_LOGI("SET", "Updating room temperature to %f", x);
-#             id(gRAUMISTTEMP) = x;
+  - platform: homeassistant
+    name: Temperature Sensor From Home Assistant
+    id: ha_temperature_sensor
+    entity_id: $entity_room_temperature
+    on_value:
+      then:
+        - lambda: |-
+            ESP_LOGI("SET", "Updating room temperature to %f", x);
+            id(gRAUMISTTEMP) = x;
 
-#   - platform: homeassistant
-#     name: Humidity Sensor From Home Assistant
-#     id: ha_humidity_sensor
-#     entity_id: $entity_humidity
-#     on_value:
-#       then:
-#         - lambda: |-
-#             ESP_LOGI("SET", "Updating humidity to %f", x);
-#             id(gRAUMFEUCHTE) = x;
+  - platform: homeassistant
+    name: Humidity Sensor From Home Assistant
+    id: ha_humidity_sensor
+    entity_id: $entity_humidity
+    on_value:
+      then:
+        - lambda: |-
+            ESP_LOGI("SET", "Updating humidity to %f", x);
+            id(gRAUMFEUCHTE) = x;
 
 #########################################
 #                                       #
@@ -589,5 +587,5 @@ canbus:
               auto callback = CallbackHandler::instance().getCallback(std::make_pair(fromCanMember->get(),property));
               callback(value);
             } else {
-              ESP_LOGW("CAN", "Ignoring message, because no CAN member with CANId 0x%04lx is known.", can_id);
+              ESP_LOGW("CAN", "Ignoring message, because no CAN member with CANId 0x%04lx is not known.", can_id);
             }

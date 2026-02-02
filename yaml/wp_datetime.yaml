@@ -61,3 +61,39 @@ text_sensor:
     name: ${sensor_name}
     id: HEATPUMP_DATETIME
     update_interval: never
+
+
+
+#########################################
+#                                       #
+#   Time Synchronization                #
+#                                       #
+#########################################
+time:
+  - platform: sntp
+    id: sntp_time
+    on_time:
+      - seconds: 0
+        minutes: 0
+        hours: 3 # sync at 3 am should be ok even with switch from/to daylight saving time
+        then:
+          - lambda: |-
+              ESP_LOGI("wp_datetime.yaml", "Auto Time sync");
+              syncTime(${target});  // TODO testme! reading the time from ttf07 works with WPM2, not Kessel 
+
+
+
+#########################################
+#                                       #
+#   Buttons                             #
+#                                       #
+#########################################
+button:
+  - platform: template
+    name: Synchronize Time
+    on_press:
+      then:
+        - lambda: |-
+            ESP_LOGI("wp_datetime.yaml", "Timesync Button pressed");
+            syncTime(${target});  // WPM2 for TTF07
+
