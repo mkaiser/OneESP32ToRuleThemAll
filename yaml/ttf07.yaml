@@ -518,7 +518,15 @@ sensor:
     lambda: |-
       return id(ENERGIE_EXT_HEIZKREISPUMPE).state + id(EL_ENERGIEAUFNAHME_HEIZ_SUMME).state + id(EL_ENERGIEAUFNAHME_WW_SUMME).state;
 
-
+  - platform: template
+    name: "Heizkreis Spreizung"
+    id: HEIZKREIS_SPREIZUNG
+    icon: "mdi:swap-vertical"
+    state_class: measurement
+    accuracy_decimals: 1
+    unit_of_measurement: "°C"
+    lambda: |-
+      return (id(VORLAUFISTTEMPWP).state - id(RUECKLAUFISTTEMP).state);
 #########################################
 #                                       #
 #   Home Assistant Actions              #
