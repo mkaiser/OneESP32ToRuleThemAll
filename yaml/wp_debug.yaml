@@ -3,15 +3,14 @@ defaults:
   accuracy_decimals: "0"
   target: ""
   unit: ""
-  name_suffix: ""
   listen_only: true
   extra_text_sensor: false
   update_interval : "never"
 
 sensor:
   - platform: template
-    name: ${property}${name_suffix}
-    id: ${property}${name_suffix}
+    name: ${sensor_name}
+    id: ${sensor_id}
     icon: ${icon}
     unit_of_measurement: ${unit}
     update_interval: ${update_interval}
@@ -26,7 +25,7 @@ esphome:
     then:
       - lambda: |-
           CallbackHandler::instance().addCallback(std::make_pair(${target},Property::k${property}),[](const SimpleVariant& value){
-              id(${property}${name_suffix}).publish_state(value);
+              id(${sensor_id}).publish_state(value);
           });
           
           // only request if not listen only
