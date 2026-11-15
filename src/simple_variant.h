@@ -5,7 +5,6 @@
 #include <string>
 #include <tuple>
 #include <type_traits>
-#include <typeinfo>
 
 template <typename T>
 struct is_string
@@ -52,17 +51,17 @@ template <typename T>
 using normalized_t = typename normalized<T>::type;
 
 struct SimpleVariant {
-    SimpleVariant() : type_id(typeid(void)){};
+    SimpleVariant() = default;
 
     template <typename T>
-    SimpleVariant(const T& value) : type_id(typeid(T)) {
+    SimpleVariant(const T& value) : type_tag(tag_of<normalized_t<T>>()) {
         auto& t_element = std::get<normalized_t<T>>(t);
         t_element = value;
     }
 
     template <typename T>
     bool holds_alternative() const {
-        return (typeid(T) == type_id);
+        return type_tag == tag_of<normalized_t<T>>();
     }
 
     template <typename T>
@@ -76,8 +75,20 @@ struct SimpleVariant {
     }
 
    private:
+    // RTTI-free type tag (ESPHome builds with -fno-rtti, so typeid is unavailable)
+    template <typename N>
+    static constexpr std::uint8_t tag_of() {
+        if constexpr (std::is_same_v<N, bool>) {
+            return 1;
+        } else if constexpr (std::is_same_v<N, float>) {
+            return 2;
+        } else {
+            return 3;  // std::string
+        }
+    }
+
     std::tuple<bool, float, std::string> t;
-    const std::type_info& type_id;
+    std::uint8_t type_tag{0};
 };
 
 #endif
