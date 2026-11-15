@@ -79,7 +79,7 @@ time:
         then:
           - lambda: |-
               ESP_LOGI("wp_datetime.yaml", "Auto Time sync");
-              syncTime(${target});  // TODO testme! reading the time from ttf07 works with WPM2, not Kessel 
+              syncTime();  // TODO testme! reading the time from ttf07 works with WPM2, not Kessel 
 
 
 
@@ -95,5 +95,5 @@ button:
       then:
         - lambda: |-
             ESP_LOGI("wp_datetime.yaml", "Timesync Button pressed");
-            syncTime(${target});  // WPM2 for TTF07
+            syncTime();  // WPM2 for TTF07
 

@@ -112,7 +112,7 @@ esphome:
             id(NHZ1).publish_state(status_bits.test(7U) && !status_bits.test(5U) && status_bits.test(4U));   // 0x0090   [7_4] 1001
             id(NHZ2).publish_state(status_bits.test(7U) && status_bits.test(5U) && !status_bits.test(4U));   // 0x00A0   [7_4] 1010
             id(NHZ3).publish_state(status_bits.test(7U) && status_bits.test(5U) && status_bits.test(4U));   // 0x00B0   [7_4] 1011
-            id(HEIZBETRIEB).publish_state(!status_bits.test(9U) && status_bits.test(7U));  //0x0080
+            id(HEIZBETRIEB).publish_state(!status_bits.test(13U) && !status_bits.test(9U) && status_bits.test(7U));  //0x0080  not in KUEHLBETRIEB
             id(QUELLENPUMPE).publish_state(status_bits.test(6U));   // 0x0040 
             id(PUFFERLADEPUMPE).publish_state(status_bits.test(7U));  // 0x0080
             id(ENTLEERUNG_HYD).publish_state(status_bits.test(9U));  // 0x0200
@@ -253,6 +253,8 @@ packages:
   VORLAUFISTTEMPNHZ:             !include { file: wp_temperature.yaml, vars: { sensor_name: "Vorlauf Ist Temperatur NHZ", property: "VORLAUFISTTEMPNHZ", update_interval: $interval_medium, target: "MFG"}}
   VORLAUFSOLLTEMP:               !include { file: wp_temperature.yaml, vars: { sensor_name: "Vorlauf Soll Temperatur", property: "VORLAUFSOLLTEMP", update_interval: $interval_medium, target: "HK1" }}
   HKISTTEMP:                     !include { file: wp_temperature.yaml, vars: { sensor_name: "HK Ist Temperatur", property: "HKISTTEMP", update_interval: $interval_medium }}
+  VORLAUFSOLLTEMP_KUEHLEN:       !include { file: wp_temperature.yaml, vars: { sensor_name: "Vorlauf Soll Temperatur Kühlen", property: "VORLAUFSOLLTEMP_KUEHLEN", update_interval: $interval_medium, target: "Kessel" }} # manager does not work
+  RAUMSOLLTEMP_KUEHLEN:          !include { file: wp_temperature.yaml, vars: { sensor_name: "Raum Soll Temperatur Kühlen", property: "RAUMSOLLTEMP_KUEHLEN", update_interval: $interval_medium, target: "Kessel" }} # manager does not work
 
   HKSOLLTEMP:                    !include { file: wp_temperature.yaml, vars: { sensor_name: "HK Soll Temperatur", property: "HKSOLLTEMP", update_interval: $interval_medium }} 
   PUFFERISTTEMP:                 !include { file: wp_temperature.yaml, vars: { sensor_name: "Puffer Ist Temperatur", property: "PUFFERISTTEMP", update_interval: $interval_medium }}
@@ -282,12 +284,12 @@ packages:
 
 # Pressures
   DRUCK_HEIZKREIS:               !include { file: wp_generic.yaml, vars: { sensor_name: "Druck Heizkreis", property: "DRUCK_HEIZKREIS", unit: "bar", icon: "mdi:water-pressure", accuracy_decimals: "2" }}
-  DRUCK_HOCHDRUCK:               !include { file: wp_generic.yaml, vars: { sensor_name: "Druck Heizkreis max", property: "DRUCK_HOCHDRUCK", unit: "bar", icon: "mdi:water-pressure", accuracy_decimals: "2" }}
-  DRUCK_NIEDERDRUCK:             !include { file: wp_generic.yaml, vars: { sensor_name: "Druck Heizkreis min", property: "DRUCK_NIEDERDRUCK", unit: "bar", icon: "mdi:water-pressure", accuracy_decimals: "2" }}
+  DRUCK_HOCHDRUCK:               !include { file: wp_generic.yaml, vars: { sensor_name: "Druck Heizkreis max", property: "DRUCK_HOCHDRUCK", unit: "bar", icon: "mdi:water-pressure", accuracy_decimals: "2", scaler: "0.1" }}
+  DRUCK_NIEDERDRUCK:             !include { file: wp_generic.yaml, vars: { sensor_name: "Druck Heizkreis min", property: "DRUCK_NIEDERDRUCK", unit: "bar", icon: "mdi:water-pressure", accuracy_decimals: "2", scaler: "0.1" }}
   QUELLENDRUCK:                  !include { file: wp_generic.yaml, vars: { sensor_name: "Druck Quelle", property: "QUELLENDRUCK", unit: "bar", icon: "mdi:water-pressure", accuracy_decimals: "2" }}
   HDSENSORMAX:                   !include { file: wp_generic.yaml, vars: { sensor_name: "Druck Sensor max",  property: "HDSENSORMAX", unit: "bar", icon: "mdi:water-pressure", accuracy_decimals: "2" }}
         
-# Flows      
+  # Flows      
   VOLUMENSTROM:                  !include { file: wp_generic.yaml, vars: { sensor_name: "Volumenstrom", property: "VOLUMENSTROM", unit: "l/min", icon: "mdi:flow", accuracy_decimals: "2" }}
         
   # Power      
@@ -312,6 +314,10 @@ packages:
   WW_KOMF_TEMP:                  !include { file: wp_number.yaml, vars: { sensor_name: "WW Komfort Temperatur", property: "WW_KOMF_TEMP", mode: "box", min: "20", max: "60", step: "0.5", icon: "mdi:valve", target: "Kessel" }}
   WW_ECO_TEMP:                   !include { file: wp_number.yaml, vars: { sensor_name: "WW Eco Temperatur", property: "WW_ECO_TEMP", mode: "box", min: "20", max: "60", step: "0.5", icon: "mdi:valve", target: "Kessel" }}
   WW_HYSTERESE:                  !include { file: wp_number.yaml, vars: { sensor_name: "WW Hysterese", property: "WW_HYSTERESE", mode: "box", min: "1", max: "10", step: "1", icon: "mdi:valve", target: "Kessel" }}
+  # KUEHLEN_EINGESCHALTET:         !include { file: wp_binary.yaml, vars: { sensor_name: "Kühlen eingeschaltet sw", property: "KUEHLEN_EINGESCHALTET", target: "Kessel" }}
+  KUEHLEN_EINGESCHALTET_SW:      !include { file: wp_switch.yaml, vars: { sensor_name: "Kühlen eingeschaltet", property: "KUEHLEN_EINGESCHALTET", target: "Kessel" }}
+
+  KUEHLEN_HYSTERESE:             !include { file: wp_number.yaml, vars: { sensor_name: "Kühlen Hysterese", property: "HYSTERESE_VORLAUFTEMP_KUEHLEN", mode: "box", min: "1", max: "10", step: "1", icon: "mdi:valve", target: "Kessel" }}
 
   PUMPENLEISTUNG_HEIZKREIS:      !include { file: wp_number.yaml, vars: { sensor_name: "Pumpenleistung Heizkreis", property: "PUMPENLEISTUNG_HEIZKREIS", mode: "box", min: "10", max: "100", step: "5", update_interval: "${interval_once_in_a_while}", unit: "%", icon: "mdi:water-percent", accuracy_decimals: "1" }}
   PUMPENLEISTUNG_SOLE:           !include { file: wp_number.yaml, vars: { sensor_name: "Pumpenleistung Sole", property: "PUMPENLEISTUNG_SOLE", mode: "box", min: "10", max: "100", step: "5", update_interval: "${interval_once_in_a_while}", unit: "%", icon: "mdi:water-percent", accuracy_decimals: "1" }}

@@ -199,6 +199,10 @@ struct Property : public oe32trta::detail::Property {
     PROPERTY(QUELLENTEMP_MIN, 0x01b0, Type::et_dec_val);
     PROPERTY(ZEIT_NHZ1, 0x0259, Type::et_default); 
     PROPERTY(ZEIT_NHZ2, 0x025A, Type::et_default);     
+    PROPERTY(VORLAUFSOLLTEMP_KUEHLEN, 0x0260, Type::et_dec_val);
+    PROPERTY(KUEHLEN_EINGESCHALTET, 0x025F, Type::et_bool);
+    PROPERTY(RAUMSOLLTEMP_KUEHLEN, 0x0261, Type::et_dec_val);
+    PROPERTY(HYSTERESE_VORLAUFTEMP_KUEHLEN, 0x0262, Type::et_dec_val);
     PROPERTY(HEIZGASTEMP, 0x0265, Type::et_dec_val);
     PROPERTY(DRUCK_HOCHDRUCK, 0x0268, Type::et_cent_val);
     PROPERTY(HKISTTEMP, 0x02ca, Type::et_dec_val);
@@ -206,7 +210,7 @@ struct Property : public oe32trta::detail::Property {
     PROPERTY(DRUCK_HEIZKREIS, 0x0674, Type::et_cent_val);
     PROPERTY(QUELLENDRUCK, 0x0675, Type::et_cent_val);
     PROPERTY(VORLAUFISTTEMPWP, 0x06a1, Type::et_dec_val);
-    PROPERTY(KUEHLEN_EINGESCHALTET, 0x06Aa, Type::et_little_bool);
+    PROPERTY(KUEHLEN_EINGESCHALTET_ALT, 0x06Aa, Type::et_little_bool);
     PROPERTY(PUMPENLEISTUNG_HEIZKREIS, 0x070a, Type::et_byte);
     PROPERTY(PUMPENLEISTUNG_WARMWASSER, 0x070b, Type::et_byte);
     PROPERTY(PUMPENLEISTUNG_SOLE, 0x070c, Type::et_byte);
