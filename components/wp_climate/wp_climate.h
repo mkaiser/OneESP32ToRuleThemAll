@@ -1,5 +1,8 @@
 #pragma once
 
+#include <functional>
+#include <optional>
+#include <string>
 #include "esphome.h"
 #include "esphome/components/climate/climate.h"
 #include "esphome/components/wp_core/communication.h"
@@ -169,6 +172,74 @@ class HotWater : public CustomClimate {
         register_target_temperature_callback(target_temperature_sensor);
         register_heating_callback(heating_sensor);
     }
+};
+
+/// Thermostat built from existing entities: presets Komfort/Eco (a select), one temperature number per preset,
+/// current temperature/humidity sensors and a "heating" binary sensor. Only the mode HEAT is offered.
+/// Any other select option means "no preset": the target is then the optional setpoint sensor and is read only.
+/// Optionally a second set of preset select and numbers ("alternative") is used while use_alternative() is true, and
+/// changes are refused while writable() is false.
+class PresetClimate : public Component, public climate::Climate {
+   public:
+    void setup() override;
+    void dump_config() override;
+    float get_setup_priority() const override { return setup_priority::LATE; }
+
+    void set_current_temperature_sensor(sensor::Sensor* sensor) { current_temperature_sensor_ = sensor; }
+    void set_current_humidity_sensor(sensor::Sensor* sensor) { current_humidity_sensor_ = sensor; }
+    void set_comfort_number(number::Number* number) { comfort_number_ = number; }
+    void set_eco_number(number::Number* number) { eco_number_ = number; }
+    void set_preset_select(select::Select* select) { preset_select_ = select; }
+    void set_options(const std::string& comfort, const std::string& eco) {
+        comfort_option_ = comfort;
+        eco_option_ = eco;
+    }
+    void set_heating_sensor(binary_sensor::BinarySensor* sensor) { heating_sensor_ = sensor; }
+    void set_setpoint_sensor(sensor::Sensor* sensor) { setpoint_sensor_ = sensor; }
+    void set_alternative(select::Select* select, number::Number* comfort, number::Number* eco,
+                         const std::string& comfort_option, const std::string& eco_option) {
+        alternative_ = Source{select, comfort, eco, comfort_option, eco_option};
+    }
+    void set_use_alternative(std::function<bool()>&& f) { use_alternative_ = std::move(f); }
+    void set_writable(std::function<bool()>&& f) { writable_ = std::move(f); }
+
+   protected:
+    /// A preset select with its Komfort/Eco numbers and option names.
+    struct Source {
+        select::Select* select{nullptr};
+        number::Number* comfort{nullptr};
+        number::Number* eco{nullptr};
+        std::string comfort_option{"Komfort"};
+        std::string eco_option{"Eco"};
+    };
+    enum class Active { COMFORT, ECO, OTHER };
+
+    void control(const climate::ClimateCall& call) override;
+    climate::ClimateTraits traits() override;
+
+    /// The source in use: the alternative while use_alternative() is true, else the primary one.
+    const Source& source() const;
+    bool writable() const { return !writable_ || writable_(); }
+    /// Which preset the select shows; OTHER for any other option (or no state yet).
+    Active active() const;
+    /// The number of the active preset, nullptr for OTHER.
+    number::Number* active_number() const;
+    /// Reads all source entities and publishes the climate state if something changed.
+    void refresh();
+
+    sensor::Sensor* current_temperature_sensor_{nullptr};
+    sensor::Sensor* current_humidity_sensor_{nullptr};
+    number::Number* comfort_number_{nullptr};
+    number::Number* eco_number_{nullptr};
+    select::Select* preset_select_{nullptr};
+    binary_sensor::BinarySensor* heating_sensor_{nullptr};
+    sensor::Sensor* setpoint_sensor_{nullptr};
+    std::string comfort_option_{"Komfort"};
+    std::string eco_option_{"Eco"};
+    Source primary_;  // filled in setup() from the fields above
+    std::optional<Source> alternative_;
+    std::function<bool()> use_alternative_;
+    std::function<bool()> writable_;
 };
 
 }  // namespace wp_climate
