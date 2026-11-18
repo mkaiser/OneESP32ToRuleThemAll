@@ -134,7 +134,12 @@ interval:
             if (!obj->is_internal() &&
                 !std::isnan(obj->state) &&
                 getWhitelistedEntities().contains(static_cast<esphome::EntityBase*>(obj))) {
-              id(analytics_mqtt).publish(base + obj->get_name(), to_string(obj->state), 0, true);
+              const auto name = getAnalyticsNames().find(obj);
+              if (name != getAnalyticsNames().end()) {
+                id(analytics_mqtt).publish(base + name->second, to_string(obj->state), 0, true);
+              } else {
+                id(analytics_mqtt).publish(base + obj->get_name(), to_string(obj->state), 0, true);
+              }
             }
           }
 

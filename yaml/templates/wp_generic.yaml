@@ -39,6 +39,7 @@ esphome:
             #if defined(ANALYTICS)
               if(${exposed}) {
                 getWhitelistedEntities().insert(id(${property}${name_suffix}));
+                getAnalyticsNames()[id(${property}${name_suffix})] = "${property}${name_suffix}";
               }
             #endif
     - priority: -100.0

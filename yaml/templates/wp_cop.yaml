@@ -47,5 +47,6 @@ esphome:
             #if defined(ANALYTICS)
               if(${exposed}) {
                 getWhitelistedEntities().insert(id(${sensor_name}));
+                getAnalyticsNames()[id(${sensor_name})] = "${sensor_name}";
               }
             #endif

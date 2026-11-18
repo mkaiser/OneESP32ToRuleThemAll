@@ -26,3 +26,8 @@ std::unordered_set<esphome::EntityBase*>& getWhitelistedEntities() {
     static std::unordered_set<esphome::EntityBase*> entities;
     return entities;
 }
+
+std::unordered_map<esphome::EntityBase*, std::string>& getAnalyticsNames() {
+    static std::unordered_map<esphome::EntityBase*, std::string> names;
+    return names;
+}
