@@ -1,0 +1,53 @@
+# Diagnostic sensor for reverse engineering: publishes the value of a register received from a node.
+# The register is given by its address, so registers whose purpose is not known yet need no entry in property.h:
+#
+# DEBUG_MANAGER_0074: !include { file: templates/wp_debug.yaml, vars: { sensor_id: "DEBUG_MANAGER_0074", address: "0x0074", target: "Manager" }}
+#
+# A known property can be given instead of an address (property: "PUMPENZYKLEN").
+# An address is received as raw value; "type" decodes it (e.g. et_dec_val). By default the sensor only listens; set listen_only to
+# "false" to request the value once at boot.
+
+defaults:
+  sensor_name: "${sensor_id}"
+  address: "Property::k${property}"
+  type: "et_default"
+  icon: "mdi:blank"
+  unit: ""
+  accuracy_decimals: "0"
+  listen_only: "true"
+  update_interval: "never"
+  disabled_by_default: "false"
+
+sensor:
+  - platform: template
+    name: ${sensor_name}
+    id: ${sensor_id}
+    icon: ${icon}
+    unit_of_measurement: ${unit}
+    accuracy_decimals: ${accuracy_decimals}
+    update_interval: ${update_interval}
+    state_class: "measurement"
+    entity_category: "diagnostic"
+    disabled_by_default: ${disabled_by_default}
+
+esphome:
+  on_boot:
+    - priority: -50
+      then:
+        - lambda: |-
+            CallbackHandler::instance().addCallback({CanNode::${target}, Property(${address})}, [](const SimpleVariant& value){
+                if constexpr(Type::${type} == Type::et_default) {
+                  id(${sensor_id}).publish_state(value.get<float>());
+                } else {
+                  // a register without a property arrives as raw value: decode it with the given type
+                  const auto raw{static_cast<std::uint16_t>(value.get<float>())};
+                  id(${sensor_id}).publish_state(GetValueByType(raw, Type::${type}).get<float>());
+                }
+            });
+    - priority: -100.0
+      then:
+        - delay: 250ms
+        - lambda: |-
+            if constexpr(!${listen_only}) {
+              queueRequest(CanNode::${target}, Property(${address}));
+            }

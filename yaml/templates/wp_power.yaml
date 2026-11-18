@@ -1,0 +1,34 @@
+# Event-driven power sensor: current * voltage, recalculated whenever one of the inputs is received.
+#
+# Example:
+# LEISTUNG_VERDICHTER: !include { file: templates/wp_power.yaml, vars: { sensor_name: "LEISTUNG_VERDICHTER", id_current: "STROMAUFNAHME", id_voltage: "VERSORGUNGSSPANNUNG" }}
+#
+# Mandatory vars: sensor_name, id_current, id_voltage
+
+defaults:
+  unit: "W"
+  update_interval: never
+
+sensor:
+  - platform: template
+    name: ${sensor_name}
+    id: ${sensor_name}
+    update_interval: ${update_interval}
+    unit_of_measurement: ${unit}
+    device_class: power
+    state_class: "measurement"
+    accuracy_decimals: 0
+    lambda: |-
+      return id(${id_current}).state * id(${id_voltage}).state;
+
+  - platform: template
+    id: !extend ${id_current}
+    on_value:
+      then:
+        - component.update: ${sensor_name}
+
+  - platform: template
+    id: !extend ${id_voltage}
+    on_value:
+      then:
+        - component.update: ${sensor_name}
