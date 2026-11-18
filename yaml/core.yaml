@@ -147,8 +147,8 @@ canbus:
       can_id_mask: 0
       then:
         - lambda: |-
-            ESP_LOGD("CAN", "Can message received with CANId 0x%04lx", can_id);
-            const auto [property, value] = processCanMessage(x);
+            ESP_LOGV("CAN", "Can message received with CANId 0x%04lx", can_id);
+            const auto [property, value] = processCanMessage(x, static_cast<CANId>(can_id));
             const auto* canNode = getCanNodeByCanId(can_id);
             if(canNode != nullptr) {
               auto callback = CallbackHandler::instance().getCallback(std::make_pair(canNode,property));

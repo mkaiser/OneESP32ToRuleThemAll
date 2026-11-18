@@ -118,8 +118,9 @@ void queueTransmission(const CanNode* node, const Property& property, const std:
  * @brief Attempts to parse the CAN message and extracts the property and the value. The value will
  *        be converted to the correct type automatically, based the type that was defined for this
  *        entity in \c property.h
+ * @param fromCanId Optional CAN id of the sender, only used for logging.
  */
-std::pair<Property, SimpleVariant> processCanMessage(const std::vector<std::uint8_t>& msg);
+std::pair<Property, SimpleVariant> processCanMessage(const std::vector<std::uint8_t>& msg, const CANId fromCanId = 0U);
 
 /**
  * @brief Sends a request over the CAN bus to read a specific \c property from the given \c node.

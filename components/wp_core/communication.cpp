@@ -1,4 +1,6 @@
 #include "communication.h"
+#include <iomanip>
+#include <sstream>
 #include "esphome.h"
 
 std::array<CanNode, 8U> CanNode::all_nodes{{{ESPCLIENT_ID, "ESPClient"},
@@ -158,7 +160,43 @@ void queueTransmission(const CanNode* node, const Property& property, const std:
     getConditionalTransmissions().emplace_back(std::make_pair(node, property), value);
 }
 
-std::pair<Property, SimpleVariant> processCanMessage(const std::vector<std::uint8_t>& msg) {
+/**
+ * @brief Message type from the low nibble of the first ID byte.
+ */
+static const char* messageTypeName(const std::uint8_t type) {
+    static const char* const names[] = {"write",     "read",           "response", "ack",
+                                        "write ack", "write response", "system",   "system response"};
+    return type < 8U ? names[type] : "unknown type";
+}
+
+/**
+ * @brief Builds a human readable description of a CAN message: sender, addressed node, message type, property and
+ *        value. The ID bytes encode the addressed node as ((b0 & 0xf0) << 3) | (b1 & 0x7f) and the message type in
+ *        the low nibble of b0 (0 write, 1 read, 2 response, ..., 6 system, 7 system response).
+ */
+static std::string describeCanMessage(const std::vector<std::uint8_t>& msg, const CANId fromCanId,
+                                      const Property& property, const std::uint16_t value) {
+    const auto msgId{static_cast<std::uint16_t>(((msg[0U] & 0xf0) << 3) | (msg[1U] & 0x7f))};
+    const auto type{static_cast<std::uint8_t>(msg[0U] & 0x0f)};
+    const auto* fromNode = getCanNodeByCanId(fromCanId);
+    const auto* toNode = getCanNodeByCanId(msgId);
+
+    std::ostringstream oss;
+    oss << std::hex << std::uppercase << std::setfill('0');
+    oss << "from 0x" << std::setw(3) << fromCanId << " (" << (fromNode ? fromNode->name : "unknown") << ")"
+        << " Read/Write ID 0x" << std::setw(2) << static_cast<unsigned>(msg[0U]) << " 0x" << std::setw(2)
+        << static_cast<unsigned>(msg[1U]) << " (to 0x" << std::setw(3) << msgId << "/"
+        << (toNode ? toNode->name : "unknown") << ", " << messageTypeName(type) << ") property " << property.name
+        << " (0x" << std::setw(4) << property.id << ") raw value " << std::dec << value << std::hex << " (0x"
+        << std::setw(4) << value << ")"
+        << " data";
+    for (const auto byte : msg) {
+        oss << ' ' << std::setw(2) << static_cast<unsigned>(byte);
+    }
+    return oss.str();
+}
+
+std::pair<Property, SimpleVariant> processCanMessage(const std::vector<std::uint8_t>& msg, const CANId fromCanId) {
     Property property{Property::kINDEX_NOT_FOUND};
     std::uint8_t byte1{0U};
     std::uint8_t byte2{0U};
@@ -179,19 +217,11 @@ std::pair<Property, SimpleVariant> processCanMessage(const std::vector<std::uint
     }
 
     const auto value{static_cast<std::uint16_t>((byte1 << 8U) | byte2)};
-    const auto canId{static_cast<std::uint16_t>(((msg[0U] & 0xfc) << 3) | (msg[1U] & 0x3f))};
     if (isRequest(msg)) {
-        ESP_LOGD("Communication", "Message is a request. Dropping it!");
-        ESP_LOGD("Communication",
-                 "Message received: Read/Write ID 0x%02x 0x%02x(0x%03x) for property %.*s (0x%04x) with raw value: %d",
-                 msg[0U], msg[1U], canId, static_cast<int>(property.name.length()), property.name.data(), property.id,
-                 value);
+        ESP_LOGV("Communication", "Request (dropped) %s", describeCanMessage(msg, fromCanId, property, value).c_str());
         return {Property::kINDEX_NOT_FOUND, value};
     }
-    ESP_LOGI("Communication",
-             "Message received: Read/Write ID 0x%02x 0x%02x(0x%03x) for property %.*s (0x%04x) with raw value: %d",
-             msg[0U], msg[1U], canId, static_cast<int>(property.name.length()), property.name.data(), property.id,
-             value);
+    ESP_LOGD("Communication", "Message %s", describeCanMessage(msg, fromCanId, property, value).c_str());
     return {property, GetValueByType(value, property.type)};
 }
 
@@ -224,6 +254,9 @@ void sendData(esphome::canbus::Canbus* can_bus, const CanNode* node, const Prope
     const auto [ValueByte1, ValueByte2] = asBytes(value);
     std::vector<std::uint8_t> data{IdByte1, IdByte2, 0xfa, IndexByte1, IndexByte2, ValueByte1, ValueByte2};
 
+    ESP_LOGD("Communication", "sendData(node=%.*s, property=%.*s (0x%04x), value=%u)",
+             static_cast<int>(node->name.length()), node->name.data(), static_cast<int>(property.name.length()),
+             property.name.data(), property.id, value);
     can_bus->send_data(CanNode::ESPClient->canId, use_extended_id, data);
     // Request the value again to make sure the sensor is updated, with a delay of 10s to allow the heatpump to react.
     scheduleRequest(node, property, std::chrono::seconds(10));
