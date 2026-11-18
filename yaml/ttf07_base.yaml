@@ -1,0 +1,82 @@
+#########################################
+#                                       #
+#   TTF07 base                          #
+#                                       #
+#########################################
+# Shared base of the Tecalor TTF07 variants (like wxx_base.yaml for the WPL/WPE family):
+#   - ttf07.yaml:       TTF07, status from the Kessel (BETRIEBS_STATUS 0x0a20)
+#   - ttf07_wpm3i.yaml: TTF07 C with WPM3i manager, status from the WPM3i (BETRIEBS_STATUS_WPM 0x4e5e)
+# The variants decode the status into the binary sensors defined here and add their own entities.
+
+#########################################
+#                                       #
+#   Substitutions                       #
+#                                       #
+#########################################
+substitutions:
+  druck_kaeltekreis_scaler: "1.0"  # DRUCK_HOCHDRUCK / DRUCK_NIEDERDRUCK
+
+#########################################
+#                                       #
+#   ESPHome                             #
+#                                       #
+#########################################
+esphome:
+  build_flags:
+    - "-DTTF_07_C"
+  on_boot:
+    - priority: -50
+      then:
+        - lambda: |-
+            CallbackHandler::instance().addCallback(std::make_pair(CanNode::Kessel,Property::kEINPHASIGER_BETRIEB),[](const SimpleVariant& value){
+              id(EINPHASIGER_BETRIEB).publish_state(value.get<bool>());
+            });
+    - priority: -100
+      then:
+        - lambda: |-
+            queueRequest(CanNode::Kessel, Property::kEINPHASIGER_BETRIEB);
+
+#########################################
+#                                       #
+#   Global variables                    #
+#                                       #
+#########################################
+globals:
+  - id: heat_pump_variant
+    type: std::string
+    initial_value: '"TTF07"'
+
+#########################################
+#                                       #
+#   Packages                            #
+#                                       #
+#########################################
+packages:
+  TXX_BASE:                 !include { file: txx_base.yaml }
+
+  # Status binary sensors, published by the variant from its status word
+  NHZ1:                     !include { file: templates/wp_binary.yaml, vars: { name: "NHZ1" }}
+  NHZ2:                     !include { file: templates/wp_binary.yaml, vars: { name: "NHZ2" }}
+  NHZ3:                     !include { file: templates/wp_binary.yaml, vars: { name: "NHZ3" }}
+  VERDICHTER:               !include { file: templates/wp_binary.yaml, vars: { name: "VERDICHTER" }}
+  WARMWASSERBEREITUNG:      !include { file: templates/wp_binary.yaml, vars: { name: "WARMWASSERBEREITUNG" }}
+  HEIZKREISPUMPE:           !include { file: templates/wp_binary.yaml, vars: { name: "HEIZKREISPUMPE" }}
+  PUFFERLADEPUMPE:          !include { file: templates/wp_binary.yaml, vars: { name: "PUFFERLADEPUMPE" }}
+  QUELLENPUMPE:             !include { file: templates/wp_binary.yaml, vars: { name: "QUELLENPUMPE" }}
+  KUEHLBETRIEB:             !include { file: templates/wp_binary.yaml, vars: { name: "KUEHLBETRIEB" }}
+
+  QUELLE_IST:               !include { file: templates/wp_temperature.yaml, vars: { property: "QUELLE_IST" }}
+  HKISTTEMP:                !include { file: templates/wp_temperature.yaml, vars: { property: "HKISTTEMP" }}
+  PUFFERISTTEMP:            !include { file: templates/wp_temperature.yaml, vars: { property: "PUFFERISTTEMP" }}
+  PUFFERSOLLTEMP:           !include { file: templates/wp_temperature.yaml, vars: { property: "PUFFERSOLLTEMP" }}
+  HKSOLLTEMP:               !include { file: templates/wp_temperature.yaml, vars: { property: "HKSOLLTEMP"     , update_interval: "never" }}
+  HEISSGAS_TEMP:            !include { file: templates/wp_temperature.yaml, vars: { property: "HEISSGAS_TEMP"  , update_interval: "${interval_slow}" }}
+  QUELLENTEMP_MIN:          !include { file: templates/wp_temperature.yaml, vars: { property: "QUELLENTEMP_MIN", update_interval: "${interval_slow}" }}
+
+  DRUCK_HEIZKREIS:          !include { file: templates/wp_generic.yaml, vars: { property: "DRUCK_HEIZKREIS"  , unit: "bar"  , icon: "mdi:water-pressure", accuracy_decimals: "1" }}
+  QUELLENDRUCK:             !include { file: templates/wp_generic.yaml, vars: { property: "QUELLENDRUCK"     , unit: "bar"  , icon: "mdi:water-pressure", accuracy_decimals: "1" }}
+  DRUCK_HOCHDRUCK:          !include { file: templates/wp_generic.yaml, vars: { property: "DRUCK_HOCHDRUCK"  , unit: "bar"  , icon: "mdi:water-pressure", accuracy_decimals: "2", scaler: "${druck_kaeltekreis_scaler}" }}
+  DRUCK_NIEDERDRUCK:        !include { file: templates/wp_generic.yaml, vars: { property: "DRUCK_NIEDERDRUCK", unit: "bar"  , icon: "mdi:water-pressure", accuracy_decimals: "2", scaler: "${druck_kaeltekreis_scaler}" }}
+  VOLUMENSTROM:             !include { file: templates/wp_generic.yaml, vars: { property: "VOLUMENSTROM"     , unit: "l/min", icon: "mdi:flow"          , accuracy_decimals: "1" }}
+  HDSENSORMAX:              !include { file: templates/wp_generic.yaml, vars: { property: "HDSENSORMAX"      , unit: "bar"  , icon: "mdi:water-pressure", accuracy_decimals: "2" }}
+  EINPHASIGER_BETRIEB:      !include { file: templates/wp_binary.yaml, vars: { name: "EINPHASIGER_BETRIEB" }}

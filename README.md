@@ -135,7 +135,8 @@ flowchart LR
     wpla5base --> wpla5([wpl_a_5.yaml<br>Manifest])
     wpla5base --> wpla7([wpl_a_7.yaml<br>Manifest])
 
-    txx --> ttf07([ttf07.yaml<br>Manifest])
+    txx --> ttf07base[ttf07_base.yaml<br>Common TTF07 Base]
+    ttf07base --> ttf07([ttf07.yaml<br>Manifest])
     txx --> thz[thz_base.yaml<br>Common THZ Base]
     txx --> thz304([thz304.yaml<br>Manifest])
 
@@ -161,7 +162,7 @@ flowchart LR
 
 * **System Core (`core.yaml`)**: Fundamental hardware and network operations.
 * **Series Common Layer (`txx_base.yaml`)**: Shared logic specifically for the TXX (THZ/TTF) family.
-* **Model Base Layer (`thz_base.yaml`, `wpl_a_base.yaml`)**: Heavy lifting and C++ logic for specific sub-families.
+* **Model Base Layer (`thz_base.yaml`, `wpl_a_base.yaml`, `ttf07_base.yaml`)**: Heavy lifting and C++ logic for specific sub-families.
 * **Device Manifests (e.g. `thz304.yaml`, `thz504.yaml`, `wpl13.yaml`)**: The clean, top-level "recipes" used to compile the firmware.
 
 ## Add new readings from heat pump / adopt to your device
