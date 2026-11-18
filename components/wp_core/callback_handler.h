@@ -55,6 +55,13 @@ class CallbackHandler {
     }
 
     /**
+     * @brief Returns whether a callback has been registered for a specific \c Property and \c CanNode.
+     */
+    bool hasCallback(const std::pair<const CanNode*, Property> key) const {
+        return key.second != Property::kINDEX_NOT_FOUND && callbacks.find(key) != callbacks.end();
+    }
+
+    /**
      * @brief Obtains the callback that has been registered for a specific \c Property and
      *        \c CanNode. If no callback could be found, it will return an empty lambda.
      * @note  Unknown property ids will be silently ignored.

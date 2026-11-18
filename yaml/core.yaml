@@ -150,6 +150,19 @@ canbus:
             ESP_LOGV("CAN", "Can message received with CANId 0x%04lx", can_id);
             const auto [property, value] = processCanMessage(x, static_cast<CANId>(can_id));
             const auto* canNode = getCanNodeByCanId(can_id);
+            // A write from the control panel (node Bedienteil, if configured) changes a setting of the addressed
+            // node: update that node's entity at once, instead of waiting for the next request.
+            if(canNode != nullptr && canNode == CanNode::Bedienteil && x.size() >= 2U && (x[0U] & 0x0f) == 0U) {
+              const auto* target = getCanNodeByCanId(((x[0U] & 0xf0) << 3) | (x[1U] & 0x7f));
+              const auto key = std::make_pair(target, property);
+              if(target != nullptr && target != canNode && CallbackHandler::instance().hasCallback(key)) {
+                ESP_LOGI("CAN", "Control panel wrote %.*s to %.*s",
+                         static_cast<int>(property.name.length()), property.name.data(),
+                         static_cast<int>(target->name.length()), target->name.data());
+                CallbackHandler::instance().getCallback(key)(value);
+                return;
+              }
+            }
             if(canNode != nullptr) {
               auto callback = CallbackHandler::instance().getCallback(std::make_pair(canNode,property));
               callback(value);

@@ -3,14 +3,15 @@
 #include <sstream>
 #include "esphome.h"
 
-std::array<CanNode, 8U> CanNode::all_nodes{{{ESPCLIENT_ID, "ESPClient"},
+std::array<CanNode, 9U> CanNode::all_nodes{{{ESPCLIENT_ID, "ESPClient"},
                                             {0x123, "Heizmodul"},
                                             {0x123, "Kessel"},
                                             {0x123, "HK1"},
                                             {0x123, "HK2"},
                                             {0x123, "FET"},
                                             {0x123, "MFG"},
-                                            {0x123, "Manager"}}};
+                                            {0x123, "Manager"},
+                                            {0x123, "Bedienteil"}}};
 
 CanNode* CanNode::ESPClient = &CanNode::all_nodes[0];
 CanNode* CanNode::Heizmodul = &CanNode::all_nodes[1];
@@ -20,6 +21,7 @@ CanNode* CanNode::HK2 = &CanNode::all_nodes[4];
 CanNode* CanNode::FET = &CanNode::all_nodes[5];
 CanNode* CanNode::MFG = &CanNode::all_nodes[6];
 CanNode* CanNode::Manager = &CanNode::all_nodes[7];
+CanNode* CanNode::Bedienteil = &CanNode::all_nodes[8];
 
 std::list<ConditionalRequest>& getConditionalRequests() {
     static std::list<ConditionalRequest> requests;
