@@ -1,0 +1,802 @@
+# Home Assistant dashboard for a Tecalor TTF07 C with WPM3i running yaml/ttf07_wpm3i.yaml.
+# Use: Settings > Dashboards > Add dashboard > "New dashboard from scratch", then Edit dashboard >
+# Raw configuration editor, paste this file and save.
+# Entity IDs assume the ESPHome device's friendly name "Wärmepumpe" (prefix "warmepumpe_"); for another name,
+# replace ".warmepumpe_" with your prefix. sensor.HOUSE_TEMPERATURE: replace with your room/house temperature sensor.
+# The FEK emulation and cooling cards need the matching parts of ttf07_wpm3i.yaml; "Community Analytics" needs
+# yaml/features/analytics.yaml. Entity IDs follow the German names of yaml/names/ttf07_wpm3i_de.yaml; the
+# "Reverse Engineering" card needs yaml/ttf07_wpm3i_debug.yaml (registers not identified yet, may change).
+title: Wärmepumpe
+views:
+- title: Übersicht
+  path: uebersicht
+  icon: mdi:heat-pump
+  type: sections
+  max_columns: 3
+  sections:
+  - type: grid
+    cards:
+    - type: heading
+      heading: Heizung
+      icon: mdi:radiator
+    - type: thermostat
+      entity: climate.warmepumpe_thermostat_heizung
+      name: Heizung
+      features:
+      - type: climate-preset-modes
+        style: icons
+        preset_modes:
+        - comfort
+        - eco
+      grid_options:
+        columns: full
+        rows: auto
+    - type: tile
+      entity: sensor.warmepumpe_heizungssteuerung_aktiv
+      name: Steuerung aktiv
+    - type: tile
+      entity: sensor.warmepumpe_fek_emulation_vorlauf_soll
+      name: Vorlauf Soll (Emulation)
+  - type: grid
+    cards:
+    - type: heading
+      heading: Temperaturen
+      icon: mdi:thermometer
+    - type: tile
+      entity: sensor.warmepumpe_aussentemperatur
+      name: Außen
+    - type: tile
+      entity: sensor.HOUSE_TEMPERATURE
+      name: Haus
+    - type: tile
+      entity: sensor.warmepumpe_vorlauf_soll_temperatur
+      name: Vorlauf Soll
+    - type: tile
+      entity: sensor.warmepumpe_vorlauf_ist_temperatur_wp
+      name: Vorlauf Ist
+    - type: tile
+      entity: sensor.warmepumpe_ruecklauf_ist_temperatur
+      name: Rücklauf
+    - type: tile
+      entity: sensor.warmepumpe_quelle_ist_temperatur
+      name: Quelle
+  - type: grid
+    cards:
+    - type: heading
+      heading: Betrieb jetzt
+      icon: mdi:state-machine
+    - type: tile
+      entity: binary_sensor.warmepumpe_verdichter
+      name: Verdichter
+    - type: tile
+      entity: binary_sensor.warmepumpe_heizbetrieb
+      name: Heizen
+    - type: tile
+      entity: binary_sensor.warmepumpe_warmwasserbereitung
+      name: Warmwasser
+    - type: tile
+      entity: binary_sensor.warmepumpe_nachheizregister_1
+      name: Heizstab 1
+    - type: tile
+      entity: binary_sensor.warmepumpe_nachheizregister_2
+      name: Heizstab 2
+    - type: tile
+      entity: sensor.warmepumpe_leistung_summe
+      name: Leistung
+    - type: tile
+      entity: sensor.warmepumpe_cop_heizen_tag
+      name: COP Heizen heute
+    - type: tile
+      entity: sensor.warmepumpe_cop_warmwasser_tag
+      name: COP WW heute
+    - type: tile
+      entity: sensor.warmepumpe_verdichter_reststillstand
+      name: Verdichter Sperrzeit
+    - type: tile
+      entity: binary_sensor.warmepumpe_heizanforderung_hk1
+      name: Heizanforderung
+  - type: grid
+    cards:
+    - type: heading
+      heading: Warmwasser
+      icon: mdi:water-boiler
+    - type: thermostat
+      entity: climate.warmepumpe_thermostat_warmwasser
+      name: Warmwasser
+      features:
+      - type: climate-preset-modes
+        style: icons
+        preset_modes:
+        - comfort
+        - eco
+      grid_options:
+        columns: full
+        rows: auto
+    - type: tile
+      entity: sensor.warmepumpe_speicher_ist_temperatur
+      name: Speicher Ist
+    - type: tile
+      entity: sensor.warmepumpe_speicher_soll_temperatur
+      name: Speicher Soll
+    - type: tile
+      entity: number.warmepumpe_ww_komfort_temperatur
+      name: WW Komfort
+      features:
+      - type: numeric-input
+        style: buttons
+      grid_options:
+        columns: 6
+        rows: 2
+    - type: tile
+      entity: number.warmepumpe_ww_eco_temperatur
+      name: WW Eco
+      features:
+      - type: numeric-input
+        style: buttons
+      grid_options:
+        columns: 6
+        rows: 2
+  - type: grid
+    column_span: 2
+    cards:
+    - type: heading
+      heading: Letzte 24 Stunden
+      icon: mdi:chart-line
+    - type: history-graph
+      hours_to_show: 24
+      title: Temperaturen
+      entities:
+      - entity: sensor.warmepumpe_vorlauf_soll_temperatur
+        name: Vorlauf Soll
+      - entity: sensor.warmepumpe_vorlauf_ist_temperatur_wp
+        name: Vorlauf Ist
+      - entity: sensor.warmepumpe_ruecklauf_ist_temperatur
+        name: Rücklauf
+      - entity: sensor.warmepumpe_aussentemperatur
+        name: Außen
+      - entity: sensor.HOUSE_TEMPERATURE
+        name: Haus
+      grid_options:
+        columns: full
+    - type: history-graph
+      hours_to_show: 24
+      title: Betrieb
+      entities:
+      - entity: binary_sensor.warmepumpe_verdichter
+        name: Verdichter
+      - entity: binary_sensor.warmepumpe_heizbetrieb
+        name: Heizen
+      - entity: binary_sensor.warmepumpe_warmwasserbereitung
+        name: Warmwasser
+      - entity: sensor.warmepumpe_heizungssteuerung_aktiv
+        name: Steuerung
+      grid_options:
+        columns: full
+- title: Energie
+  path: energie
+  icon: mdi:lightning-bolt
+  type: sections
+  max_columns: 3
+  sections:
+  - type: grid
+    column_span: 2
+    cards:
+    - type: heading
+      heading: Strom pro Tag (30 Tage)
+      icon: mdi:chart-bar
+    - type: statistics-graph
+      title: Stromverbrauch Wärmepumpe
+      entities:
+      - entity: sensor.warmepumpe_energie_summe_kwh
+        name: Gesamt
+      period: day
+      chart_type: bar
+      stat_types:
+      - change
+      days_to_show: 30
+      grid_options:
+        columns: full
+    - type: statistics-graph
+      title: COP pro Tag
+      entities:
+      - entity: sensor.warmepumpe_cop_heizen_tag
+        name: Heizen
+      - entity: sensor.warmepumpe_cop_warmwasser_tag
+        name: Warmwasser
+      period: day
+      chart_type: line
+      stat_types:
+      - max
+      days_to_show: 30
+      grid_options:
+        columns: full
+  - type: grid
+    cards:
+    - type: heading
+      heading: Heute
+      icon: mdi:calendar-today
+    - type: entities
+      entities:
+      - entity: sensor.warmepumpe_warmeertrag_heizen_tag
+        name: Wärme
+      - entity: sensor.warmepumpe_el_energieaufnahme_heizen_tag
+        name: Strom
+      - entity: sensor.warmepumpe_cop_heizen_tag
+        name: COP
+      title: Heizen
+    - type: entities
+      entities:
+      - entity: sensor.warmepumpe_warmeertrag_warmwasser_tag
+        name: Wärme
+      - entity: sensor.warmepumpe_el_energieaufnahme_warmwasser_tag
+        name: Strom
+      - entity: sensor.warmepumpe_cop_warmwasser_tag
+        name: COP
+      title: Warmwasser
+  - type: grid
+    cards:
+    - type: heading
+      heading: Gesamt
+      icon: mdi:sigma
+    - type: entities
+      entities:
+      - entity: sensor.warmepumpe_warmeertrag_heizen
+        name: Wärme Heizen
+      - entity: sensor.warmepumpe_el_energieaufnahme_heizen
+        name: Strom Heizen
+      - entity: sensor.warmepumpe_cop_heizen
+        name: COP Heizen
+      - entity: sensor.warmepumpe_warmeertrag_warmwasser
+        name: Wärme Warmwasser
+      - entity: sensor.warmepumpe_el_energieaufnahme_warmwasser
+        name: Strom Warmwasser
+      - entity: sensor.warmepumpe_cop_warmwasser
+        name: COP Warmwasser
+      - entity: sensor.warmepumpe_energie_summe_kwh
+        name: Strom gesamt (kWh)
+      - entity: sensor.warmepumpe_energie_ext_heizkreispumpe
+        name: Ext. Heizkreispumpe
+      - entity: sensor.warmepumpe_warmeertrag_nhz_heizen
+        name: Wärme Heizstab Heizen
+      - entity: sensor.warmepumpe_warmeertrag_nhz_warmwasser
+        name: Wärme Heizstab Warmwasser
+  - type: grid
+    cards:
+    - type: heading
+      heading: Leistung jetzt
+      icon: mdi:flash
+    - type: entities
+      entities:
+      - entity: sensor.warmepumpe_leistung_summe
+        name: Summe
+      - entity: sensor.warmepumpe_leistung_verdichter
+        name: Verdichter
+      - entity: sensor.warmepumpe_leistung_heizen
+        name: Heizen
+      - entity: sensor.warmepumpe_leistung_warmwasserbereitung
+        name: Warmwasser
+      - entity: sensor.warmepumpe_leistung_ext_heizkreispumpe
+        name: Ext. Heizkreispumpe
+- title: Verlauf
+  path: verlauf
+  icon: mdi:chart-line
+  type: sections
+  max_columns: 2
+  sections:
+  - type: grid
+    cards:
+    - type: heading
+      heading: Heizkreis (7 Tage)
+      icon: mdi:radiator
+    - type: statistics-graph
+      title: Vor- und Rücklauf
+      entities:
+      - entity: sensor.warmepumpe_vorlauf_soll_temperatur
+        name: Vorlauf Soll
+      - entity: sensor.warmepumpe_vorlauf_ist_temperatur_wp
+        name: Vorlauf Ist
+      - entity: sensor.warmepumpe_ruecklauf_ist_temperatur
+        name: Rücklauf
+      period: hour
+      chart_type: line
+      stat_types:
+      - mean
+      days_to_show: 7
+      grid_options:
+        columns: full
+    - type: statistics-graph
+      title: Spreizung
+      entities:
+      - entity: sensor.warmepumpe_heizkreis_spreizung
+        name: Spreizung
+      period: hour
+      chart_type: line
+      stat_types:
+      - mean
+      days_to_show: 7
+      grid_options:
+        columns: full
+    - type: statistics-graph
+      title: Raum und Außen
+      entities:
+      - entity: sensor.HOUSE_TEMPERATURE
+        name: Haus
+      - entity: sensor.warmepumpe_aussentemperatur
+        name: Außen
+      period: hour
+      chart_type: line
+      stat_types:
+      - mean
+      days_to_show: 7
+      grid_options:
+        columns: full
+  - type: grid
+    cards:
+    - type: heading
+      heading: Warmwasser und Quelle (7 Tage)
+      icon: mdi:water-boiler
+    - type: statistics-graph
+      title: Warmwasserspeicher
+      entities:
+      - entity: sensor.warmepumpe_speicher_ist_temperatur
+        name: Ist
+      - entity: sensor.warmepumpe_speicher_soll_temperatur
+        name: Soll
+      period: hour
+      chart_type: line
+      stat_types:
+      - mean
+      days_to_show: 7
+      grid_options:
+        columns: full
+    - type: statistics-graph
+      title: Quelle
+      entities:
+      - entity: sensor.warmepumpe_quelle_ist_temperatur
+        name: Quelle
+      period: hour
+      chart_type: line
+      stat_types:
+      - mean
+      - min
+      days_to_show: 7
+      grid_options:
+        columns: full
+    - type: history-graph
+      hours_to_show: 72
+      title: Pumpen und Verdichter (3 Tage)
+      entities:
+      - entity: binary_sensor.warmepumpe_verdichter
+        name: Verdichter
+      - entity: binary_sensor.warmepumpe_quellenpumpe
+        name: Quellenpumpe
+      - entity: binary_sensor.warmepumpe_pufferladepumpe
+        name: Pufferladepumpe
+      - entity: binary_sensor.warmepumpe_heizkreispumpe
+        name: Heizkreispumpe
+      - entity: binary_sensor.warmepumpe_warmwasserbereitung
+        name: Warmwasser
+      - entity: binary_sensor.warmepumpe_nachheizregister_1
+        name: Heizstab 1
+      grid_options:
+        columns: full
+- title: Einstellungen
+  path: einstellungen
+  icon: mdi:cog
+  type: sections
+  max_columns: 3
+  sections:
+  - type: grid
+    cards:
+    - type: heading
+      heading: Heizungssteuerung
+      icon: mdi:home-thermometer
+    - type: tile
+      entity: select.warmepumpe_heizungssteuerung
+      name: Heizungssteuerung
+      features:
+      - type: select-options
+      grid_options:
+        columns: 6
+        rows: 2
+    - type: tile
+      entity: sensor.warmepumpe_heizungssteuerung_aktiv
+      name: Aktiv
+    - type: tile
+      entity: select.warmepumpe_programmschalter
+      name: Programmschalter
+      features:
+      - type: select-options
+      grid_options:
+        columns: 6
+        rows: 2
+    - type: markdown
+      content: '**FEK Emulation**: das ESP ist die Raumstation und berechnet den Vorlauf aus der Heizkurve unten. **Wärmepumpe**:
+        die WPM3i regelt selbst (Einstellungen HK1). Mit echter FEK regelt die FEK; die HK1-Einstellungen sind dann gesperrt.'
+  - type: grid
+    cards:
+    - type: heading
+      heading: FEK Emulation (Heizkurve)
+      icon: mdi:chart-bell-curve-cumulative
+    - type: entities
+      entities:
+      - entity: select.warmepumpe_fek_emulation_betriebsart
+        name: Betriebsart
+      - entity: number.warmepumpe_fek_emulation_komfort_temperatur
+        name: Komfort
+      - entity: number.warmepumpe_fek_emulation_eco_temperatur
+        name: Eco
+      - entity: number.warmepumpe_fek_emulation_steigung
+        name: Steigung
+      - entity: number.warmepumpe_fek_emulation_offset
+        name: Offset
+      - entity: number.warmepumpe_fek_emulation_raumeinfluss
+        name: Raumeinfluss
+      - entity: number.warmepumpe_fek_emulation_vorlauf_min
+        name: Vorlauf min
+      - entity: number.warmepumpe_fek_emulation_vorlauf_max
+        name: Vorlauf max
+      - entity: sensor.warmepumpe_fek_emulation_vorlauf_soll
+        name: Vorlauf Soll (berechnet)
+      grid_options:
+        columns: full
+    visibility:
+    - condition: state
+      entity: sensor.warmepumpe_heizungssteuerung_aktiv
+      state:
+      - FEK Emulation
+      - Prüfung läuft
+  - type: grid
+    cards:
+    - type: heading
+      heading: Wärmepumpe allein (HK1)
+      icon: mdi:heat-pump-outline
+    - type: entities
+      entities:
+      - entity: number.warmepumpe_heizen_komfort_temperatur
+        name: Komfort
+      - entity: number.warmepumpe_heizen_eco_temperatur
+        name: Eco
+      - entity: number.warmepumpe_steigung_hk1
+        name: Steigung
+      - entity: number.warmepumpe_raumeinfluss
+        name: Raumeinfluss
+      grid_options:
+        columns: full
+    visibility:
+    - condition: state
+      entity: sensor.warmepumpe_heizungssteuerung_aktiv
+      state: Wärmepumpe
+  - type: grid
+    cards:
+    - type: heading
+      heading: Warmwasser
+      icon: mdi:water-boiler
+    - type: entities
+      entities:
+      - entity: number.warmepumpe_ww_komfort_temperatur
+        name: Komfort
+      - entity: number.warmepumpe_ww_eco_temperatur
+        name: Eco
+      - entity: number.warmepumpe_ww_hysterese
+        name: Hysterese
+      grid_options:
+        columns: full
+  - type: grid
+    cards:
+    - type: heading
+      heading: Anlage
+      icon: mdi:tune
+    - type: entities
+      entities:
+      - entity: number.warmepumpe_pumpenleistung_heizkreis
+        name: Pumpe Heizkreis
+      - entity: number.warmepumpe_pumpenleistung_sole
+        name: Pumpe Sole
+      - entity: number.warmepumpe_pumpenleistung_warmwasser
+        name: Pumpe Warmwasser
+      - entity: number.warmepumpe_reglerdynamik
+        name: Reglerdynamik
+      - entity: number.warmepumpe_verdichter_stillstand
+        name: Verdichter Stillstand
+      - entity: button.warmepumpe_synchronize_time
+        name: Uhrzeit synchronisieren
+      - entity: sensor.warmepumpe_bivalenztemperatur_heizen
+        name: Bivalenz Heizen
+      - entity: sensor.warmepumpe_bivalenztemperatur_warmwasser
+        name: Bivalenz Warmwasser
+      - entity: sensor.warmepumpe_einsatzgrenze_heizen
+        name: Einsatzgrenze Heizen
+      - entity: sensor.warmepumpe_einsatzgrenze_warmwasser
+        name: Einsatzgrenze Warmwasser
+      - entity: sensor.warmepumpe_festwertsolltemperatur
+        name: Festwertsolltemperatur
+      - entity: sensor.warmepumpe_maximale_vorlauftemperatur
+        name: Max. Vorlauf
+      - entity: sensor.warmepumpe_maximale_rucklauftemperatur
+        name: Max. Rücklauf
+      - entity: binary_sensor.warmepumpe_sommerbetrieb
+        name: Automatischer Sommerbetrieb
+      - entity: sensor.warmepumpe_sommerbetrieb_heizgrenze
+        name: Heizgrenze Sommerbetrieb
+      - entity: binary_sensor.warmepumpe_antilegionellenbehandlung
+        name: Antilegionellen
+      - entity: binary_sensor.warmepumpe_pufferbetrieb
+        name: Pufferbetrieb
+      - entity: binary_sensor.warmepumpe_pumpenzyklen
+        name: Pumpenzyklen
+      grid_options:
+        columns: full
+  - type: grid
+    cards:
+    - type: heading
+      heading: Kühlen
+      icon: mdi:snowflake
+    - type: entities
+      entities:
+      - entity: switch.warmepumpe_kuhlen
+        name: Kühlen
+      - entity: switch.warmepumpe_kuhlmodus_aktivkuhlung
+        name: Aktivkühlung (aus = passiv)
+      - entity: switch.warmepumpe_flachenkuhlung
+        name: Flächenkühlung
+      - entity: number.warmepumpe_kuhlen_vorlauf_soll_temperatur
+        name: Vorlauf Soll
+      - entity: number.warmepumpe_kuhlen_raum_soll_temperatur
+        name: Raum Soll
+      - entity: number.warmepumpe_kuhlen_hysterese
+        name: Hysterese Vorlauf
+      - entity: switch.warmepumpe_geblasekuhlung
+        name: Gebläsekühlung
+      - entity: binary_sensor.warmepumpe_kuehlbetrieb
+        name: Kühlbetrieb
+      grid_options:
+        columns: full
+  - type: grid
+    cards:
+    - type: heading
+      heading: Warmwasserprogramm
+    - type: entities
+      entities:
+      - entity: text.warmepumpe_warmwasserprogramm_montag
+        name: Montag
+      - entity: text.warmepumpe_warmwasserprogramm_dienstag
+        name: Dienstag
+      - entity: text.warmepumpe_warmwasserprogramm_mittwoch
+        name: Mittwoch
+      - entity: text.warmepumpe_warmwasserprogramm_donnerstag
+        name: Donnerstag
+      - entity: text.warmepumpe_warmwasserprogramm_freitag
+        name: Freitag
+      - entity: text.warmepumpe_warmwasserprogramm_samstag
+        name: Samstag
+      - entity: text.warmepumpe_warmwasserprogramm_sonntag
+        name: Sonntag
+      grid_options:
+        columns: full
+    - type: markdown
+      content: 'Format `06:00-08:00, 17:00-18:30`: höchstens 3 Zeitfenster pro Tag, 15-Minuten-Schritte, `-` = keins. Eine
+        Änderung wird in die Wärmepumpe geschrieben.'
+  - type: grid
+    cards:
+    - type: heading
+      heading: Programme
+    - type: entities
+      entities:
+      - entity: sensor.warmepumpe_partyprogramm
+        name: Partyprogramm
+      - entity: binary_sensor.warmepumpe_aufheizprogramm
+        name: Aufheizprogramm (Estrich)
+      - entity: sensor.warmepumpe_ferienprogramm
+        name: Ferienprogramm
+  - type: grid
+    cards:
+    - type: heading
+      heading: Heizprogramm (nur ohne FEK)
+    - type: entities
+      entities:
+      - entity: sensor.warmepumpe_heizprogramm_montag
+        name: Montag
+      - entity: sensor.warmepumpe_heizprogramm_dienstag
+        name: Dienstag
+      - entity: sensor.warmepumpe_heizprogramm_mittwoch
+        name: Mittwoch
+      - entity: sensor.warmepumpe_heizprogramm_donnerstag
+        name: Donnerstag
+      - entity: sensor.warmepumpe_heizprogramm_freitag
+        name: Freitag
+      - entity: sensor.warmepumpe_heizprogramm_samstag
+        name: Samstag
+      - entity: sensor.warmepumpe_heizprogramm_sonntag
+        name: Sonntag
+    visibility:
+    - condition: state
+      entity: sensor.warmepumpe_heizungssteuerung_aktiv
+      state: Wärmepumpe
+- title: Diagnose
+  path: diagnose
+  icon: mdi:stethoscope
+  type: sections
+  max_columns: 3
+  sections:
+  - type: grid
+    cards:
+    - type: heading
+      heading: Gerät
+      icon: mdi:chip
+    - type: entities
+      entities:
+      - entity: binary_sensor.warmepumpe_fek_installiert
+        name: FEK installiert
+      - entity: sensor.warmepumpe_software_hk1
+        name: Software HK1
+      - entity: sensor.warmepumpe_software_wpm3i
+        name: Software WPM3i
+      - entity: sensor.warmepumpe_fehlermeldung
+        name: Fehlermeldung
+      - entity: sensor.warmepumpe_fehlernummer
+        name: Fehlernummer (21 = Keine Leistung)
+      - entity: binary_sensor.warmepumpe_einphasiger_betrieb
+        name: Einphasiger Betrieb
+      - entity: sensor.warmepumpe_zeitstempel
+        name: Zeitstempel
+    - type: entities
+      title: Community Analytics
+      entities:
+      - entity: binary_sensor.warmepumpe_analytics_mqtt_connected
+        name: MQTT verbunden
+      - entity: sensor.warmepumpe_analytics_last_update
+        name: Letzte Übertragung
+      - entity: binary_sensor.warmepumpe_github
+        name: Update auf GitHub
+      - entity: sensor.warmepumpe_analytics_global_device_id
+        name: Geräte-ID (Hash)
+  - type: grid
+    cards:
+    - type: heading
+      heading: Laufzeiten
+      icon: mdi:timer-outline
+    - type: entities
+      entities:
+      - entity: sensor.warmepumpe_verdichterstarts
+        name: Verdichterstarts
+      - entity: sensor.warmepumpe_betriebsstunden_verdichter_heizen
+        name: Verdichter Heizen
+      - entity: sensor.warmepumpe_betriebsstunden_verdichter_warmwasser
+        name: Verdichter Warmwasser
+      - entity: sensor.warmepumpe_betriebsstunden_kuehlen
+        name: Kühlen
+      - entity: sensor.warmepumpe_betriebsstunden_nachheizregister_1
+        name: Heizstab 1
+      - entity: sensor.warmepumpe_betriebsstunden_nachheizregister_2
+        name: Heizstab 2
+      - entity: sensor.warmepumpe_betriebsstunden_nachheizregister_1_2
+        name: Heizstab 1+2
+  - type: grid
+    cards:
+    - type: heading
+      heading: Hydraulik
+      icon: mdi:pipe
+    - type: entities
+      entities:
+      - entity: sensor.warmepumpe_druck_heizkreis
+        name: Druck Heizkreis
+      - entity: sensor.warmepumpe_druck_heizkreis_max
+        name: Hochdruck (Kältekreis)
+      - entity: sensor.warmepumpe_druck_heizkreis_min
+        name: Niederdruck (Kältekreis)
+      - entity: sensor.warmepumpe_druck_quelle
+        name: Druck Quelle
+      - entity: sensor.warmepumpe_volumenstrom
+        name: Volumenstrom
+      - entity: sensor.warmepumpe_quellenpumpe_pwm
+        name: Quellenpumpe PWM
+      - entity: sensor.warmepumpe_ladepumpe_pwm
+        name: Ladepumpe PWM
+      - entity: sensor.warmepumpe_umschaltventil_warmwasser
+        name: Umschaltventil WW
+      - entity: binary_sensor.warmepumpe_mischer_aktiv
+        name: Mischer aktiv
+      - entity: sensor.warmepumpe_heizkreis_spreizung
+        name: Spreizung
+  - type: grid
+    cards:
+    - type: heading
+      heading: Kältekreis und Strom
+      icon: mdi:sine-wave
+    - type: entities
+      entities:
+      - entity: sensor.warmepumpe_heizgastemperatur
+        name: Heißgas
+      - entity: sensor.warmepumpe_hk_ist_temperatur
+        name: HK Ist
+      - entity: sensor.warmepumpe_hk_soll_temperatur
+        name: HK Soll
+      - entity: sensor.warmepumpe_puffer_ist_temperatur
+        name: Puffer Ist
+      - entity: sensor.warmepumpe_puffer_soll_temperatur
+        name: Puffer Soll
+      - entity: sensor.warmepumpe_vorlauf_ist_temperatur_nhz
+        name: Vorlauf NHZ
+      - entity: sensor.warmepumpe_stromaufnahme
+        name: Stromaufnahme
+      - entity: sensor.warmepumpe_versorgungsspannung
+        name: Versorgungsspannung
+  - type: grid
+    cards:
+    - type: heading
+      heading: Raum (wie die WPM3i ihn sieht)
+    - type: entities
+      entities:
+      - entity: sensor.warmepumpe_raum_ist_wpm3i
+        name: Raum Ist
+      - entity: sensor.warmepumpe_raum_soll_wpm3i
+        name: Raum Soll
+      - entity: sensor.warmepumpe_raumfeuchte_wpm3i
+        name: Raumfeuchte
+      - entity: sensor.warmepumpe_taupunkt
+        name: Taupunkt
+      - entity: sensor.warmepumpe_verdichter_reststillstand
+        name: Verdichter Reststillstand
+  - type: grid
+    cards:
+    - type: heading
+      heading: Reverse Engineering
+      icon: mdi:magnify
+    - type: entities
+      entities:
+      - entity: sensor.warmepumpe_debug_betrieb
+        name: Betriebsstatus Bits
+      - entity: sensor.warmepumpe_debug_mfg_0xfe09_temperatur
+        name: TBD_INTERNAL_HEATPUMP_TEMP
+      - sensor.warmepumpe_debug_mfg_0xfe4c
+      - sensor.warmepumpe_debug_manager_0xfe1e
+      - sensor.warmepumpe_debug_bedienteil_0x06af
+      - sensor.warmepumpe_debug_bedienteil_0x4e8b
+      - sensor.warmepumpe_debug_manager_0x080e
+      - entity: sensor.warmepumpe_fek2_raumtemperatur_hk1
+        name: FEK2 Raumtemperatur
+      - entity: sensor.warmepumpe_fek2_raumfeuchte_hk1
+        name: FEK2 Raumfeuchte
+      state_color: false
+    - type: entities
+      entities:
+      - sensor.warmepumpe_debug_manager_0x068e_kuhlen
+      title: Kühlen (unbekannt)
+  - type: grid
+    cards:
+    - type: heading
+      heading: CAN IDs
+      icon: mdi:identifier
+    - type: entities
+      title: Frames pro Stunde, letzte 60 min (0 = Knoten still)
+      entities:
+      - entity: sensor.warmepumpe_can_kessel_0x180_frames
+        name: Kessel 0x180
+      - entity: sensor.warmepumpe_can_manager_0x480_frames
+        name: Manager (WPM3i) 0x480
+      - entity: sensor.warmepumpe_can_mfg_0x700_frames
+        name: MFG 0x700
+      - entity: sensor.warmepumpe_can_bedienteil_0x100_frames
+        name: Bedienteil 0x100
+      - entity: sensor.warmepumpe_can_hk1_0x301_frames
+        name: HK1 / FEK 0x301
+      - entity: sensor.warmepumpe_can_0x601_frames
+        name: '0x601'
+      - entity: sensor.warmepumpe_can_0x680_frames
+        name: 0x680 (fremd)
+      - entity: sensor.warmepumpe_can_unbekannt_frames
+        name: Unbekannte Sender
+      - entity: sensor.warmepumpe_can_unbekannte_sender
+        name: Unbekannte IDs
+    - type: entities
+      entities:
+      - text.warmepumpe_kessel_can_id
+      - text.warmepumpe_hk1_can_id
+      - text.warmepumpe_manager_can_id
+      - text.warmepumpe_mfg_can_id
+      - text.warmepumpe_bedienteil_can_id
+      - text.warmepumpe_hk2_can_id
+      - text.warmepumpe_heizmodul_can_id
+      - text.warmepumpe_fet_can_id
+      title: CAN IDs (einstellbar)
