@@ -1,0 +1,1799 @@
+# Tecalor TTF07 C (cool) with WPM3i manager (maybe compatible with Stiebel Eltron WPF*)
+#
+# Variant of ttf07_base.yaml (shared with ttf07.yaml): the entities of ttf07.yaml keep their names, so switching from
+# ttf07.yaml keeps the Home Assistant history. Differences to ttf07.yaml, set here, by substitutions and !extend:
+# - Betriebsstatus and Programmschalter are read from / written to the WPM3i manager (CAN 0x480 = CanNode::Manager),
+#   not from the Kessel. The Betriebsstatus bit layout of the WPM3i (0x4e5e) differs from the Kessel one (0x0a20).
+# - VORLAUFISTTEMP from the Kessel, the refrigerant pressures scaled by 10, more frequent reads; pump powers,
+#   Verdichter Stillstand and Reglerdynamik are numbers (sensors in ttf07.yaml); no KUEHLEN_EINGESCHALTET (does not
+#   react here, cooling: KUEHLEN_EIN); the HK1 room values of txx_base.yaml are internal (HK1 is the FEK or the ESP's
+#   emulation here).
+# - New template entities are named by their id like in the other device files (e.g. HKISTTEMP). For human readable German names, add names/ttf07_wpm3i_de.yaml as a package (choose before
+#   the first install: renaming an entity later starts a new history in Home Assistant).
+# - Additional sensors: power/energy split (heating, hot water, external heating circuit pump), COP, operating hours,
+#   cooling settings. Sensors for registers that are not identified yet: ttf07_wpm3i_debug.yaml (optional package).
+#
+# NOTES
+# - Heating control (section "Heating control"): if a FEK2 is installed, it controls heating (it sets the flow
+#   setpoint) and the HK1 heating settings are locked here. Without a FEK2, select "Heizungssteuerung":
+#     - "Wärmepumpe": the WPM3i controls heating itself (Eco/Komfort temperature, Steigung, Programmschalter).
+#     - "FEK Emulation": the ESP registers as FEK2, sends the room values from Home Assistant and the flow setpoint
+#       from its own heating curve. Without a FEK2 the WPM blocks cooling; the emulation unblocks the "Kühlen" menu.
+# - core.yaml's way of sending room temperature/humidity (to HK1 every minute) is removed; the FEK emulation sends
+#   them like the FEK2 does.
+# - The external heating circuit pump has a constant power consumption, set $static_leistung_heizkreispumpe (in W,
+#   0 if not applicable) in your device yaml.
+# - HA Energy dashboard (>2025.12), add as "individual devices":
+#     - Wärmepumpe:     Energie Summe / Leistung Summe
+#     - Warmwasser:     EL_ENERGIEAUFNAHME_WW_SUMME_MWH / Leistung Warmwasserbereitung   (upstream: Wärmepumpe)
+#     - Heizung:        EL_ENERGIEAUFNAHME_HEIZ_SUMME_MWH / Leistung Heizen             (upstream: Wärmepumpe)
+#     - Heizkreispumpe: Energie ext. Heizkreispumpe / Leistung ext. Heizkreispumpe      (upstream: Heizung)
+#
+# ToDo / open issues
+# - Kühlen: the settings are mapped, cooling itself is not tested yet.
+# - naming: Is NHZ3 actually NHZ1_2?
+
+#########################################
+#                                       #
+#   Substitutions                       #
+#                                       #
+#########################################
+substitutions:
+  espclient_can_id: "0x680"
+  static_leistung_heizkreispumpe: "0"
+  # ttf07_base.yaml / txx_base.yaml
+  druck_kaeltekreis_scaler: "10.0"    # et_cent_val divides by 100, the panel shows raw/10 bar
+  vorlaufisttemp_target: "Kessel"
+  hk1_settings_write_lock: "id(heating_settings_locked)"
+
+#########################################
+#                                       #
+#   ESPHome                             #
+#                                       #
+#########################################
+esphome:
+  on_boot:
+    # Sommerbetrieb, Antilegionellen, Pumpenzyklen (Kessel, 0x0100 = EIN), Pufferbetrieb (Kessel, 1 = EIN) and the Heizprogramm of HK1 (7 days x 3 windows at
+    # HK1 0x1410 + 0x10 * day + window; answered only while the WPM3i owns HK1, i.e. no FEK / emulation)
+    - priority: -50
+      then:
+        - lambda: |-
+            const auto flag = [](binary_sensor::BinarySensor *sensor) {
+              return [sensor](const SimpleVariant &value) {
+                const bool on = static_cast<std::int32_t>(value.get<float>()) != 0;
+                if (!sensor->has_state() || sensor->state != on) sensor->publish_state(on);
+              };
+            };
+            CallbackHandler::instance().addCallback({CanNode::Kessel, Property::kSOMMERBETRIEB}, flag(id(SOMMERBETRIEB)));
+            CallbackHandler::instance().addCallback({CanNode::Kessel, Property::kANTILEGIONELLEN}, flag(id(ANTILEGIONELLEN)));
+            CallbackHandler::instance().addCallback({CanNode::Kessel, Property::kPUMPENZYKLEN}, flag(id(PUMPENZYKLEN)));
+            CallbackHandler::instance().addCallback({CanNode::Kessel, Property::kPUFFERBETRIEB}, flag(id(PUFFERBETRIEB)));
+            for (std::size_t i = 0; i < 21; ++i) {
+              const std::uint16_t addr = 0x1410 + 0x10 * (i / 3) + (i % 3);
+              CallbackHandler::instance().addCallback({CanNode::HK1, Property(addr)}, [i](const SimpleVariant &value) {
+                id(heiz_programm)[i] = static_cast<std::uint16_t>(static_cast<std::int32_t>(value.get<float>()));
+                id(heiz_programm_valid) |= (1UL << i);
+                const std::size_t day = i / 3;
+                if (((id(heiz_programm_valid) >> (3 * day)) & 7UL) != 7UL) return;
+                std::string text;
+                for (std::size_t w = 0; w < 3; ++w) {
+                  const std::uint16_t v = id(heiz_programm)[3 * day + w];
+                  if (v & 0x8080) continue;
+                  char buf[16];
+                  snprintf(buf, sizeof(buf), "%02u:%02u-%02u:%02u", (v >> 8) / 4U, 15U * ((v >> 8) % 4U),
+                           (v & 0xff) / 4U, 15U * ((v & 0xff) % 4U));
+                  if (!text.empty()) text += ", ";
+                  text += buf;
+                }
+                if (text.empty()) text = "-";
+                const std::array<template_::TemplateTextSensor *, 7> days{id(HEIZ_PROGRAMM_MO), id(HEIZ_PROGRAMM_DI),
+                    id(HEIZ_PROGRAMM_MI), id(HEIZ_PROGRAMM_DO), id(HEIZ_PROGRAMM_FR), id(HEIZ_PROGRAMM_SA), id(HEIZ_PROGRAMM_SO)};
+                if (days[day]->state != text) days[day]->publish_state(text);
+              });
+            }
+    # Settings shown as text ("Aus" for 0x9000), Aufheizprogramm state, Ferienprogramm dates
+    - priority: -50
+      then:
+        - lambda: |-
+            const auto temp_or_aus = [](template_::TemplateTextSensor *sensor) {
+              return [sensor](const SimpleVariant &value) {
+                const auto raw = static_cast<std::uint16_t>(static_cast<std::int32_t>(value.get<float>()));  // float may be negative
+                char buf[16];
+                // 0x8000..0xEFFF can't be a temperature (< -409.6 °C): status codes. 0x9000 = AUS on the panel;
+                // 0xA000 also seen for the same settings (meaning unknown)
+                if (raw == 0x9000 || raw == 0xA000) snprintf(buf, sizeof(buf), "Aus");
+                else if (raw >= 0x8000 && raw < 0xF000) snprintf(buf, sizeof(buf), "0x%04X", raw);
+                else snprintf(buf, sizeof(buf), "%.1f °C", static_cast<std::int16_t>(raw) / 10.0f);
+                ESP_LOGD("SETTING", "%s: raw 0x%04X -> %s", sensor->get_name().c_str(), raw, buf);
+                if (sensor->state != buf) sensor->publish_state(buf);
+              };
+            };
+            CallbackHandler::instance().addCallback({CanNode::Kessel, Property::kEINSATZGRENZE_HZG}, temp_or_aus(id(EINSATZGRENZE_HZG)));
+            CallbackHandler::instance().addCallback({CanNode::Kessel, Property::kEINSATZGRENZE_WW}, temp_or_aus(id(EINSATZGRENZE_WW)));
+            CallbackHandler::instance().addCallback({CanNode::Kessel, Property::kFESTWERTBETRIEB}, temp_or_aus(id(FESTWERTBETRIEB)));
+            CallbackHandler::instance().addCallback({CanNode::Kessel, Property::kAUFHEIZPROGRAMM}, [](const SimpleVariant &value) {
+              const bool on = value.get<float>() != 0.0f;
+              if (!id(AUFHEIZPROGRAMM).has_state() || id(AUFHEIZPROGRAMM).state != on) id(AUFHEIZPROGRAMM).publish_state(on);
+            });
+            const std::array<Property, 6> ferien{Property::kFERIEN_BEGINN_TAG, Property::kFERIEN_BEGINN_MONAT,
+                Property::kFERIEN_BEGINN_JAHR, Property::kFERIEN_ENDE_TAG, Property::kFERIEN_ENDE_MONAT,
+                Property::kFERIEN_ENDE_JAHR};
+            for (std::size_t i = 0; i < ferien.size(); ++i) {
+              CallbackHandler::instance().addCallback({CanNode::Manager, ferien[i]}, [i](const SimpleVariant &value) {
+                id(ferien_datum)[i] = static_cast<int>(value.get<float>());
+                for (const int v : id(ferien_datum)) if (v < 0) return;
+                const auto &d = id(ferien_datum);
+                char buf[32];
+                snprintf(buf, sizeof(buf), "%02d.%02d.%02d - %02d.%02d.%02d", d[0], d[1], d[2], d[3], d[4], d[5]);
+                if (id(FERIENPROGRAMM).state != buf) id(FERIENPROGRAMM).publish_state(buf);
+              });
+            }
+    # Warmwasserprogramm: register the 21 time windows (7 days x 3, Kessel 0x1710 + 0x10 * day + window) and publish
+    # each day as text "06:00-08:00, 17:00-18:30" ("-" = no window) once all 3 windows of the day are known
+    - priority: -50
+      then:
+        - lambda: |-
+            for (std::size_t i = 0; i < 21; ++i) {
+              const std::uint16_t addr = 0x1710 + 0x10 * (i / 3) + (i % 3);
+              CallbackHandler::instance().addCallback({CanNode::Kessel, Property(addr)}, [i](const SimpleVariant &value) {
+                id(ww_programm)[i] = static_cast<std::uint16_t>(static_cast<std::int32_t>(value.get<float>()));
+                id(ww_programm_valid) |= (1UL << i);
+                id(ww_modus_pending) &= ~(1UL << i);
+                id(ww_programm_update_modus)();
+                const std::size_t day = i / 3;
+                if (((id(ww_programm_valid) >> (3 * day)) & 7UL) != 7UL) return;
+                std::string text;
+                for (std::size_t w = 0; w < 3; ++w) {
+                  const std::uint16_t v = id(ww_programm)[3 * day + w];
+                  if (v & 0x8080) continue;  // empty window (--:--)
+                  char buf[16];
+                  snprintf(buf, sizeof(buf), "%02u:%02u-%02u:%02u", (v >> 8) / 4U, 15U * ((v >> 8) % 4U),
+                           (v & 0xff) / 4U, 15U * ((v & 0xff) % 4U));
+                  if (!text.empty()) text += ", ";
+                  text += buf;
+                }
+                if (text.empty()) text = "-";
+                const std::array<template_::TemplateText *, 7> days{id(WW_PROGRAMM_MO), id(WW_PROGRAMM_DI),
+                    id(WW_PROGRAMM_MI), id(WW_PROGRAMM_DO), id(WW_PROGRAMM_FR), id(WW_PROGRAMM_SA), id(WW_PROGRAMM_SO)};
+                if (days[day]->state != text) days[day]->publish_state(text);
+              });
+            }
+    # Warmwasserprogramm: first read 90 s after boot
+    - priority: -200
+      then:
+        - delay: 90s
+        - script.execute: ww_programm_lesen
+        - delay: 10s
+        - lambda: |-
+            queueRequest(CanNode::Kessel, Property::kEINSATZGRENZE_HZG);
+            queueRequest(CanNode::Kessel, Property::kEINSATZGRENZE_WW);
+            queueRequest(CanNode::Kessel, Property::kFESTWERTBETRIEB);
+            queueRequest(CanNode::Kessel, Property::kAUFHEIZPROGRAMM);
+            for (const auto &p : {Property::kFERIEN_BEGINN_TAG, Property::kFERIEN_BEGINN_MONAT, Property::kFERIEN_BEGINN_JAHR,
+                                  Property::kFERIEN_ENDE_TAG, Property::kFERIEN_ENDE_MONAT, Property::kFERIEN_ENDE_JAHR}) {
+              queueRequest(CanNode::Manager, p);
+            }
+    # Error list: first read 2 min after boot (CAN and queues are running by then)
+    - priority: -200
+      then:
+        - delay: 2min
+        - script.execute: fehlerliste_lesen
+    - priority: -50
+      then:
+        - lambda: |-
+            // Error list: the Manager answers a request of 0x0B9A to the control panel (0x100); the ESP listens. Also
+            // filled when someone opens the list on the panel.
+            CallbackHandler::instance().addCallback({CanNode::Manager, Property::kFEHLERLISTE_INDEX}, [](const SimpleVariant &value) {
+              id(fehlerliste_index) = static_cast<int>(value.get<float>());
+            });
+            const auto fehlerliste_feld = [](std::size_t field) {
+              return [field](const SimpleVariant &value) {
+                const int index = id(fehlerliste_index);
+                if (index >= 0 && index < static_cast<int>(id(fehlerliste).size())) {
+                  id(fehlerliste)[index][field] = static_cast<std::int16_t>(value.get<float>());
+                }
+              };
+            };
+            CallbackHandler::instance().addCallback({CanNode::Manager, Property::kFEHLERLISTE_CODE}, fehlerliste_feld(0));
+            CallbackHandler::instance().addCallback({CanNode::Manager, Property::kFEHLERLISTE_MINUTE}, fehlerliste_feld(1));
+            CallbackHandler::instance().addCallback({CanNode::Manager, Property::kFEHLERLISTE_STUNDE}, fehlerliste_feld(2));
+            CallbackHandler::instance().addCallback({CanNode::Manager, Property::kFEHLERLISTE_TAG}, fehlerliste_feld(3));
+            CallbackHandler::instance().addCallback({CanNode::Manager, Property::kFEHLERLISTE_MONAT}, fehlerliste_feld(4));
+            CallbackHandler::instance().addCallback({CanNode::Manager, Property::kFEHLERLISTE_JAHR}, fehlerliste_feld(5));
+            // Current error as text; a new error refreshes the error list
+            CallbackHandler::instance().addCallback({CanNode::Manager, Property::kFEHLERNUMMER_WPM}, [](const SimpleVariant &value) {
+              static int last = -1;
+              const int code = static_cast<int>(value.get<float>());
+              std::string text = "kein Fehler";
+              if (code != 0) {
+                const auto it = id(fehler_texte).find(code);
+                text = (it != id(fehler_texte).end() ? it->second : std::string("unbekannt")) + " (" + to_string(code) + ")";
+              }
+              if (id(FEHLER_AKTUELL).state != text) {
+                id(FEHLER_AKTUELL).publish_state(text);
+              }
+              if (last != -1 && code != last && code != 0) {
+                id(fehlerliste_lesen).execute();
+              }
+              last = code;
+            });
+            CallbackHandler::instance().addCallback({CanNode::Manager,Property::kBETRIEBS_STATUS_WPM},[](const SimpleVariant& value){
+              const std::bitset<16U> status_bits{static_cast<std::uint16_t>(value.get<float>())};
+
+              // for debugging (remove after Sommerbetrieb and Kühlbetrieb were tested)
+              id(DEBUG_BETRIEB).publish_state(status_bits.to_string());
+
+              id(HEIZKREISPUMPE).publish_state(status_bits.test(0U));
+              id(MISCHER_PUMPE).publish_state(status_bits.test(1U));
+              id(MISCHER_AUF).publish_state(status_bits.test(2U));
+              id(MISCHER_ZU).publish_state(status_bits.test(3U));
+              id(NHZ1).publish_state(status_bits.test(7U) && !status_bits.test(5U) && status_bits.test(4U));  // 0x0090 [7_4] 1001
+              id(NHZ2).publish_state(status_bits.test(7U) && status_bits.test(5U) && !status_bits.test(4U));  // 0x00A0 [7_4] 1010
+              id(NHZ3).publish_state(status_bits.test(7U) && status_bits.test(5U) && status_bits.test(4U));   // 0x00B0 [7_4] 1011
+              id(HEIZBETRIEB).publish_state(!status_bits.test(13U) && !status_bits.test(9U) && status_bits.test(7U));  // 0x0080, not in KUEHLBETRIEB
+              id(QUELLENPUMPE).publish_state(status_bits.test(6U));                         // 0x0040
+              id(PUFFERLADEPUMPE).publish_state(status_bits.test(7U));                      // 0x0080
+              id(ENTLEERUNG_HYD).publish_state(status_bits.test(9U));                       // 0x0200
+              id(WARMWASSERBEREITUNG).publish_state(status_bits.test(9U) && status_bits.test(7U));  // 0x0280
+              id(KUEHLBETRIEB).publish_state(status_bits.test(13U));                        // 0x2000
+              id(VERDICHTER).publish_state(status_bits.test(14U));                          // 0x4000
+            });
+
+            // Heating control: the WPM3i checks the node 0x301 every 8 min (system message, ANMELDUNG = 0x0800).
+            // A FEK answers with a system response (0x0100); as long as it does, the FEK owns HK1.
+            CallbackHandler::instance().addCallback({CanNode::HK1,Property::kANMELDUNG},[](const SimpleVariant& value){
+              const auto raw = static_cast<std::uint16_t>(static_cast<std::int32_t>(value.get<float>()));  // float may be negative
+              // ANMELDUNG on 0x301: 0x0800 = the WPM3i's presence check, 0x0900 = a FEK registers, 0x0100 = a FEK answers
+              const char* what = raw == 0x0800 ? "presence check" : raw == 0x0900 ? "FEK registration" :
+                                 raw == 0x0100 ? "FEK answer to the presence check" : "unknown";
+              ESP_LOGI("FEK", "ANMELDUNG 0x%04x on 0x301 (%s), emulation %s", raw, what, id(fek_registered) ? "registered" : "off");
+              if (raw == 0x0800 && id(fek_registered)) {
+                id(fek_send)(0x301, 7, 0xfd, 0x0100);  // system response: "present"
+              }
+            });
+
+            // FEK detection: HK1 reports the WPM3i's software version (same as the Manager) unless a FEK owns HK1.
+            CallbackHandler::instance().addCallback({CanNode::Manager,Property::kFET_SOFTWARE},[](const SimpleVariant& value){
+              id(sw_version_manager) = static_cast<int>(value.get<float>());
+              id(software_publish)();
+            });
+            CallbackHandler::instance().addCallback({CanNode::Manager,Property::kFET_SOFTWARESTAND},[](const SimpleVariant& value){
+              id(sw_revision_manager) = static_cast<int>(value.get<float>());
+              id(software_publish)();
+            });
+            CallbackHandler::instance().addCallback({CanNode::HK1,Property::kFET_SOFTWARESTAND},[](const SimpleVariant& value){
+              id(sw_revision_hk1) = static_cast<int>(value.get<float>());
+              id(software_publish)();
+            });
+            CallbackHandler::instance().addCallback({CanNode::HK1,Property::kFET_SOFTWARE},[](const SimpleVariant& value){
+              const int hk1 = static_cast<int>(value.get<float>());
+              id(sw_version_hk1) = hk1;
+              id(software_publish)();
+              const int manager = id(sw_version_manager);
+              if (manager < 0) {
+                return;  // compare at the next check
+              }
+              if (hk1 == manager) {
+                if (id(fek_state) != 1) {
+                  ESP_LOGI("FEK", "No FEK installed: HK1 is the WPM3i's (software %d)", hk1);
+                }
+                id(fek_state) = 1;
+                if (id(fek_registered)) {
+                  // the WPM3i answers for HK1 again, so the emulation lost its registration (e.g. WPM3i restart)
+                  ESP_LOGW("FEK", "Emulation registration lost, registering again");
+                  id(fek_registered) = false;
+                }
+              } else {
+                id(fek_seen)("HK1 software differs from the WPM3i's");
+              }
+              id(heating_control_update).execute();
+            });
+    - priority: -100
+      then:
+        - delay: 250ms
+        - lambda: |-
+            queueRequest(CanNode::Manager, Property::kBETRIEBS_STATUS_WPM);
+            queueRequest(CanNode::Kessel, Property::kEINPHASIGER_BETRIEB);
+
+#########################################
+#                                       #
+#   CAN Bus                             #
+#                                       #
+#########################################
+canbus:
+  - id: !extend wp_can
+    bit_rate: $can_bus_bit_rate
+    on_frame:
+      # CAN nodes on the bus: count the frames per sender (the ESP does not receive its own frames)
+      - can_id: 0
+        can_id_mask: 0
+        then:
+          - lambda: |-
+              id(can_frames)[static_cast<std::uint16_t>(can_id)]++;
+      # Heating control: detect a real FEK and, while emulating, answer what is addressed to the FEK (node 0x301)
+      # like the real FEK does. The ESP does not receive its own frames.
+      - can_id: 0
+        can_id_mask: 0
+        then:
+          - lambda: |-
+              if (x.size() < 7) {
+                return;
+              }
+              const std::uint16_t node = ((x[0] & 0xf0) << 3) | (x[1] & 0x7f);
+              const std::uint8_t type = x[0] & 0x0f;
+              // Signs of a real FEK, sent with CAN ID 0x301: registration (system 0x00fd = 0x0900), answer to the
+              // WPM3i's presence check (system response 0x00fd), room temperature written to 0x601.
+              if (can_id == 0x301) {
+                if (type == 6 && node == 0x301 && x[2] == 0xfd && x[3] == 0x09) {
+                  id(fek_seen)("registration");
+                } else if (type == 7 && node == 0x301 && x[2] == 0xfd) {
+                  id(fek_seen)("answer to the presence check");
+                } else if (type == 0 && node == 0x601 && x[2] == 0x11) {
+                  id(fek_seen)("room temperature to 0x601");
+                }
+              }
+              // HK1 heat demand: 0x601 writes 0x0052 to HK1 (0x301), 0x0100 = demand. Not dispatched by core.yaml
+              // (0x601 is no CanNode), so decoded here; short form [.., 0x52, hi, lo], long form [.., 0xfa, 0x00, 0x52, hi, lo].
+              if (can_id == 0x601 && type == 0 && node == 0x301) {
+                const bool long_form = x[2] == 0xfa;
+                const std::uint16_t addr = long_form ? ((x[3] << 8) | x[4]) : x[2];
+                const std::uint16_t val = long_form ? ((x[5] << 8) | x[6]) : ((x[3] << 8) | x[4]);
+                if (addr == 0x0052) {
+                  const bool on = val != 0;
+                  if (!id(HEIZ_ANFORDERUNG_HK1).has_state() || id(HEIZ_ANFORDERUNG_HK1).state != on)
+                    id(HEIZ_ANFORDERUNG_HK1).publish_state(on);
+                }
+              }
+              if (!id(fek_registered) || node != 0x301) {
+                return;
+              }
+              // Reads addressed to HK1 (= the ESP while emulating): answer like the real FEK did, so the reader does
+              // not run into a timeout. The control panel (0x100) reads VORLAUFSOLLTEMP in short form and retries
+              // every ~6 s without an answer (spinning wheel on the display). The answer goes to the
+              // reader in the form of the read (short form: [.., property, value, 0, 0], long form: [.., 0xfa, ...]).
+              if (type == 1) {
+                const bool long_form = x[2] == 0xfa;
+                const std::uint16_t property = long_form ? ((x[3] << 8) | x[4]) : x[2];
+                const std::uint16_t reader = can_id & 0x7ff;
+                const bool eco = id(FEK_BETRIEBSART).active_index().value_or(0) == 1;
+                const auto dec = [](float v) -> int { return std::isnan(v) ? -1 : static_cast<int>(lroundf(v * 10.0f)); };
+                int value = -1;
+                switch (property) {
+                  case 0x0199: value = 0x01a0; break;                              // FET_SOFTWARE (FEK2: 416)
+                  case 0x019a: value = 0x0003; break;                              // FET_SOFTWARESTAND (FEK2: 3)
+                  case 0x0004: value = dec(id(FEK_VORLAUF_SOLL).state); break;     // VORLAUFSOLLTEMP, as last sent
+                  case 0x0005: value = dec(id(FEK_KOMF_TEMP).state); break;        // KOMF_TEMP
+                  case 0x0008: value = dec(id(FEK_ECO_TEMP).state); break;         // ECO_TEMP
+                  case 0x0012: value = dec(eco ? id(FEK_ECO_TEMP).state : id(FEK_KOMF_TEMP).state); break;  // VERSTELLTE_RAUMSOLLTEMP
+                  case 0x010e:                                                     // STEIGUNG_HK1 (cent)
+                    if (!std::isnan(id(FEK_STEIGUNG).state)) value = static_cast<int>(lroundf(id(FEK_STEIGUNG).state * 100.0f));
+                    break;
+                  case 0x010f: value = 0x0200; break;                              // RAUMEINFLUSS 2 (little endian), as sent to 0x601
+                  default: break;
+                }
+                if (value < 0) {
+                  ESP_LOGD("FEK", "Read of 0x%04x from 0x%03x: not answered (unknown to the emulation)", property, reader);
+                  return;
+                }
+                if (long_form && property < 0x100) {
+                  // fek_send would pick the short form for this property; answer in the long form of the read
+                  const auto v = static_cast<std::uint16_t>(value);
+                  id(fek_tx_queue).push_back({static_cast<std::uint8_t>(((reader >> 3) & 0xf0) | 2),
+                                              static_cast<std::uint8_t>(reader & 0x7f), 0xfa,
+                                              static_cast<std::uint8_t>(property >> 8), static_cast<std::uint8_t>(property),
+                                              static_cast<std::uint8_t>(v >> 8), static_cast<std::uint8_t>(v)});
+                } else {
+                  id(fek_send)(reader, 2, property, static_cast<std::uint16_t>(value));
+                }
+                ESP_LOGD("FEK", "Read of 0x%04x from 0x%03x: answered %d", property, reader, value);
+                return;
+              }
+              // System message 0x00fe from 0x601: answer to 0x601 and to the Kessel (system response)
+              if (type == 6 && can_id == 0x601 && x[2] == 0xfe) {
+                id(fek_send)(0x601, 7, 0xfe, 0x0100);
+                id(fek_send)(0x180, 7, 0xfe, 0x0100);
+              }
+
+#########################################
+#                                       #
+#   Global variables                    #
+#                                       #
+#########################################
+globals:
+  # Heizprogramm HK1: raw time windows (7 days x 3) and which of them have been read (bit per window)
+  - id: heiz_programm
+    type: std::array<std::uint16_t, 21>
+  - id: heiz_programm_valid
+    type: std::uint32_t
+    initial_value: '0'
+  # Ferienprogramm: start day, month, year, end day, month, year (-1 = not read yet)
+  - id: ferien_datum
+    type: std::array<int, 6>
+    initial_value: '{-1, -1, -1, -1, -1, -1}'
+  # Warmwasserprogramm: raw time windows (7 days x 3) and which of them have been read since boot (bit per window)
+  - id: ww_programm
+    type: std::array<std::uint16_t, 21>
+  - id: ww_programm_valid
+    type: std::uint32_t
+    initial_value: '0'
+  # Windows not read back yet since "Warmwasser Modus" was switched (bit per window); until all are back, the mode
+  # is not evaluated, so a half-updated program does not show as "Programm"
+  - id: ww_modus_pending
+    type: std::uint32_t
+    initial_value: '0'
+  # Publishes "Warmwasser Modus" from ww_programm once all 21 windows are known (see the select WW_MODUS)
+  - id: ww_programm_update_modus
+    type: std::function<void()>
+    initial_value: |-
+      []() {
+        if (id(ww_programm_valid) != (1UL << 21) - 1 || id(ww_modus_pending) != 0) return;
+        bool komfort = true, eco = true;
+        for (std::size_t i = 0; i < 21; ++i) {
+          const std::uint16_t v = id(ww_programm)[i];
+          const std::uint16_t komfort_v = (i % 3 == 0) ? 0x0060 : 0x8080;
+          if (v != komfort_v) komfort = false;
+          if (!(v & 0x8080)) eco = false;
+        }
+        const char *modus = komfort ? "Komfort" : (eco ? "Eco" : "Programm");
+        if (!id(WW_MODUS).has_state() || id(WW_MODUS).current_option() != std::string(modus)) {
+          id(WW_MODUS).publish_state(modus);
+        }
+      }
+  # CAN nodes on the bus (diagnostic): frames per sender CAN ID in the current minute, the counts of the last 60
+  # minutes (sliding window for the hourly rate), and for unknown senders the time they were last seen (epoch
+  # seconds). Published every minute by the interval "CAN nodes".
+  - id: can_frames
+    type: std::map<std::uint16_t, std::uint32_t>
+  - id: can_frames_window      # [minute][sender]: the 7 known senders in the order of the interval, then unknown
+    type: std::array<std::array<std::uint16_t, 8>, 60>
+  - id: can_frames_window_pos  # next slot to write
+    type: std::uint8_t
+    initial_value: '0'
+  - id: can_frames_window_fill # minutes recorded so far (up to 60)
+    type: std::uint8_t
+    initial_value: '0'
+  - id: can_unknown_last_seen
+    type: std::map<std::uint16_t, std::uint32_t>
+  # Error list (see script fehlerliste_lesen): the 5 newest entries [index][code, minute, hour, day, month, year],
+  # the index of the block being received, and the texts of the known WPM3i error codes
+  - id: fehlerliste
+    type: std::array<std::array<std::int16_t, 6>, 5>
+  - id: fehlerliste_index
+    type: int
+    initial_value: '-1'
+  - id: fehler_texte
+    type: std::map<int, std::string>
+    initial_value: '{{18, "Hochdruck"}, {21, "Keine Leistung"}, {22, "Niederdruck"}, {130, "Fühlerbruch E 130"}, {8036, "TO P SOL MFG"}, {8039, "TO PU SOL MFG"}, {8040, "TO VENTIL MFG"}, {8041, "TO DHC MFG"}}'
+  # Heating control (see section "Heating control")
+  - id: fek_state             # 0 = checking, 1 = no FEK (HK1 is the WPM3i's), 2 = a real FEK is installed
+    type: int
+    initial_value: '0'
+  - id: fek_last_seen         # millis() of the last sign of a real FEK
+    type: uint32_t
+    initial_value: '0'
+  - id: sw_version_manager    # FET_SOFTWARE of the WPM3i, -1 = not read yet
+    type: int
+    initial_value: '-1'
+  - id: sw_revision_manager   # FET_SOFTWARESTAND of the WPM3i, -1 = not read yet
+    type: int
+    initial_value: '-1'
+  - id: sw_version_hk1        # FET_SOFTWARE of HK1 (the WPM3i's or a FEK's), -1 = not read yet
+    type: int
+    initial_value: '-1'
+  - id: sw_revision_hk1       # FET_SOFTWARESTAND of HK1, -1 = not read yet
+    type: int
+    initial_value: '-1'
+  - id: software_publish      # publishes the diagnostic sensors "Software WPM3i" and "Software HK1"
+    type: std::function<void()>
+    initial_value: |-
+      []() {
+        const auto version = [](int v, int r) -> std::string {
+          char buf[32];
+          if (r >= 0) snprintf(buf, sizeof(buf), "%d.%02d", v, r); else snprintf(buf, sizeof(buf), "%d", v);
+          return buf;
+        };
+        if (id(sw_version_manager) >= 0) {
+          const auto wpm3i = version(id(sw_version_manager), id(sw_revision_manager));
+          if (id(SOFTWARE_WPM3I).state != wpm3i) id(SOFTWARE_WPM3I).publish_state(wpm3i);
+        }
+        std::string hk1;
+        if (id(fek_registered)) {
+          hk1 = "416.03 (Emulation)";  // the ESP is HK1 and answers like the FEK2
+        } else if (id(sw_version_hk1) >= 0) {
+          hk1 = version(id(sw_version_hk1), id(sw_revision_hk1)) +
+                (id(sw_version_hk1) == id(sw_version_manager) ? " (WPM3i)" : " (FEK)");
+        }
+        if (!hk1.empty() && id(SOFTWARE_HK1).state != hk1) id(SOFTWARE_HK1).publish_state(hk1);
+      }
+  - id: fek_registered        # the ESP is registered as FEK (emulation active)
+    type: bool
+    initial_value: 'false'
+  - id: heating_settings_locked  # HK1 heating settings are not written (FEK installed, emulation active, checking)
+    type: bool
+    initial_value: 'true'
+  - id: fek_tx_queue          # frames to send as 0x301, sent one every 30 ms
+    type: std::vector<std::vector<std::uint8_t>>
+  - id: fek_send
+    type: std::function<void(std::uint16_t, std::uint8_t, std::uint16_t, std::uint16_t)>
+    initial_value: |-
+      [](std::uint16_t node, std::uint8_t type, std::uint16_t property, std::uint16_t value) {
+        // Frame like the FEK sends it (CAN ID 0x301). ID bytes = addressed node + message type
+        // (0 write, 1 read, 2 response, 6 system, 7 system response).
+        // Short form for properties < 0x100: [id0, id1, property, value_hi, value_lo, 0, 0]
+        // Long form otherwise:               [id0, id1, 0xfa, property_hi, property_lo, value_hi, value_lo]
+        auto b = [](unsigned v) { return static_cast<std::uint8_t>(v & 0xff); };
+        const auto id0 = b(((node >> 3) & 0xf0) | (type & 0x0f));
+        const auto id1 = b(node & 0x7f);
+        std::vector<std::uint8_t> data;
+        if (property < 0x100) {
+          data = {id0, id1, b(property), b(value >> 8), b(value), 0x00, 0x00};
+        } else {
+          data = {id0, id1, 0xfa, b(property >> 8), b(property), b(value >> 8), b(value)};
+        }
+        id(fek_tx_queue).push_back(data);
+      }
+  - id: fek_seen
+    type: std::function<void(const char*)>
+    initial_value: |-
+      [](const char* reason) {
+        if (id(fek_state) != 2) {
+          ESP_LOGW("FEK", "Real FEK detected (%s): it controls heating, HK1 settings locked", reason);
+        }
+        if (id(fek_registered)) {
+          ESP_LOGE("FEK", "Real FEK detected while emulating: stopping the emulation");
+          id(fek_registered) = false;
+        }
+        id(fek_state) = 2;
+        id(fek_last_seen) = millis();
+      }
+  - id: fek_flow_setpoint
+    type: std::function<float()>
+    initial_value: |-
+      []() -> float {
+        // Heating curve, fitted to the WPM3i's own flow setpoint (146 values over a week, Eco and Komfort,
+        // rms 0.06 K): Vorlauf = Raumsoll + Steigung * (Raumsoll - Aussen) + Offset (Offset 0.23 with Steigung 0.26).
+        // The real FEK's values (21.5 °C, Steigung 0.24, 7.9 °C outside -> 25.0 °C) fit the same curve.
+        // Room influence (own definition, K flow per K room deviation) uses the house temperature from HA.
+        const float outside = id(AUSSENTEMP).state;
+        if (std::isnan(outside) || outside < -30.0f || outside > 40.0f) {
+          return NAN;
+        }
+        const bool eco = id(FEK_BETRIEBSART).active_index().value_or(0) == 1;
+        const float room_set = eco ? id(FEK_ECO_TEMP).state : id(FEK_KOMF_TEMP).state;
+        float flow = room_set + id(FEK_STEIGUNG).state * (room_set - outside) + id(FEK_OFFSET).state;
+        const float room = id(fek_ha_temperature).state;
+        if (!std::isnan(room) && room > 5.0f && room < 35.0f) {
+          flow += std::clamp(id(FEK_RAUMEINFLUSS).state * (room_set - room), -5.0f, 5.0f);
+        }
+        return std::clamp(flow, id(FEK_VORLAUF_MIN).state, id(FEK_VORLAUF_MAX).state);
+      }
+
+#########################################
+#                                       #
+#   Heating control                     #
+#                                       #
+#########################################
+# FEK detection: every minute the ESP reads FET_SOFTWARE (0x0199) from HK1 and the Manager. Without a FEK, the WPM3i
+# answers for HK1 with its own version (391); a FEK answers with its own (FEK2: 416). Registration, answers to the
+# presence check and room values from 0x301 also count as a FEK. Without signs for 10 min the check starts again.
+#
+# "Heizungssteuerung" (only without a FEK):
+#   - "Wärmepumpe": the WPM3i controls heating; the HK1 settings (Komfort/Eco, Steigung, Raumeinfluss) are writable.
+#   - "FEK Emulation": the ESP registers as FEK on node 0x301 like the FEK2 (sends with CAN ID 0x301), answers the
+#     presence check, the control panel's identification and 0x601's system messages, sends the room values from HA
+#     every minute and the flow setpoint from its heating curve every 3 min (to the Kessel 0x0002 and to 0x601 0x0004,
+#     plus the FEK2's other periodic values). Without a valid outdoor temperature, or when a real FEK appears, the ESP
+#     stops answering, and the WPM3i takes HK1 back at its next check (<= 8 min).
+select:
+  - platform: template
+    name: "Heizungssteuerung"
+    id: HEIZUNGSSTEUERUNG
+    icon: "mdi:home-thermometer"
+    entity_category: config
+    options: ["Wärmepumpe", "FEK Emulation"]
+    initial_option: "Wärmepumpe"
+    optimistic: true
+    restore_value: true
+    on_value:
+      - script.execute: heating_control_update
+
+  - platform: template
+    name: "FEK Emulation Betriebsart"
+    id: FEK_BETRIEBSART
+    icon: "mdi:sun-thermometer"
+    options: ["Komfort", "Eco"]
+    initial_option: "Komfort"
+    optimistic: true
+    restore_value: true
+    on_value:
+      - script.execute: fek_send_setpoint  # like the FEK2: send the new phase and setpoint at once
+
+  # Hot water Komfort/Eco. The WPM3i heats hot water to WW Komfort inside the Warmwasserprogramm's windows and to WW
+  # Eco outside them; the Programmschalter does not change that (test 2026-11-18). So:
+  #   Komfort  = window 00:00-24:00 on every day (Mo-So group 0x17A0, the WPM3i copies it to all days)
+  #   Eco      = no window on any day
+  #   Programm = any other program (e.g. set on the control panel); shown only, cannot be selected here
+  # The state follows the program read back from the heat pump (ww_programm_update_modus).
+  - platform: template
+    name: "Warmwasser Modus"
+    id: WW_MODUS
+    icon: "mdi:water-boiler"
+    options: ["Komfort", "Eco", "Programm"]
+    optimistic: false
+    set_action:
+      - lambda: |-
+          if (x == "Programm") {
+            ESP_LOGW("WW", "Warmwasser Modus: 'Programm' cannot be selected, set the program on the panel or per day");
+            id(ww_programm_update_modus)();
+            return;
+          }
+          const bool komfort = x == "Komfort";
+          const std::array<std::uint16_t, 3> raw{static_cast<std::uint16_t>(komfort ? 0x0060 : 0x8080), 0x8080, 0x8080};
+          ESP_LOGI("WW", "Warmwasser Modus -> %s: Warmwasserprogramm Mo-So window 1 = 0x%04x", x.c_str(), raw[0]);
+          for (std::size_t w = 0; w < 3; ++w) {
+            queueTransmission(CanNode::Kessel, Property(static_cast<std::uint16_t>(0x17A0 + w)), raw[w]);
+          }
+          id(ww_modus_pending) = (1UL << 21) - 1;  // evaluate again once all windows are read back
+          id(WW_MODUS).publish_state(x);  // optimistic; corrected by the read back
+      - delay: 5s
+      - script.execute: ww_programm_lesen
+
+# Parameters of the emulated FEK (defaults: the FEK2's own settings, offset from the fit above)
+number:
+  - id: !extend STEIGUNG_HK1
+    mode: box
+  - id: !extend RAUMEINFLUSS
+    mode: box
+
+  - platform: template
+    name: "FEK Emulation Komfort Temperatur"
+    id: FEK_KOMF_TEMP
+    icon: "mdi:home-thermometer"
+    entity_category: config
+    mode: box
+    unit_of_measurement: "°C"
+    min_value: 15
+    max_value: 28
+    step: 0.1
+    initial_value: 21.0
+    optimistic: true
+    restore_value: true
+  - platform: template
+    name: "FEK Emulation Eco Temperatur"
+    id: FEK_ECO_TEMP
+    icon: "mdi:home-thermometer-outline"
+    entity_category: config
+    mode: box
+    unit_of_measurement: "°C"
+    min_value: 15
+    max_value: 28
+    step: 0.1
+    initial_value: 20.0
+    optimistic: true
+    restore_value: true
+  - platform: template
+    name: "FEK Emulation Steigung"
+    id: FEK_STEIGUNG
+    icon: "mdi:chart-line"
+    entity_category: config
+    mode: box
+    min_value: 0
+    max_value: 2
+    step: 0.01
+    initial_value: 0.24
+    optimistic: true
+    restore_value: true
+  - platform: template
+    name: "FEK Emulation Offset"
+    id: FEK_OFFSET
+    icon: "mdi:plus-minus-variant"
+    entity_category: config
+    mode: box
+    unit_of_measurement: "K"
+    min_value: -5
+    max_value: 5
+    step: 0.1
+    initial_value: 0.2
+    optimistic: true
+    restore_value: true
+  - platform: template
+    name: "FEK Emulation Raumeinfluss"
+    id: FEK_RAUMEINFLUSS
+    icon: "mdi:home-import-outline"
+    entity_category: config
+    mode: box
+    unit_of_measurement: "K/K"
+    min_value: 0
+    max_value: 5
+    step: 0.1
+    initial_value: 0.5
+    optimistic: true
+    restore_value: true
+  - platform: template
+    name: "FEK Emulation Vorlauf min"
+    id: FEK_VORLAUF_MIN
+    icon: "mdi:thermometer-chevron-down"
+    entity_category: config
+    mode: box
+    unit_of_measurement: "°C"
+    min_value: 10
+    max_value: 40
+    step: 0.5
+    initial_value: 15
+    optimistic: true
+    restore_value: true
+  - platform: template
+    name: "FEK Emulation Vorlauf max"
+    id: FEK_VORLAUF_MAX
+    icon: "mdi:thermometer-chevron-up"
+    entity_category: config
+    mode: box
+    unit_of_measurement: "°C"
+    min_value: 20
+    max_value: 55
+    step: 0.5
+    initial_value: 35
+    optimistic: true
+    restore_value: true
+
+script:
+  # Warmwasserprogramm: read all 21 time windows from the Kessel
+  - id: ww_programm_lesen
+    mode: single
+    then:
+      - lambda: |-
+          for (std::size_t i = 0; i < 21; ++i) {
+            queueRequest(CanNode::Kessel, Property(static_cast<std::uint16_t>(0x1710 + 0x10 * (i / 3) + (i % 3))));
+          }
+  # Warmwasserprogramm: write one day from HA (text "06:00-08:00, 17:00-18:30", up to 3 windows in 15-min steps;
+  # "-" or empty = no window). Writes to the heat pump only when the day is changed in HA; only windows that
+  # differ are written, then the day is read back.
+  - id: ww_programm_schreiben
+    mode: queued
+    parameters:
+      tag: int
+      eingabe: string
+    then:
+      - lambda: |-
+          std::string s;
+          for (const char c : eingabe) if (c != ' ') s += c;
+          std::array<std::uint16_t, 3> raw{0x8080, 0x8080, 0x8080};
+          std::size_t n = 0;
+          bool ok = tag >= 0 && tag < 7;
+          if (ok && !s.empty() && s != "-") {
+            std::size_t pos = 0;
+            while (true) {
+              const std::size_t end = s.find_first_of(",;", pos);
+              const std::string part = s.substr(pos, end == std::string::npos ? std::string::npos : end - pos);
+              unsigned h1, m1, h2, m2;
+              char rest;
+              if (n >= 3 || sscanf(part.c_str(), "%u:%u-%u:%u%c", &h1, &m1, &h2, &m2, &rest) != 4 || h1 > 23 ||
+                  m1 > 45 || m1 % 15 != 0 || m2 > 45 || m2 % 15 != 0 || h2 > 24 || (h2 == 24 && m2 != 0)) {
+                ok = false;
+                break;
+              }
+              raw[n++] = static_cast<std::uint16_t>(((4U * h1 + m1 / 15U) << 8) | (4U * h2 + m2 / 15U));
+              if (end == std::string::npos) break;
+              pos = end + 1;
+            }
+          }
+          const std::array<template_::TemplateText *, 7> days{id(WW_PROGRAMM_MO), id(WW_PROGRAMM_DI),
+              id(WW_PROGRAMM_MI), id(WW_PROGRAMM_DO), id(WW_PROGRAMM_FR), id(WW_PROGRAMM_SA), id(WW_PROGRAMM_SO)};
+          if (!ok) {
+            ESP_LOGW("WW", "Warmwasserprogramm: '%s' not understood (e.g. '06:00-08:00, 17:00-18:30', at most 3 "
+                     "windows, 15-min steps, '-' = none)", eingabe.c_str());
+            if (tag >= 0 && tag < 7) days[tag]->publish_state(days[tag]->state);
+            return;
+          }
+          for (std::size_t w = 0; w < 3; ++w) {
+            const std::size_t i = 3 * tag + w;
+            if (((id(ww_programm_valid) >> i) & 1UL) && id(ww_programm)[i] == raw[w]) continue;
+            const std::uint16_t addr = 0x1710 + 0x10 * tag + w;
+            ESP_LOGI("WW", "Warmwasserprogramm day %d window %u: 0x%04x", tag, static_cast<unsigned>(w + 1), raw[w]);
+            queueTransmission(CanNode::Kessel, Property(addr), raw[w]);
+          }
+      - delay: 5s
+      - lambda: |-
+          for (std::size_t w = 0; w < 3; ++w) {
+            queueRequest(CanNode::Kessel, Property(static_cast<std::uint16_t>(0x1710 + 0x10 * tag + w)));
+          }
+  # Error list: request the 5 newest entries from the WPM3i like the control panel does (write of 0x0B9A to the
+  # Manager; it only triggers the answer), then publish them.
+  - id: fehlerliste_lesen
+    mode: single
+    then:
+      - lambda: |-
+          for (auto &entry : id(fehlerliste)) {
+            entry.fill(0);
+          }
+      - repeat:
+          count: 5
+          then:
+            - lambda: |-
+                queueTransmission(CanNode::Manager, Property::kFEHLERLISTE_INDEX, static_cast<std::uint16_t>(iteration));
+            - delay: 2s
+      # The WPM3i keeps a cursor: every request returns the next entry (the index sent is ignored; each answer names
+      # its index in 0x0B9A); after a pause of ~1 min it starts at entry 0 again. If the ESP missed fields, wait for
+      # that reset and read the 5 entries once more, keeping what was received.
+      - if:
+          condition:
+            lambda: |-
+              for (const auto &e : id(fehlerliste)) {
+                if (e[0] == 0 || e[3] == 0 || e[4] == 0 || e[5] == 0) {
+                  return true;
+                }
+              }
+              return false;
+          then:
+            - lambda: ESP_LOGI("Fehlerliste", "Entries incomplete, reading them again in 2 min");
+            - delay: 2min
+            - repeat:
+                count: 5
+                then:
+                  - lambda: |-
+                      queueTransmission(CanNode::Manager, Property::kFEHLERLISTE_INDEX, static_cast<std::uint16_t>(iteration));
+                  - delay: 2s
+      - lambda: |-
+          std::string list;
+          std::string newest;
+          for (const auto &e : id(fehlerliste)) {
+            if (e[0] == 0) {
+              continue;
+            }
+            const auto it = id(fehler_texte).find(e[0]);
+            // day, month and year are never 0: 0 = not received (shown as ??)
+            const auto part = [](int v) {
+              char b[4];
+              snprintf(b, sizeof(b), "%02d", v);
+              return v == 0 ? std::string("??") : std::string(b);
+            };
+            char time_part[8];
+            snprintf(time_part, sizeof(time_part), "%02d:%02d", e[2], e[1]);
+            const std::string entry = part(e[3]) + "." + part(e[4]) + "." + part(e[5]) + " " + time_part + " " +
+                                      (it != id(fehler_texte).end() ? it->second : std::string("unbekannt")) + " (" +
+                                      to_string(e[0]) + ")";
+            if (newest.empty()) {
+              newest = entry;
+            }
+            list += (list.empty() ? "" : "; ") + entry;
+          }
+          if (list.empty()) {
+            list = "keine";
+            newest = "keiner";
+          }
+          if (list.size() > 250) {
+            list = list.substr(0, 247) + "...";
+          }
+          ESP_LOGI("Fehlerliste", "%s", list.c_str());
+          id(FEHLERLISTE).publish_state(list);
+          id(LETZTER_FEHLER).publish_state(newest);
+  # Decide which mode is active: a real FEK wins; otherwise the selected mode. Called every 10 s and on changes.
+  - id: heating_control_update
+    mode: queued
+    then:
+      - lambda: |-
+          if (id(fek_state) == 2 && millis() - id(fek_last_seen) > 10UL * 60UL * 1000UL) {
+            ESP_LOGI("FEK", "No sign of the FEK for 10 min, checking again");
+            id(fek_state) = 0;
+          }
+          const bool emulation_selected = id(HEIZUNGSSTEUERUNG).active_index().value_or(0) == 1;
+          const bool setpoint_valid = !std::isnan(id(fek_flow_setpoint)());
+          const bool want = emulation_selected && id(fek_state) == 1 && setpoint_valid;
+          if (want && !id(fek_registered)) {
+            ESP_LOGI("FEK", "Starting the FEK emulation");
+            id(fek_registered) = true;
+            id(fek_register).execute();
+          } else if (!want && id(fek_registered)) {
+            ESP_LOGW("FEK", "Stopping the FEK emulation (%s): the WPM3i takes HK1 back at its next check (<= 8 min)",
+                     !emulation_selected ? "not selected" : !setpoint_valid ? "no valid outdoor temperature" : "FEK check");
+            id(fek_registered) = false;
+          }
+          if (emulation_selected && !setpoint_valid) {
+            ESP_LOGW("FEK", "FEK emulation selected, but no flow setpoint can be computed (outdoor temperature missing)");
+          }
+          id(heating_settings_locked) = !(id(fek_state) == 1 && !id(fek_registered));
+          const char* mode = id(fek_state) == 2 ? "FEK installiert"
+                           : id(fek_state) == 0 ? "Prüfung läuft"
+                           : id(fek_registered) ? "FEK Emulation" : "Wärmepumpe";
+          if (id(HEIZUNGSSTEUERUNG_AKTIV).state != mode) {
+            id(HEIZUNGSSTEUERUNG_AKTIV).publish_state(mode);
+          }
+          if (id(fek_state) != 0 && (!id(FEK_INSTALLIERT).has_state() || id(FEK_INSTALLIERT).state != (id(fek_state) == 2))) {
+            id(FEK_INSTALLIERT).publish_state(id(fek_state) == 2);
+          }
+
+  # Register as FEK, like the FEK2 when plugged in
+  - id: fek_register
+    mode: restart
+    then:
+      - lambda: |-
+          ESP_LOGI("FEK", "Registering as FEK on 0x301");
+          id(fek_send)(0x301, 6, 0xfd, 0x0900);
+      - delay: 10s
+      - if:
+          condition:
+            lambda: 'return id(fek_registered);'
+          then:
+            - lambda: |-
+                id(fek_send)(0x180, 6, 0xfe, 0x0100);  // system message 0x00fe to the Kessel and to 0x601
+                id(fek_send)(0x601, 6, 0xfe, 0x0100);
+            - delay: 1s
+            - script.execute: fek_send_setpoint
+            - delay: 2s
+            - script.execute: fek_send_room_values
+
+  # Flow setpoint and the FEK2's other periodic values. 0x0058 = phase (0x0200 Komfort, 0x0100 Eco/Aus);
+  # 0x006e, 0x0029, 0x002a unknown, copied (the FEK2 sends 0x006e = 0x0100 after plug-in, then 0x0200)
+  - id: fek_send_setpoint
+    mode: restart
+    then:
+      - if:
+          condition:
+            lambda: 'return id(fek_registered) && !std::isnan(id(fek_flow_setpoint)());'
+          then:
+            - lambda: |-
+                const float flow = id(fek_flow_setpoint)();
+                const auto raw = static_cast<std::uint16_t>(lroundf(flow * 10.0f));
+                ESP_LOGI("FEK", "Sending flow setpoint %.1f °C (outdoor %.1f °C, room %.1f °C)", flow,
+                         id(AUSSENTEMP).state, id(fek_ha_temperature).state);
+                id(FEK_VORLAUF_SOLL).publish_state(flow);
+                id(VORLAUFSOLLTEMP).publish_state(flow);  // the ESP is HK1: its own HK1 reads get no answer
+                const bool eco = id(FEK_BETRIEBSART).active_index().value_or(0) == 1;
+                id(fek_send)(0x180, 0, 0x0002, raw);
+                id(fek_send)(0x180, 0, 0x0058, eco ? 0x0100 : 0x0200);
+                id(fek_send)(0x180, 0, 0x006e, 0x0100);
+            - delay: 2s
+            - lambda: |-
+                if (!id(fek_registered)) return;
+                const bool eco = id(FEK_BETRIEBSART).active_index().value_or(0) == 1;
+                const float room_set = eco ? id(FEK_ECO_TEMP).state : id(FEK_KOMF_TEMP).state;
+                id(fek_send)(0x601, 0, 0x0058, eco ? 0x0100 : 0x0200);
+                id(fek_send)(0x601, 0, 0x0029, 0x0a00);
+                id(fek_send)(0x601, 0, 0x002a, 0x1e00);
+                id(fek_send)(0x601, 0, 0x010f, 0x0200);  // RAUMEINFLUSS 2 (little endian), like the FEK2
+                id(fek_send)(0x601, 0, 0x0012, static_cast<std::uint16_t>(lroundf(room_set * 10.0f)));  // VERSTELLTE_RAUMSOLLTEMP
+            - delay: 8s
+            - lambda: |-
+                const float flow = id(fek_flow_setpoint)();
+                if (!id(fek_registered) || std::isnan(flow)) return;
+                id(fek_send)(0x601, 0, 0x0004, static_cast<std::uint16_t>(lroundf(flow * 10.0f)));  // VORLAUFSOLLTEMP
+
+  # Room temperature and humidity from HA, written as the FEK did (0x301 -> 0x601)
+  - id: fek_send_room_values
+    mode: single
+    then:
+      - lambda: |-
+          if (!id(fek_registered)) return;
+          const float temp = id(fek_ha_temperature).state;
+          const float hum = id(fek_ha_humidity).state;
+          if (std::isnan(temp) || temp < 5.0f || temp > 35.0f) {
+            ESP_LOGW("FEK", "Room temperature from HA invalid (%.1f °C), not sending", temp);
+          } else {
+            id(fek_send)(0x601, 0, Property::kRAUMISTTEMP.id, static_cast<std::uint16_t>(lroundf(temp * 10.0f)));
+          }
+          if (std::isnan(hum) || hum <= 0.0f || hum > 100.0f) {
+            ESP_LOGW("FEK", "Humidity from HA invalid (%.1f %%), not sending", hum);
+          } else {
+            id(fek_send)(0x601, 0, Property::kRAUMFEUCHTE.id, static_cast<std::uint16_t>(lroundf(hum * 10.0f)));
+          }
+
+#########################################
+#                                       #
+#   Intervals                           #
+#                                       #
+#########################################
+interval:
+  # Warmwasserprogramm: refresh every 15 min (also catches changes made on the control panel)
+  - interval: 15min
+    then:
+      - script.execute: ww_programm_lesen
+      - lambda: |-
+          // Settings shown as text, Aufheizprogramm, Ferienprogramm
+          queueRequest(CanNode::Kessel, Property::kEINSATZGRENZE_HZG);
+          queueRequest(CanNode::Kessel, Property::kEINSATZGRENZE_WW);
+          queueRequest(CanNode::Kessel, Property::kFESTWERTBETRIEB);
+          queueRequest(CanNode::Kessel, Property::kAUFHEIZPROGRAMM);
+          queueRequest(CanNode::Kessel, Property::kSOMMERBETRIEB);
+          queueRequest(CanNode::Kessel, Property::kANTILEGIONELLEN);
+          queueRequest(CanNode::Kessel, Property::kPUMPENZYKLEN);
+          queueRequest(CanNode::Kessel, Property::kPUFFERBETRIEB);
+          if (!id(fek_registered)) {
+            for (std::size_t i = 0; i < 21; ++i) {
+              queueRequest(CanNode::HK1, Property(static_cast<std::uint16_t>(0x1410 + 0x10 * (i / 3) + (i % 3))));
+            }
+          }
+          for (const auto &p : {Property::kFERIEN_BEGINN_TAG, Property::kFERIEN_BEGINN_MONAT, Property::kFERIEN_BEGINN_JAHR,
+                                Property::kFERIEN_ENDE_TAG, Property::kFERIEN_ENDE_MONAT, Property::kFERIEN_ENDE_JAHR}) {
+            queueRequest(CanNode::Manager, p);
+          }
+  # Error list: refresh once a day
+  - interval: 24h
+    then:
+      - script.execute: fehlerliste_lesen
+  # CAN nodes on the bus: publish frames per hour per sender (sliding window of the last 60 minutes, updated every
+  # minute); unknown senders are summed and listed. In the first 10 minutes after boot the rates are unknown, until
+  # 60 minutes they are extrapolated to one hour.
+  - interval: 60s
+    then:
+      - lambda: |-
+          static const std::array<std::pair<std::uint16_t, sensor::Sensor*>, 7> known{{
+              {0x100, id(CAN_RATE_BEDIENTEIL)}, {0x180, id(CAN_RATE_KESSEL)}, {0x301, id(CAN_RATE_HK1)},
+              {0x480, id(CAN_RATE_MANAGER)},    {0x601, id(CAN_RATE_0X601)},  {0x680, id(CAN_RATE_0X680)},
+              {0x700, id(CAN_RATE_MFG)}}};
+          static constexpr std::size_t kMinMinutes = 10;
+          auto &frames = id(can_frames);
+          auto &window = id(can_frames_window);
+          auto &pos = id(can_frames_window_pos);
+          auto &fill = id(can_frames_window_fill);
+          const auto now = id(homeassistant_time).now();
+          std::uint32_t unknown = 0;
+          for (const auto &[can_id, count] : frames) {
+            const auto key = can_id;
+            const bool is_known = std::any_of(known.begin(), known.end(),
+                                              [key](const auto &k) { return k.first == key; });
+            if (!is_known && count > 0) {
+              unknown += count;
+              if (now.is_valid()) {
+                id(can_unknown_last_seen)[key] = now.timestamp;
+              } else if (!id(can_unknown_last_seen).count(key)) {
+                id(can_unknown_last_seen)[key] = 0;
+              }
+              ESP_LOGI("CAN nodes", "Unknown sender 0x%03X: %u frames in the last minute", key,
+                       static_cast<unsigned>(count));
+            }
+          }
+          // Sliding window of the last 60 minutes: slots 0-6 = known senders, slot 7 = unknown senders
+          auto &slot = window[pos];
+          for (std::size_t i = 0; i < known.size(); i++) {
+            const auto it = frames.find(known[i].first);
+            slot[i] = static_cast<std::uint16_t>(std::min<std::uint32_t>(it != frames.end() ? it->second : 0, 0xffff));
+          }
+          slot[known.size()] = static_cast<std::uint16_t>(std::min<std::uint32_t>(unknown, 0xffff));
+          pos = (pos + 1) % window.size();
+          if (fill < window.size()) {
+            fill++;
+          }
+          const auto per_hour = [&window, fill](std::size_t index) -> float {
+            if (fill < kMinMinutes) {
+              return NAN;
+            }
+            std::uint32_t sum = 0;
+            for (const auto &minute : window) {  // unused slots are 0
+              sum += minute[index];
+            }
+            return static_cast<float>(sum) * window.size() / fill;
+          };
+          for (std::size_t i = 0; i < known.size(); i++) {
+            known[i].second->publish_state(per_hour(i));
+          }
+          id(CAN_RATE_UNKNOWN).publish_state(per_hour(known.size()));
+          std::string list;
+          for (const auto &[can_id, last] : id(can_unknown_last_seen)) {
+            char entry[48];
+            if (last > 0) {
+              const auto t = ESPTime::from_epoch_local(last);
+              snprintf(entry, sizeof(entry), "%s0x%03X (%02d.%02d. %02d:%02d)", list.empty() ? "" : ", ", can_id,
+                       t.day_of_month, t.month, t.hour, t.minute);
+            } else {
+              snprintf(entry, sizeof(entry), "%s0x%03X", list.empty() ? "" : ", ", can_id);
+            }
+            list += entry;
+          }
+          if (list.empty()) {
+            list = "keine";
+          }
+          if (list.size() > 250) {
+            list = list.substr(0, 247) + "...";
+          }
+          if (id(CAN_UNKNOWN_SENDERS).state != list) {
+            id(CAN_UNKNOWN_SENDERS).publish_state(list);
+          }
+          frames.clear();
+  # Heating control: send queued FEK frames (one every 30 ms, the FEK2 spaces them 10-20 ms)
+  - interval: 30ms
+    then:
+      - lambda: |-
+          auto& queue = id(fek_tx_queue);
+          if (queue.empty()) return;
+          const auto& data = queue.front();
+          char buf[32];
+          int n = 0;
+          for (const auto b : data) n += snprintf(buf + n, sizeof(buf) - n, " %02X", b);
+          ESP_LOGD("FEK", "Sending as 0x301:%s", buf);
+          id(wp_can).send_data(0x301, false, data);
+          queue.erase(queue.begin());
+  # Heating control: FEK check (software version of HK1 vs. Manager) and mode decision
+  - interval: 60s
+    startup_delay: 5s
+    then:
+      - lambda: |-
+          if (id(sw_version_manager) < 0) {
+            queueRequest(CanNode::Manager, Property::kFET_SOFTWARE);
+          }
+          if (id(sw_revision_manager) < 0) {
+            queueRequest(CanNode::Manager, Property::kFET_SOFTWARESTAND);
+          }
+          queueRequest(CanNode::HK1, Property::kFET_SOFTWARE);
+          if (!id(fek_registered)) {
+            queueRequest(CanNode::HK1, Property::kFET_SOFTWARESTAND);  // diagnostic sensor "Software HK1"
+          }
+          id(software_publish)();
+  - interval: 10s
+    then:
+      - script.execute: heating_control_update
+  # FEK emulation: system message 0x00fe every 7 min, flow setpoint every 3 min, room values every minute
+  - interval: 7min
+    then:
+      - lambda: |-
+          if (id(fek_registered)) {
+            id(fek_send)(0x180, 6, 0xfe, 0x0100);
+            id(fek_send)(0x601, 6, 0xfe, 0x0100);
+          }
+  - interval: 3min
+    then:
+      - script.execute: fek_send_setpoint
+  - interval: 60s
+    then:
+      - script.execute: fek_send_room_values
+  - interval: $interval_fast
+    then:
+      - lambda: |-
+          queueRequest(CanNode::Manager, Property::kBETRIEBS_STATUS_WPM);
+          queueRequest(CanNode::Manager, Property::kPROGRAMMSCHALTER);
+  - interval: $interval_once_in_a_while
+    then:
+      - lambda: |-
+          queueRequest(CanNode::Kessel, Property::kEINPHASIGER_BETRIEB);
+  # Settings (numbers/switch) are otherwise only requested once at boot. Refresh them, so a lost answer or a change on
+  # the control panel shows up.
+  - interval: $interval_very_slow
+    then:
+      - lambda: |-
+          for (const auto& property : {Property::kKOMF_TEMP, Property::kECO_TEMP, Property::kSTEIGUNG_HK1, Property::kRAUMEINFLUSS}) {
+            queueRequest(CanNode::HK1, property);
+          }
+          for (const auto& property : {Property::kWW_KOMF_TEMP, Property::kWW_ECO_TEMP, Property::kWW_HYSTERESE,
+                                       Property::kKUEHLEN_EIN, Property::kKUEHLMODE, Property::kFLAECHENKUEHLUNG,
+                                       Property::kVORLAUFSOLLTEMP_KUEHLEN, Property::kRAUMSOLLTEMP_KUEHLEN,
+                                       Property::kHYSTERESE_VORLAUFTEMP_KUEHLEN,
+                                       Property::kLEISTUNG_HEIZKREISPUMPE, Property::kLEISTUNG_SOLEPUMPE,
+                                       Property::kLEISTUNG_WARMWASSERPUMPE, Property::kVERDICHTER_STILLSTAND,
+                                       Property::kREGLERDYNAMIK, Property::kGEBLAESEKUEHLUNG}) {
+            queueRequest(CanNode::Kessel, property);
+          }
+
+#########################################
+#                                       #
+#   Packages                            #
+#                                       #
+#########################################
+packages:
+  TTF07_BASE:                    !include { file: ttf07_base.yaml }  # -> txx_base.yaml -> core.yaml
+  MANAGER:                       !include { file: templates/wp_can_id.yaml, vars: { can_node: "Manager", can_id: "0x480" }}
+  BEDIENTEIL:                    !include { file: templates/wp_can_id.yaml, vars: { can_node: "Bedienteil", can_id: "0x100" }}  # most likely the control panel
+
+# Programmschalter (on the WPM3i)
+  PROGRAMMSCHALTER:              !include { file: templates/wp_select.yaml, vars: { property: PROGRAMMSCHALTER, target: "Manager", mapper_func_set: getBetriebsartId, mapper_func_get: getBetriebsart, options: ["Notbetrieb", "Bereitschaft", "Programm", "Komfort", "Eco", "Warmwasser", "Unbekannt"] }}
+
+# Betriebsstatus: the binaries of ttf07_base.yaml plus these, all decoded from BETRIEBS_STATUS_WPM (see on_boot)
+  MISCHER_PUMPE:                 !include { file: templates/wp_binary.yaml, vars: { name: "MISCHER_PUMPE" }}
+  MISCHER_AUF:                   !include { file: templates/wp_binary.yaml, vars: { name: "MISCHER_AUF" }}
+  MISCHER_ZU:                    !include { file: templates/wp_binary.yaml, vars: { name: "MISCHER_ZU" }}
+  ENTLEERUNG_HYD:                !include { file: templates/wp_binary.yaml, vars: { name: "ENTLEERUNG_HYD" }}
+  HEIZBETRIEB:                   !include { file: templates/wp_binary.yaml, vars: { name: "HEIZBETRIEB" }}
+
+# Temperatures
+  VORLAUFISTTEMPNHZ:             !include { file: templates/wp_temperature.yaml, vars: { property: "VORLAUFISTTEMPNHZ", update_interval: $interval_medium, target: "MFG" }}
+
+# COP
+  COP_WW:                        !include { file: templates/wp_cop.yaml, vars: { sensor_name: "COP_WW",         output_property: "WAERMEERTRAG_WW_SUMME_MWH",   input_property: "EL_ENERGIEAUFNAHME_WW_SUMME_MWH" }}
+  COP_HEIZEN:                    !include { file: templates/wp_cop.yaml, vars: { sensor_name: "COP_HEIZEN",     output_property: "WAERMEERTRAG_HEIZ_SUMME_MWH", input_property: "EL_ENERGIEAUFNAHME_HEIZ_SUMME_MWH" }}
+
+# Power
+  VERSORGUNGSSPANNUNG:           !include { file: templates/wp_generic.yaml, vars: { property: "VERSORGUNGSSPANNUNG", unit: "V", icon: "mdi:lightning-bolt", accuracy_decimals: "1", update_interval: "${interval_fast}", target: "MFG" }}
+  STROMAUFNAHME:                 !include { file: templates/wp_generic.yaml, vars: { property: "STROMAUFNAHME", unit: "A", icon: "mdi:current-ac", accuracy_decimals: "1", update_interval: "${interval_fast}", target: "MFG" }}
+  LEISTUNG_VERDICHTER:           !include { file: templates/wp_power.yaml, vars: { sensor_name: "LEISTUNG_VERDICHTER", id_current: "STROMAUFNAHME", id_voltage: "VERSORGUNGSSPANNUNG" }}
+
+# Betriebsstunden
+  LAUFZEIT_VD_HEIZEN:            !include { file: templates/wp_generic.yaml, vars: { property: "LAUFZEIT_VD_HEIZEN", update_interval: "${interval_once_in_a_while}" }}
+  LAUFZEIT_VD_WW:                !include { file: templates/wp_generic.yaml, vars: { property: "LAUFZEIT_VD_WW", update_interval: "${interval_once_in_a_while}" }}
+  LAUFZEIT_VD_KUEHLEN:           !include { file: templates/wp_generic.yaml, vars: { property: "LAUFZEIT_VD_KUEHLEN", update_interval: "${interval_once_in_a_while}" }}
+  LAUFZEIT_NHZ1:                 !include { file: templates/wp_generic.yaml, vars: { property: "LAUFZEIT_NHZ1", update_interval: "${interval_once_in_a_while}" }}
+  LAUFZEIT_NHZ2:                 !include { file: templates/wp_generic.yaml, vars: { property: "LAUFZEIT_NHZ2", update_interval: "${interval_once_in_a_while}" }}
+  LAUFZEIT_NHZ1_2:               !include { file: templates/wp_generic.yaml, vars: { property: "LAUFZEIT_NHZ1_2", update_interval: "${interval_once_in_a_while}" }}
+
+# Settings (pump powers, Verdichter Stillstand and Reglerdynamik: read-only sensors in ttf07.yaml, numbers here)
+  KOMF_TEMP:                     !include { file: templates/wp_number.yaml, vars: { write_lock: "id(heating_settings_locked)", property: "KOMF_TEMP", mode: "box", min: "15", max: "30", step: "0.5", icon: "mdi:valve", target: "HK1" }}
+  ECO_TEMP:                      !include { file: templates/wp_number.yaml, vars: { write_lock: "id(heating_settings_locked)", property: "ECO_TEMP", mode: "box", min: "15", max: "30", step: "0.5", icon: "mdi:valve", target: "HK1" }}
+  WW_KOMF_TEMP:                  !include { file: templates/wp_number.yaml, vars: { property: "WW_KOMF_TEMP", mode: "box", min: "20", max: "60", step: "0.5", icon: "mdi:valve" }}
+  WW_ECO_TEMP:                   !include { file: templates/wp_number.yaml, vars: { property: "WW_ECO_TEMP", mode: "box", min: "20", max: "60", step: "0.5", icon: "mdi:valve" }}
+  WW_HYSTERESE:                  !include { file: templates/wp_number.yaml, vars: { property: "WW_HYSTERESE", mode: "box", min: "1", max: "10", step: "1", icon: "mdi:valve" }}
+  KUEHLEN_EIN:                   !include { file: templates/wp_switch.yaml, vars: { property: "KUEHLEN_EIN", icon: "mdi:snowflake" }}
+  KUEHLMODE:                     !include { file: templates/wp_switch.yaml, vars: { property: "KUEHLMODE", icon: "mdi:snowflake-alert" }}
+  FLAECHENKUEHLUNG:              !include { file: templates/wp_switch.yaml, vars: { property: "FLAECHENKUEHLUNG", icon: "mdi:heating-coil" }}
+  GEBLAESEKUEHLUNG:              !include { file: templates/wp_switch.yaml, vars: { property: "GEBLAESEKUEHLUNG", icon: "mdi:fan" }}
+  VORLAUFSOLLTEMP_KUEHLEN:       !include { file: templates/wp_number.yaml, vars: { property: "VORLAUFSOLLTEMP_KUEHLEN", mode: "box", min: "15", max: "25", step: "0.1", unit: "°C", icon: "mdi:snowflake-thermometer" }}
+  RAUMSOLLTEMP_KUEHLEN:          !include { file: templates/wp_number.yaml, vars: { property: "RAUMSOLLTEMP_KUEHLEN", mode: "box", min: "18", max: "30", step: "0.1", unit: "°C", icon: "mdi:home-thermometer" }}
+  KUEHLEN_HYSTERESE:             !include { file: templates/wp_number.yaml, vars: { property: "HYSTERESE_VORLAUFTEMP_KUEHLEN", mode: "box", min: "0.5", max: "5", step: "0.1", unit: "K", icon: "mdi:valve" }}
+  LEISTUNG_HEIZKREISPUMPE:       !include { file: templates/wp_number.yaml, vars: { property: "LEISTUNG_HEIZKREISPUMPE", mode: "box", min: "10", max: "100", step: "5", unit: "%", icon: "mdi:water-percent" }}
+  LEISTUNG_SOLEPUMPE:            !include { file: templates/wp_number.yaml, vars: { property: "LEISTUNG_SOLEPUMPE", mode: "box", min: "10", max: "100", step: "5", unit: "%", icon: "mdi:water-percent" }}
+  LEISTUNG_WARMWASSERPUMPE:      !include { file: templates/wp_number.yaml, vars: { property: "LEISTUNG_WARMWASSERPUMPE", mode: "box", min: "10", max: "100", step: "5", unit: "%", icon: "mdi:water-percent" }}
+  VERDICHTER_STILLSTAND:         !include { file: templates/wp_number.yaml, vars: { property: "VERDICHTER_STILLSTAND", mode: "box", min: "10", max: "120", step: "5", unit: "min" }}
+  REGLERDYNAMIK:                 !include { file: templates/wp_number.yaml, vars: { property: "REGLERDYNAMIK", mode: "box", min: "1", max: "30" }}
+
+# Pumps and valve as commanded by the WPM3i to the MFG (diagnostic).
+# PWM is inverted: 100 % = pump off, lower = faster (about 100 - the pump power setting).
+  PWM_QUELLENPUMPE:              !include { file: templates/wp_debug.yaml, vars: { sensor_id: "PWM_QUELLENPUMPE", property: "PWM_QUELLENPUMPE", target: "Manager", unit: "%", icon: "mdi:pump" }}
+  PWM_LADEPUMPE:                 !include { file: templates/wp_debug.yaml, vars: { sensor_id: "PWM_LADEPUMPE", property: "PWM_LADEPUMPE", target: "Manager", unit: "%", icon: "mdi:pump" }}
+  UMSCHALTVENTIL_WW:             !include { file: templates/wp_debug.yaml, vars: { sensor_id: "UMSCHALTVENTIL_WW", property: "UMSCHALTVENTIL_WW", target: "Manager", unit: "%", icon: "mdi:valve" }}
+
+# Room values sent by a FEK2 (diagnostic)
+  FEK_RAUMISTTEMP_HK1:           !include { file: templates/wp_debug.yaml, vars: { sensor_id: "FEK_RAUMTEMPERATUR_HK1", property: "RAUMISTTEMP", target: "HK1" }}
+  FEK_RAUMFEUCHTE_HK1:           !include { file: templates/wp_debug.yaml, vars: { sensor_id: "FEK_RAUMFEUCHTE", property: "RAUMFEUCHTE", unit: "%", icon: "mdi:water-percent", target: "HK1", accuracy_decimals: "1" }}
+
+  # Error number of the WPM3i (sent to the control panel every ~3.5 min; 0 = no error, 21 = Keine Leistung)
+  FEHLERNUMMER_WPM:              !include { file: templates/wp_debug.yaml, vars: { sensor_id: "FEHLERNUMMER_WPM", property: "FEHLERNUMMER_WPM", target: "Manager", icon: "mdi:alert-circle" }}
+  # Minutes until the compressor may start again (Diagnose > Status Wärmepumpe > Reststillstand; counts down from
+  # VERDICHTER_STILLSTAND = 60 min after a compressor stop)
+  VERDICHTER_RESTSTILLSTAND:     !include { file: templates/wp_generic.yaml, vars: { property: "VERDICHTER_RESTSTILLSTAND", target: "Manager", unit: "min", icon: "mdi:timer-sand", update_interval: "60s" }}
+  # Settings from the expert menus
+  SOMMERBETRIEB_HEIZGRENZE:      !include { file: templates/wp_temperature.yaml, vars: { property: "SOMMERBETRIEB_HEIZGRENZE" }}
+  MAXVORLAUFTEMP:                !include { file: templates/wp_temperature.yaml, vars: { property: "MAXVORLAUFTEMP" }}
+  MAXRUECKLAUFTEMP:              !include { file: templates/wp_temperature.yaml, vars: { property: "MAXRUECKLAUFTEMP" }}
+  SOMMERBETRIEB:                 !include { file: templates/wp_binary.yaml, vars: { name: "SOMMERBETRIEB" }}
+  ANTILEGIONELLEN:               !include { file: templates/wp_binary.yaml, vars: { name: "ANTILEGIONELLEN" }}
+  PUMPENZYKLEN:                  !include { file: templates/wp_binary.yaml, vars: { name: "PUMPENZYKLEN" }}
+  PUFFERBETRIEB:                 !include { file: templates/wp_binary.yaml, vars: { name: "PUFFERBETRIEB" }}
+  HEIZ_ANFORDERUNG_HK1:          !include { file: templates/wp_binary.yaml, vars: { name: "HEIZ_ANFORDERUNG_HK1" }}
+  # Found in the expert menus
+  TAUPUNKT_HK1:                  !include { file: templates/wp_temperature.yaml, vars: { property: "TAUPUNKT_HK1", update_interval: $interval_slow }}
+  RAUMISTTEMP_WPM:               !include { file: templates/wp_temperature.yaml, vars: { property: "RAUMISTTEMP_WPM", target: "Manager", update_interval: $interval_slow }}
+  RAUMSOLLTEMP_WPM:              !include { file: templates/wp_temperature.yaml, vars: { property: "RAUMSOLLTEMP_WPM", target: "Manager", update_interval: $interval_slow }}
+  RAUMFEUCHTE_WPM:               !include { file: templates/wp_generic.yaml, vars: { property: "RAUMFEUCHTE_WPM", target: "Manager", unit: "%", accuracy_decimals: "1", icon: "mdi:water-percent", update_interval: $interval_slow }}
+  BIVALENZTEMPERATUR_HZG:        !include { file: templates/wp_temperature.yaml, vars: { property: "BIVALENZTEMPERATUR_HZG" }}
+  BIVALENZTEMPERATUR_WW:         !include { file: templates/wp_temperature.yaml, vars: { property: "BIVALENZTEMPERATUR_WW" }}
+  NHZ_WAERME_HEIZ_SUMME:         !include { file: templates/wp_generic_combined.yaml, vars: { sensor_name: "NHZ_WAERME_HEIZ_SUMME", scaled_property: "NHZ_WAERME_HEIZ_SUM_KWH", property: "WAERMEERTRAG_2WE_HEIZ_SUM_MWH", device_class: "energy", unit: "MWh", accuracy_decimals: "3", icon: "mdi:heating-coil" }}
+  NHZ_WAERME_WW_SUMME:           !include { file: templates/wp_generic_combined.yaml, vars: { sensor_name: "NHZ_WAERME_WW_SUMME", scaled_property: "NHZ_WAERME_WW_SUM_KWH", property: "NHZ_WAERME_WW_SUM_MWH", device_class: "energy", unit: "MWh", accuracy_decimals: "3", icon: "mdi:heating-coil" }}
+  PARTYPROGRAMM:                 !include { file: templates/wp_generic.yaml, vars: { property: "PARTYPROGRAMM", target: "Manager", unit: "h", icon: "mdi:party-popper", update_interval: $interval_slow }}
+  AUFHEIZPROGRAMM:               !include { file: templates/wp_binary.yaml, vars: { name: "AUFHEIZPROGRAMM" }}
+
+#########################################
+#                                       #
+#   Binary sensors                      #
+#                                       #
+#########################################
+binary_sensor:
+  # Heating control: a real FEK is installed (published by heating_control_update)
+  - platform: template
+    name: "FEK installiert"
+    id: FEK_INSTALLIERT
+    icon: "mdi:thermostat-box"
+
+  # trigger recalculation of LEISTUNG_*, when one of following sensors change
+  - id: !extend HEIZKREISPUMPE
+    on_state:
+      then:
+        - component.update: LEISTUNG_EXT_HEIZKREISPUMPE
+        - component.update: LEISTUNG_SUMME
+
+  - id: !extend HEIZBETRIEB
+    on_state:
+      then:
+        - component.update: LEISTUNG_HEIZEN
+        - component.update: LEISTUNG_SUMME
+
+  - id: !extend WARMWASSERBEREITUNG
+    on_state:
+      then:
+        - component.update: LEISTUNG_WARMWASSERBEREITUNG
+        - component.update: LEISTUNG_SUMME
+
+#########################################
+#                                       #
+#   Thermostats                         #
+#                                       #
+#########################################
+# Heating as one thermostat; its targets follow who controls heating ("Heizungssteuerung aktiv"):
+# - Wärmepumpe: preset Komfort/Eco = Programmschalter (WPM3i), target = HK1 Komfort or Eco temperature. (The
+#   Programmschalter does not set the hot water setpoint: that is the Warmwasserprogramm, see "Warmwasser Modus".)
+# - FEK Emulation: preset = "FEK Emulation Betriebsart", target = the emulation's Komfort or Eco temperature.
+# - FEK installiert / Prüfung läuft: read only (the real FEK keeps its settings itself).
+# Current temperature/humidity = the house values from Home Assistant, action = Heizbetrieb.
+# Needs the external component wp_climate in the device file.
+climate:
+  - platform: wp_climate
+    type: preset
+    name: "Thermostat Heizung"
+    id: THERMOSTAT_HEIZUNG
+    icon: "mdi:home-thermometer"
+    current_temp: fek_ha_temperature
+    current_humidity: fek_ha_humidity
+    comfort_temp: KOMF_TEMP
+    eco_temp: ECO_TEMP
+    preset_select: PROGRAMMSCHALTER
+    alternative:
+      comfort_temp: FEK_KOMF_TEMP
+      eco_temp: FEK_ECO_TEMP
+      preset_select: FEK_BETRIEBSART
+    use_alternative: "return id(fek_registered);"
+    writable: "return id(fek_state) == 1;"  # no real FEK, check done
+    heating: HEIZBETRIEB
+
+  # Hot water as a thermostat: preset Komfort/Eco = "Warmwasser Modus" (= the Warmwasserprogramm, see there), target =
+  # WW Komfort or WW Eco temperature, current = Speicher Ist, action = Warmwasserbereitung. Not the Programmschalter:
+  # it does not change the hot water setpoint (test 2026-11-18). With an own program ("Programm") there is no preset;
+  # the target shows the Speicher Soll and is read only.
+  - platform: wp_climate
+    type: preset
+    name: "Thermostat Warmwasser"
+    id: THERMOSTAT_WARMWASSER
+    icon: "mdi:water-boiler"
+    current_temp: SPEICHERISTTEMP
+    comfort_temp: WW_KOMF_TEMP
+    eco_temp: WW_ECO_TEMP
+    preset_select: WW_MODUS
+    setpoint: SPEICHERSOLLTEMP
+    heating: WARMWASSERBEREITUNG
+
+#########################################
+#                                       #
+#   Text sensors                        #
+#                                       #
+#########################################
+text_sensor:
+  - platform: template
+    name: "Heizprogramm Montag"
+    id: HEIZ_PROGRAMM_MO
+    icon: "mdi:calendar-clock"
+    entity_category: diagnostic
+  - platform: template
+    name: "Heizprogramm Dienstag"
+    id: HEIZ_PROGRAMM_DI
+    icon: "mdi:calendar-clock"
+    entity_category: diagnostic
+  - platform: template
+    name: "Heizprogramm Mittwoch"
+    id: HEIZ_PROGRAMM_MI
+    icon: "mdi:calendar-clock"
+    entity_category: diagnostic
+  - platform: template
+    name: "Heizprogramm Donnerstag"
+    id: HEIZ_PROGRAMM_DO
+    icon: "mdi:calendar-clock"
+    entity_category: diagnostic
+  - platform: template
+    name: "Heizprogramm Freitag"
+    id: HEIZ_PROGRAMM_FR
+    icon: "mdi:calendar-clock"
+    entity_category: diagnostic
+  - platform: template
+    name: "Heizprogramm Samstag"
+    id: HEIZ_PROGRAMM_SA
+    icon: "mdi:calendar-clock"
+    entity_category: diagnostic
+  - platform: template
+    name: "Heizprogramm Sonntag"
+    id: HEIZ_PROGRAMM_SO
+    icon: "mdi:calendar-clock"
+    entity_category: diagnostic
+  # Settings from the expert menus: temperature or "Aus" (0x9000), Ferienprogramm dates
+  - platform: template
+    name: "Einsatzgrenze Heizen"
+    id: EINSATZGRENZE_HZG
+    icon: "mdi:thermometer-off"
+    entity_category: diagnostic
+  - platform: template
+    name: "Einsatzgrenze Warmwasser"
+    id: EINSATZGRENZE_WW
+    icon: "mdi:thermometer-off"
+    entity_category: diagnostic
+  - platform: template
+    name: "Festwertsolltemperatur"
+    id: FESTWERTBETRIEB
+    icon: "mdi:thermometer-lines"
+    entity_category: diagnostic
+  - platform: template
+    name: "Ferienprogramm"
+    id: FERIENPROGRAMM
+    icon: "mdi:beach"
+    entity_category: diagnostic
+  # Errors of the WPM3i (see globals fehlerliste and script fehlerliste_lesen)
+  - platform: template
+    name: "Fehler aktuell"
+    id: FEHLER_AKTUELL
+    icon: "mdi:alert-circle"
+  - platform: template
+    name: "Fehlerliste"
+    id: FEHLERLISTE
+    icon: "mdi:format-list-bulleted"
+    entity_category: diagnostic
+  - platform: template
+    name: "Letzter Fehler"
+    id: LETZTER_FEHLER
+    icon: "mdi:alert-circle-outline"
+  # CAN nodes on the bus: unknown sender IDs with the time they were last seen (since boot)
+  - platform: template
+    name: "CAN unbekannte Sender"
+    id: CAN_UNKNOWN_SENDERS
+    icon: "mdi:help-network"
+    entity_category: diagnostic
+  # Heating control: who controls heating ("FEK installiert", "FEK Emulation", "Wärmepumpe", "Prüfung läuft")
+  - platform: template
+    name: "Heizungssteuerung aktiv"
+    id: HEIZUNGSSTEUERUNG_AKTIV
+    icon: "mdi:home-thermometer"
+
+  # Software version.revision of the WPM3i and of HK1 (the WPM3i's, a real FEK's, or the emulated FEK2's)
+  - platform: template
+    name: "Software WPM3i"
+    id: SOFTWARE_WPM3I
+    icon: "mdi:chip"
+    entity_category: diagnostic
+  - platform: template
+    name: "Software HK1"
+    id: SOFTWARE_HK1
+    icon: "mdi:chip"
+    entity_category: diagnostic
+
+  # Remove after Sommerbetrieb and Kühlbetrieb were tested
+  - platform: template
+    name: DEBUG_BETRIEB
+    id: DEBUG_BETRIEB
+    entity_category: "diagnostic"
+
+#########################################
+#                                       #
+#   Sensors                             #
+#                                       #
+#########################################
+sensor:
+  # Base entities (ttf07.yaml / txx_base.yaml) adapted to the TTF07 C with WPM3i
+  - id: !extend AUSSENTEMP
+    update_interval: $interval_medium
+  - id: !extend SPEICHERSOLLTEMP
+    update_interval: $interval_medium
+  - id: !extend VORLAUFSOLLTEMP
+    update_interval: $interval_medium
+  - id: !extend HKISTTEMP
+    update_interval: $interval_medium
+  - id: !extend HKSOLLTEMP
+    update_interval: $interval_medium
+  - id: !extend PUFFERISTTEMP
+    update_interval: $interval_medium
+  - id: !extend PUFFERSOLLTEMP
+    update_interval: $interval_medium
+  - id: !extend QUELLE_IST
+    update_interval: $interval_medium
+  - id: !extend QUELLENTEMP_MIN
+    update_interval: $interval_medium
+  - id: !extend HEISSGAS_TEMP
+    update_interval: $interval_medium
+  - id: !extend DRUCK_HEIZKREIS
+    accuracy_decimals: 2
+  - id: !extend QUELLENDRUCK
+    accuracy_decimals: 2
+  - id: !extend VOLUMENSTROM
+    accuracy_decimals: 2
+  # Energy totals: device class energy (HA Energy dashboard)
+  - id: !extend EL_ENERGIEAUFNAHME_WW_SUMME_MWH
+    icon: "mdi:fire"
+    device_class: energy
+  - id: !extend EL_ENERGIEAUFNAHME_HEIZ_SUMME_MWH
+    icon: "mdi:fire"
+    device_class: energy
+  - id: !extend WAERMEERTRAG_WW_SUMME_MWH
+    device_class: energy
+  - id: !extend WAERMEERTRAG_HEIZ_SUMME_MWH
+    device_class: energy
+  # Room values of HK1: on this heat pump HK1 is the FEK (or the ESP's emulation); see FEK_RAUMTEMPERATUR_HK1,
+  # FEK_RAUMFEUCHTE and RAUM*_WPM instead
+  - id: !extend RAUMISTTEMP
+    internal: true
+    update_interval: never
+  - id: !extend VERSTELLTE_RAUMSOLLTEMP
+    internal: true
+    update_interval: never
+  - id: !extend RAUMFEUCHTE
+    internal: true
+    update_interval: never
+
+  # CAN nodes on the bus: frames per hour per sender CAN ID, last 60 minutes (0 = node silent); see interval "CAN nodes"
+  - platform: template
+    name: "CAN Kessel 0x180 Frames"
+    id: CAN_RATE_KESSEL
+    unit_of_measurement: "1/h"
+    icon: "mdi:lan-connect"
+    accuracy_decimals: 0
+    state_class: measurement
+    entity_category: diagnostic
+    update_interval: never
+  - platform: template
+    name: "CAN HK1 0x301 Frames"
+    id: CAN_RATE_HK1
+    unit_of_measurement: "1/h"
+    icon: "mdi:lan-connect"
+    accuracy_decimals: 0
+    state_class: measurement
+    entity_category: diagnostic
+    update_interval: never
+  - platform: template
+    name: "CAN Manager 0x480 Frames"
+    id: CAN_RATE_MANAGER
+    unit_of_measurement: "1/h"
+    icon: "mdi:lan-connect"
+    accuracy_decimals: 0
+    state_class: measurement
+    entity_category: diagnostic
+    update_interval: never
+  - platform: template
+    name: "CAN MFG 0x700 Frames"
+    id: CAN_RATE_MFG
+    unit_of_measurement: "1/h"
+    icon: "mdi:lan-connect"
+    accuracy_decimals: 0
+    state_class: measurement
+    entity_category: diagnostic
+    update_interval: never
+  - platform: template
+    name: "CAN Bedienteil 0x100 Frames"
+    id: CAN_RATE_BEDIENTEIL
+    unit_of_measurement: "1/h"
+    icon: "mdi:lan-connect"
+    accuracy_decimals: 0
+    state_class: measurement
+    entity_category: diagnostic
+    update_interval: never
+  - platform: template
+    name: "CAN 0x601 Frames"
+    id: CAN_RATE_0X601
+    unit_of_measurement: "1/h"
+    icon: "mdi:lan-connect"
+    accuracy_decimals: 0
+    state_class: measurement
+    entity_category: diagnostic
+    update_interval: never
+  - platform: template
+    name: "CAN 0x680 Frames"
+    id: CAN_RATE_0X680
+    unit_of_measurement: "1/h"
+    icon: "mdi:lan-connect"
+    accuracy_decimals: 0
+    state_class: measurement
+    entity_category: diagnostic
+    update_interval: never
+  - platform: template
+    name: "CAN unbekannt Frames"
+    id: CAN_RATE_UNKNOWN
+    unit_of_measurement: "1/h"
+    icon: "mdi:lan-connect"
+    accuracy_decimals: 0
+    state_class: measurement
+    entity_category: diagnostic
+    update_interval: never
+  # Do not send room temperature and humidity from Home Assistant to HK1 like core.yaml does (see notes above).
+  - id: !remove ha_temperature_sensor
+  - id: !remove ha_humidity_sensor
+
+  # Room values for the FEK emulation (and its heating curve)
+  - platform: homeassistant
+    id: fek_ha_temperature
+    entity_id: $entity_room_temperature
+    internal: true
+  - platform: homeassistant
+    id: fek_ha_humidity
+    entity_id: $entity_humidity
+    internal: true
+
+  # Flow setpoint computed by the FEK emulation (published while it is active)
+  - platform: template
+    name: "FEK Emulation Vorlauf Soll"
+    id: FEK_VORLAUF_SOLL
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    accuracy_decimals: 1
+    update_interval: never
+
+  # trigger recalculation of LEISTUNG_*, when the compressor power changes
+  - id: !extend LEISTUNG_VERDICHTER
+    on_value:
+      then:
+        - component.update: LEISTUNG_HEIZEN
+        - component.update: LEISTUNG_WARMWASSERBEREITUNG
+        - component.update: LEISTUNG_SUMME
+
+  - platform: template
+    name: "Leistung ext. Heizkreispumpe"
+    id: LEISTUNG_EXT_HEIZKREISPUMPE
+    update_interval: never
+    unit_of_measurement: "W"
+    device_class: power
+    state_class: "measurement"
+    lambda: |-
+      return id(HEIZKREISPUMPE).state ? $static_leistung_heizkreispumpe : 0;
+
+  - platform: integration
+    name: "Energie ext. Heizkreispumpe"
+    id: ENERGIE_EXT_HEIZKREISPUMPE
+    sensor: LEISTUNG_EXT_HEIZKREISPUMPE
+    time_unit: h
+    restore: true  # keep the energy across reboots
+    unit_of_measurement: "kWh"
+    device_class: energy
+    state_class: "total_increasing"
+    accuracy_decimals: 3
+    filters:
+      - multiply: 0.001
+
+  # corresponding energy is provided by EL_ENERGIEAUFNAHME_HEIZ_SUMME_MWH (which has a better accuracy)
+  - platform: template
+    name: "Leistung Heizen"
+    id: LEISTUNG_HEIZEN
+    update_interval: never
+    unit_of_measurement: "W"
+    device_class: power
+    state_class: "measurement"
+    # Heizbetrieb means that the Verdichter is running. It can be either Warmwasser or Heizen.
+    lambda: |-
+      return id(LEISTUNG_EXT_HEIZKREISPUMPE).state + ((id(HEIZBETRIEB).state && !id(WARMWASSERBEREITUNG).state) ? id(LEISTUNG_VERDICHTER).state : 0);
+
+  # corresponding energy is provided by EL_ENERGIEAUFNAHME_WW_SUMME_MWH
+  - platform: template
+    name: "Leistung Warmwasserbereitung"
+    id: LEISTUNG_WARMWASSERBEREITUNG
+    update_interval: never
+    unit_of_measurement: "W"
+    device_class: power
+    state_class: "measurement"
+    lambda: |-
+      return id(WARMWASSERBEREITUNG).state ? id(LEISTUNG_VERDICHTER).state : 0;
+
+  - platform: template
+    name: "Leistung Summe"
+    id: LEISTUNG_SUMME
+    update_interval: never
+    unit_of_measurement: "W"
+    device_class: power
+    state_class: "measurement"
+    lambda: |-
+      return id(LEISTUNG_HEIZEN).state + id(LEISTUNG_WARMWASSERBEREITUNG).state;
+
+  - platform: integration
+    name: "Leistung Summe integrated"
+    id: ENERGIE_SUNMME_INTEGRATED
+    sensor: LEISTUNG_SUMME
+    time_unit: h
+    restore: true  # keep the energy across reboots
+    unit_of_measurement: "kWh"
+    device_class: energy
+    state_class: "total_increasing"
+    accuracy_decimals: 3
+    filters:
+      - multiply: 0.001
+
+  # Total electrical energy of the heat pump in kWh: (estimated) ext. Heizkreispumpe + EL_ENERGIEAUFNAHME_HEIZ_SUMME_MWH and
+  # EL_ENERGIEAUFNAHME_WW_SUMME_MWH (MWh, converted to kWh)
+  - platform: template
+    name: "Energie Summe kWh"
+    id: ENERGIE_SUMME_KWH
+    unit_of_measurement: "kWh"
+    device_class: energy
+    state_class: "total_increasing"
+    accuracy_decimals: 1
+    lambda: |-
+      if (!id(EL_ENERGIEAUFNAHME_HEIZ_SUMME_MWH).has_state() || !id(EL_ENERGIEAUFNAHME_WW_SUMME_MWH).has_state()) {
+        return {};
+      }
+      const float ext = id(ENERGIE_EXT_HEIZKREISPUMPE).has_state() ? id(ENERGIE_EXT_HEIZKREISPUMPE).state : 0.0f;
+      return ext + 1000.0f * (id(EL_ENERGIEAUFNAHME_HEIZ_SUMME_MWH).state + id(EL_ENERGIEAUFNAHME_WW_SUMME_MWH).state);
+
+  - platform: template
+    name: "Heizkreis Spreizung"
+    id: HEIZKREIS_SPREIZUNG
+    icon: "mdi:swap-vertical"
+    state_class: measurement
+    accuracy_decimals: 1
+    unit_of_measurement: "°C"
+    lambda: |-
+      return (id(VORLAUFISTTEMP).state - id(RUECKLAUFISTTEMP).state);
+
+#########################################
+#                                       #
+#   Texts                               #
+#                                       #
+#########################################
+
+# Warmwasserprogramm (Einstellungen > Programme on the control panel), one text per day: "06:00-08:00, 17:00-18:30"
+# (at most 3 windows, 15-min steps; "-" = no window). Changing a day in HA writes it to the heat pump.
+text:
+  - platform: template
+    name: "Warmwasserprogramm Montag"
+    id: WW_PROGRAMM_MO
+    icon: "mdi:calendar-clock"
+    entity_category: config
+    mode: text
+    max_length: 40
+    optimistic: false
+    set_action:
+      - script.execute:
+          id: ww_programm_schreiben
+          tag: 0
+          eingabe: !lambda 'return x;'
+  - platform: template
+    name: "Warmwasserprogramm Dienstag"
+    id: WW_PROGRAMM_DI
+    icon: "mdi:calendar-clock"
+    entity_category: config
+    mode: text
+    max_length: 40
+    optimistic: false
+    set_action:
+      - script.execute:
+          id: ww_programm_schreiben
+          tag: 1
+          eingabe: !lambda 'return x;'
+  - platform: template
+    name: "Warmwasserprogramm Mittwoch"
+    id: WW_PROGRAMM_MI
+    icon: "mdi:calendar-clock"
+    entity_category: config
+    mode: text
+    max_length: 40
+    optimistic: false
+    set_action:
+      - script.execute:
+          id: ww_programm_schreiben
+          tag: 2
+          eingabe: !lambda 'return x;'
+  - platform: template
+    name: "Warmwasserprogramm Donnerstag"
+    id: WW_PROGRAMM_DO
+    icon: "mdi:calendar-clock"
+    entity_category: config
+    mode: text
+    max_length: 40
+    optimistic: false
+    set_action:
+      - script.execute:
+          id: ww_programm_schreiben
+          tag: 3
+          eingabe: !lambda 'return x;'
+  - platform: template
+    name: "Warmwasserprogramm Freitag"
+    id: WW_PROGRAMM_FR
+    icon: "mdi:calendar-clock"
+    entity_category: config
+    mode: text
+    max_length: 40
+    optimistic: false
+    set_action:
+      - script.execute:
+          id: ww_programm_schreiben
+          tag: 4
+          eingabe: !lambda 'return x;'
+  - platform: template
+    name: "Warmwasserprogramm Samstag"
+    id: WW_PROGRAMM_SA
+    icon: "mdi:calendar-clock"
+    entity_category: config
+    mode: text
+    max_length: 40
+    optimistic: false
+    set_action:
+      - script.execute:
+          id: ww_programm_schreiben
+          tag: 5
+          eingabe: !lambda 'return x;'
+  - platform: template
+    name: "Warmwasserprogramm Sonntag"
+    id: WW_PROGRAMM_SO
+    icon: "mdi:calendar-clock"
+    entity_category: config
+    mode: text
+    max_length: 40
+    optimistic: false
+    set_action:
+      - script.execute:
+          id: ww_programm_schreiben
+          tag: 6
+          eingabe: !lambda 'return x;'

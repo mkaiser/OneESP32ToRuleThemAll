@@ -137,6 +137,7 @@ flowchart LR
 
     txx --> ttf07base[ttf07_base.yaml<br>Common TTF07 Base]
     ttf07base --> ttf07([ttf07.yaml<br>Manifest])
+    ttf07base --> ttf07wpm3i([ttf07_wpm3i.yaml<br>Manifest])
     txx --> thz[thz_base.yaml<br>Common THZ Base]
     txx --> thz304([thz304.yaml<br>Manifest])
 
@@ -154,6 +155,7 @@ flowchart LR
     style wpla5 stroke-width:2px
     style wpla7 stroke-width:2px
     style ttf07 stroke-width:2px
+    style ttf07wpm3i stroke-width:2px
     style thz304 stroke-width:2px
     style thz404 stroke-width:2px
     style thz504 stroke-width:2px
@@ -164,6 +166,7 @@ flowchart LR
 * **Series Common Layer (`txx_base.yaml`)**: Shared logic specifically for the TXX (THZ/TTF) family.
 * **Model Base Layer (`thz_base.yaml`, `wpl_a_base.yaml`, `ttf07_base.yaml`)**: Heavy lifting and C++ logic for specific sub-families.
 * **Device Manifests (e.g. `thz304.yaml`, `thz504.yaml`, `wpl13.yaml`)**: The clean, top-level "recipes" used to compile the firmware.
+* **`ttf07_wpm3i.yaml`**: Tecalor TTF07 C with WPM3i manager, a variant on `ttf07_base.yaml` like `ttf07.yaml`: status and Programmschalter from the manager, thermostats and an optional FEK emulation. Optional packages: German display names (`names/ttf07_wpm3i_de.yaml`) and debug sensors for unidentified registers (`ttf07_wpm3i_debug.yaml`).
 
 ## Add new readings from heat pump / adopt to your device
 
