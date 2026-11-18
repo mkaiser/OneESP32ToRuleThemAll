@@ -1,0 +1,228 @@
+# Optional package for ttf07_wpm3i.yaml: German display names for the entities that ttf07_wpm3i.yaml names by their
+# id (e.g. HKISTTEMP -> "HK Ist Temperatur"). Add it next to ttf07_wpm3i.yaml:
+#
+# packages:
+#   wp: !include OneESP32ToRuleThemAll/yaml/ttf07_wpm3i.yaml
+#   wp_names: !include OneESP32ToRuleThemAll/yaml/names/ttf07_wpm3i_de.yaml
+#
+# Choose before the first install: Home Assistant identifies ESPHome entities by their name, so adding, removing or
+# switching a names package later creates new entities and their history starts again.
+# Only for ttf07_wpm3i.yaml: every id must exist in the device file.
+
+sensor:
+  - id: !extend VERDICHTER_STARTS
+    name: "Verdichterstarts"
+  - id: !extend FEHLERMELDUNG
+    name: "Fehlermeldung"
+  - id: !extend AUSSENTEMP
+    name: "Aussentemperatur"
+  - id: !extend SPEICHERSOLLTEMP
+    name: "Speicher Soll Temperatur"
+  - id: !extend SPEICHERISTTEMP
+    name: "Speicher Ist Temperatur"
+  - id: !extend RUECKLAUFISTTEMP
+    name: "Ruecklauf Ist Temperatur"
+  - id: !extend VORLAUFISTTEMP
+    name: "Vorlauf Ist Temperatur WP"
+  - id: !extend VORLAUFISTTEMPNHZ
+    name: "Vorlauf Ist Temperatur NHZ"
+  - id: !extend VORLAUFSOLLTEMP
+    name: "Vorlauf Soll Temperatur"
+  - id: !extend HKISTTEMP
+    name: "HK Ist Temperatur"
+  - id: !extend HKSOLLTEMP
+    name: "HK Soll Temperatur"
+  - id: !extend PUFFERISTTEMP
+    name: "Puffer Ist Temperatur"
+  - id: !extend PUFFERSOLLTEMP
+    name: "Puffer Soll Temperatur"
+  - id: !extend QUELLE_IST
+    name: "Quelle Ist Temperatur"
+  - id: !extend QUELLENTEMP_MIN
+    name: "Quelle Temperatur Minimum"
+  - id: !extend HEISSGAS_TEMP
+    name: "Heizgastemperatur"
+  - id: !extend EL_ENERGIEAUFNAHME_WW_SUMME_KWH
+    name: "El Energieaufnahme Warmwasser Tag"
+  - id: !extend EL_ENERGIEAUFNAHME_HEIZ_SUMME_KWH
+    name: "El Energieaufnahme Heizen Tag"
+  - id: !extend WAERMEERTRAG_WW_TAG_SUMME_KWH
+    name: "Wärmeertrag Warmwasser Tag"
+  - id: !extend WAERMEERTRAG_HEIZ_TAG_SUMME_KWH
+    name: "Wärmeertrag Heizen Tag"
+  - id: !extend EL_ENERGIEAUFNAHME_WW_SUMME_MWH
+    name: "El Energieaufnahme Warmwasser"
+  - id: !extend EL_ENERGIEAUFNAHME_HEIZ_SUMME_MWH
+    name: "El Energieaufnahme Heizen"
+  - id: !extend WAERMEERTRAG_WW_SUMME_MWH
+    name: "Wärmeertrag Warmwasser"
+  - id: !extend WAERMEERTRAG_HEIZ_SUMME_MWH
+    name: "Wärmeertrag Heizen"
+  - id: !extend COP_WW
+    name: "COP Warmwasser"
+  - id: !extend COP_HEIZEN
+    name: "COP Heizen"
+  - id: !extend COP_WW_TAG
+    name: "COP Warmwasser Tag"
+  - id: !extend COP_HEIZ_TAG
+    name: "COP Heizen Tag"
+  - id: !extend DRUCK_HEIZKREIS
+    name: "Druck Heizkreis"
+  - id: !extend DRUCK_HOCHDRUCK
+    name: "Druck Heizkreis max"
+  - id: !extend DRUCK_NIEDERDRUCK
+    name: "Druck Heizkreis min"
+  - id: !extend QUELLENDRUCK
+    name: "Druck Quelle"
+  - id: !extend HDSENSORMAX
+    name: "Druck Sensor max"
+  - id: !extend VOLUMENSTROM
+    name: "Volumenstrom"
+  - id: !extend VERSORGUNGSSPANNUNG
+    name: "Versorgungsspannung"
+  - id: !extend STROMAUFNAHME
+    name: "Stromaufnahme"
+  - id: !extend LEISTUNG_VERDICHTER
+    name: "Leistung Verdichter"
+  - id: !extend LAUFZEIT_VD_HEIZEN
+    name: "Betriebsstunden Verdichter Heizen"
+  - id: !extend LAUFZEIT_VD_WW
+    name: "Betriebsstunden Verdichter Warmwasser"
+  - id: !extend LAUFZEIT_VD_KUEHLEN
+    name: "Betriebsstunden Kuehlen"
+  - id: !extend LAUFZEIT_NHZ1
+    name: "Betriebsstunden Nachheizregister 1"
+  - id: !extend LAUFZEIT_NHZ2
+    name: "Betriebsstunden Nachheizregister 2"
+  - id: !extend LAUFZEIT_NHZ1_2
+    name: "Betriebsstunden Nachheizregister 1_2"
+  - id: !extend PWM_QUELLENPUMPE
+    name: "Quellenpumpe PWM"
+  - id: !extend MFG_SOFTWARE
+    name: "Software MFG"
+  - id: !extend PWM_LADEPUMPE
+    name: "Ladepumpe PWM"
+  - id: !extend UMSCHALTVENTIL_WW
+    name: "Umschaltventil Warmwasser"
+  - id: !extend FEK_RAUMTEMPERATUR_HK1
+    name: "FEK2 Raumtemperatur HK1"
+  - id: !extend FEK_RAUMFEUCHTE
+    name: "FEK2 Raumfeuchte HK1"
+  - id: !extend FEHLERNUMMER_WPM
+    name: "Fehlernummer"
+  - id: !extend VERDICHTER_RESTSTILLSTAND
+    name: "Verdichter Reststillstand"
+  - id: !extend SOMMERBETRIEB_HEIZGRENZE
+    name: "Sommerbetrieb Heizgrenze"
+  - id: !extend MAXVORLAUFTEMP
+    name: "Maximale Vorlauftemperatur"
+  - id: !extend MAXRUECKLAUFTEMP
+    name: "Maximale Rücklauftemperatur"
+  - id: !extend TAUPUNKT_HK1
+    name: "Taupunkt"
+  - id: !extend RAUMISTTEMP_WPM
+    name: "Raum Ist WPM3i"
+  - id: !extend RAUMSOLLTEMP_WPM
+    name: "Raum Soll WPM3i"
+  - id: !extend RAUMFEUCHTE_WPM
+    name: "Raumfeuchte WPM3i"
+  - id: !extend BIVALENZTEMPERATUR_HZG
+    name: "Bivalenztemperatur Heizen"
+  - id: !extend BIVALENZTEMPERATUR_WW
+    name: "Bivalenztemperatur Warmwasser"
+  - id: !extend NHZ_WAERME_HEIZ_SUMME
+    name: "Wärmeertrag NHZ Heizen"
+  - id: !extend NHZ_WAERME_WW_SUMME
+    name: "Wärmeertrag NHZ Warmwasser"
+  - id: !extend PARTYPROGRAMM
+    name: "Partyprogramm"
+
+binary_sensor:
+  - id: !extend HEIZKREISPUMPE
+    name: "Heizkreispumpe"
+  - id: !extend MISCHER_PUMPE
+    name: "Mischer aktiv"
+  - id: !extend MISCHER_AUF
+    name: "Mischer auf"
+  - id: !extend MISCHER_ZU
+    name: "Mischer zu"
+  - id: !extend PUFFERLADEPUMPE
+    name: "Pufferladepumpe"
+  - id: !extend NHZ1
+    name: "Nachheizregister 1"
+  - id: !extend NHZ2
+    name: "Nachheizregister 2"
+  - id: !extend NHZ3
+    name: "Nachheizregister 3"
+  - id: !extend ENTLEERUNG_HYD
+    name: "Entleerung HYD"
+  - id: !extend WARMWASSERBEREITUNG
+    name: "Warmwasserbereitung"
+  - id: !extend KUEHLBETRIEB
+    name: "Kuehlbetrieb"
+  - id: !extend VERDICHTER
+    name: "Verdichter"
+  - id: !extend HEIZBETRIEB
+    name: "Heizbetrieb"
+  - id: !extend QUELLENPUMPE
+    name: "Quellenpumpe"
+  - id: !extend EINPHASIGER_BETRIEB
+    name: "Einphasiger Betrieb"
+  - id: !extend SOMMERBETRIEB
+    name: "Sommerbetrieb"
+  - id: !extend ANTILEGIONELLEN
+    name: "Antilegionellenbehandlung"
+  - id: !extend PUMPENZYKLEN
+    name: "Pumpenzyklen"
+  - id: !extend PUFFERBETRIEB
+    name: "Pufferbetrieb"
+  - id: !extend HEIZ_ANFORDERUNG_HK1
+    name: "Heizanforderung HK1"
+  - id: !extend AUFHEIZPROGRAMM
+    name: "Aufheizprogramm"
+
+text_sensor:
+  - id: !extend HEATPUMP_DATETIME
+    name: "Zeitstempel"
+
+number:
+  - id: !extend KOMF_TEMP
+    name: "Heizen Komfort Temperatur"
+  - id: !extend ECO_TEMP
+    name: "Heizen Eco Temperatur"
+  - id: !extend WW_KOMF_TEMP
+    name: "WW Komfort Temperatur"
+  - id: !extend WW_ECO_TEMP
+    name: "WW Eco Temperatur"
+  - id: !extend WW_HYSTERESE
+    name: "WW Hysterese"
+  - id: !extend VORLAUFSOLLTEMP_KUEHLEN
+    name: "Kühlen Vorlauf Soll Temperatur"
+  - id: !extend RAUMSOLLTEMP_KUEHLEN
+    name: "Kühlen Raum Soll Temperatur"
+  - id: !extend HYSTERESE_VORLAUFTEMP_KUEHLEN
+    name: "Kühlen Hysterese"
+  - id: !extend LEISTUNG_HEIZKREISPUMPE
+    name: "Pumpenleistung Heizkreis"
+  - id: !extend LEISTUNG_SOLEPUMPE
+    name: "Pumpenleistung Sole"
+  - id: !extend LEISTUNG_WARMWASSERPUMPE
+    name: "Pumpenleistung Warmwasser"
+  - id: !extend VERDICHTER_STILLSTAND
+    name: "Verdichter Stillstand"
+  - id: !extend REGLERDYNAMIK
+    name: "Reglerdynamik"
+  - id: !extend STEIGUNG_HK1
+    name: "Steigung HK1"
+  - id: !extend RAUMEINFLUSS
+    name: "Raumeinfluss"
+
+switch:
+  - id: !extend KUEHLEN_EIN
+    name: "Kühlen"
+  - id: !extend KUEHLMODE
+    name: "Kühlmodus Aktivkühlung"
+  - id: !extend FLAECHENKUEHLUNG
+    name: "Flächenkühlung"
+  - id: !extend GEBLAESEKUEHLUNG
+    name: "Gebläsekühlung"

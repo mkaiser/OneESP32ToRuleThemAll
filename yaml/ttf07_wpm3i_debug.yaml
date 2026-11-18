@@ -1,0 +1,47 @@
+# Optional package for ttf07_wpm3i.yaml: diagnostic sensors for registers whose meaning is not known yet (reverse
+# engineering). The registers are given by their address, so they need no entry in property.h. Sensor names:
+# "Debug <node> <address> (hint)". Add it next to ttf07_wpm3i.yaml:
+#
+# packages:
+#   wp: !include OneESP32ToRuleThemAll/yaml/ttf07_wpm3i.yaml
+#   wp_debug: !include OneESP32ToRuleThemAll/yaml/ttf07_wpm3i_debug.yaml
+
+packages:
+# Read by the control panel in the "Kühlen" menu
+  DEBUG_KESSEL_06A5:    !include { file: templates/wp_debug.yaml, vars: { sensor_id: "DEBUG_KESSEL_06A5", sensor_name: "Debug Kessel 0x06A5 (Kühlen)", address: "0x06a5", target: "Kessel", listen_only: "false" }}
+  DEBUG_KESSEL_06A6:    !include { file: templates/wp_debug.yaml, vars: { sensor_id: "DEBUG_KESSEL_06A6", sensor_name: "Debug Kessel 0x06A6 (Kühlen)", address: "0x06a6", target: "Kessel", listen_only: "false" }}
+  DEBUG_MANAGER_068E:   !include { file: templates/wp_debug.yaml, vars: { sensor_id: "DEBUG_MANAGER_068E", sensor_name: "Debug Manager 0x068E (Kühlen)", address: "0x068e", target: "Manager", listen_only: "false" }}
+  DEBUG_MANAGER_FDB6:   !include { file: templates/wp_debug.yaml, vars: { sensor_id: "DEBUG_MANAGER_FDB6", sensor_name: "Debug Manager 0xFDB6 (Kühlen)", address: "0xfdb6", target: "Manager", listen_only: "false" }}
+
+# Read by the control panel in the Diagnose and expert menus; disabled by default, requested every 5 min
+  DEBUG_MANAGER_0074:   !include { file: templates/wp_debug.yaml, vars: { sensor_id: "DEBUG_MANAGER_0074", sensor_name: "Debug Manager 0x0074 (EVU-Sperre?)", address: "0x0074", target: "Manager", disabled_by_default: "true" }}
+  DEBUG_MANAGER_0294:   !include { file: templates/wp_debug.yaml, vars: { sensor_id: "DEBUG_MANAGER_0294", sensor_name: "Debug Manager 0x0294 (Diagnose System)", address: "0x0294", target: "Manager", disabled_by_default: "true" }}
+  DEBUG_MANAGER_06AE:   !include { file: templates/wp_debug.yaml, vars: { sensor_id: "DEBUG_MANAGER_06AE", sensor_name: "Debug Manager 0x06AE (Inbetriebnahme)", address: "0x06ae", target: "Manager", disabled_by_default: "true" }}
+  DEBUG_MANAGER_4E5A:   !include { file: templates/wp_debug.yaml, vars: { sensor_id: "DEBUG_MANAGER_4E5A", sensor_name: "Debug Manager 0x4E5A (expert menus)", address: "0x4e5a", target: "Manager", disabled_by_default: "true" }}
+  DEBUG_MANAGER_4E68:   !include { file: templates/wp_debug.yaml, vars: { sensor_id: "DEBUG_MANAGER_4E68", sensor_name: "Debug Manager 0x4E68 (Wärmepumpentyp?)", address: "0x4e68", target: "Manager", disabled_by_default: "true" }}
+
+# Sent on the bus without a request
+  DEBUG_MANAGER_080E:   !include { file: templates/wp_debug.yaml, vars: { sensor_id: "DEBUG_MANAGER_080E", sensor_name: "Debug Manager 0x080E", address: "0x080e", target: "Manager" }}
+  DEBUG_MANAGER_FE1E:   !include { file: templates/wp_debug.yaml, vars: { sensor_id: "DEBUG_MANAGER_FE1E", sensor_name: "Debug Manager 0xFE1E", address: "0xfe1e", target: "Manager" }}
+  DEBUG_MFG_FE1E:       !include { file: templates/wp_debug.yaml, vars: { sensor_id: "DEBUG_MFG_FE1E", sensor_name: "Debug MFG 0xFE1E", address: "0xfe1e", target: "MFG" }}
+  DEBUG_MFG_FE09:       !include { file: templates/wp_debug.yaml, vars: { sensor_id: "DEBUG_MFG_FE09", sensor_name: "Debug MFG 0xFE09 (Temperatur)", address: "0xfe09", type: "et_dec_val", target: "MFG", unit: "°C", accuracy_decimals: "1", listen_only: "false" }}
+  DEBUG_BEDIENTEIL_06AF: !include { file: templates/wp_debug.yaml, vars: { sensor_id: "DEBUG_BEDIENTEIL_06AF", sensor_name: "Debug Bedienteil 0x06AF", address: "0x06af", target: "Bedienteil" }}
+  DEBUG_BEDIENTEIL_4E8B: !include { file: templates/wp_debug.yaml, vars: { sensor_id: "DEBUG_BEDIENTEIL_4E8B", sensor_name: "Debug Bedienteil 0x4E8B", address: "0x4e8b", target: "Bedienteil" }}
+
+interval:
+  - interval: 5min
+    then:
+      - lambda: |-
+          for (const std::uint16_t address : {0x0074, 0x0294, 0x06ae, 0x4e5a, 0x4e68}) {
+            queueRequest(CanNode::Manager, Property(address));
+          }
+  - interval: $interval_very_slow
+    then:
+      - lambda: |-
+          for (const std::uint16_t address : {0x06a5, 0x06a6}) {
+            queueRequest(CanNode::Kessel, Property(address));
+          }
+          for (const std::uint16_t address : {0x068e, 0xfdb6}) {
+            queueRequest(CanNode::Manager, Property(address));
+          }
+          queueRequest(CanNode::MFG, Property(0xfe09));
