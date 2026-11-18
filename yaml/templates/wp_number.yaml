@@ -6,12 +6,15 @@ defaults:
   icon: "mdi:valve"
   unit: ""
   exposed: "true"
+  mode: "auto"  # auto, slider or box
+  write_lock: "false"  # optional C++ expression; while true, writes are refused and the value is read back
 
 number:
   - platform: template
     name: ${property}
     id: ${property}
     icon: ${icon}
+    mode: ${mode}
     unit_of_measurement: ${unit}
     min_value: ${min}
     max_value: ${max}
@@ -20,6 +23,11 @@ number:
     optimistic: true
     set_action:
       - lambda: |-
+          if (${write_lock}) {
+            ESP_LOGW("Number", "%s is locked, not writing %f", std::string(Property::k${property}.name).c_str(), x);
+            queueRequest(CanNode::${target}, Property::k${property});  // read back, so the entity shows the real value
+            return;
+          }
           ESP_LOGI("Number", "Setting new value %f for %s", x, std::string(Property::k${property}.name).c_str());
           if(x != NAN) {
             const auto type = Property::k${property}.type;
