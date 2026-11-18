@@ -1,0 +1,130 @@
+# 2026-11-18 10:45-10:48 CET, ESP log after the flash of 10:44 (fix: ww_modus_pending). 10:45:29 Thermostat Warmwasser -> comfort (HA), 10:46:49 -> eco. Filtered like 2026-11-18-1039-ww-modus-test.log.
+[10:44:56.570][V][climate:431]: 'Thermostat Warmwasser' >>
+[10:45:01.970][V][climate:431]: 'Thermostat Warmwasser' >>
+[10:45:14.185][D][Communication:226]: Message from 0x180 (Kessel) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property SPEICHERSOLLTEMP (0x0003) raw value 500 (0x01F4) data D2 00 FA 00 03 01 F4
+[10:45:21.942][D][Communication:226]: Message from 0x180 (Kessel) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property WW_PROGRAMM_MO_1 (0x1710) raw value 32896 (0x8080) data D2 00 FA 17 10 80 80
+[10:45:22.189][D][Communication:226]: Message from 0x180 (Kessel) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property WW_PROGRAMM_MO_2 (0x1711) raw value 32896 (0x8080) data D2 00 FA 17 11 80 80
+[10:45:22.446][D][Communication:226]: Message from 0x180 (Kessel) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property WW_PROGRAMM_MO_3 (0x1712) raw value 32896 (0x8080) data D2 00 FA 17 12 80 80
+[10:45:22.688][D][Communication:226]: Message from 0x180 (Kessel) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property WW_PROGRAMM_DI_1 (0x1720) raw value 32896 (0x8080) data D2 00 FA 17 20 80 80
+[10:45:22.949][D][Communication:226]: Message from 0x180 (Kessel) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property WW_PROGRAMM_DI_2 (0x1721) raw value 32896 (0x8080) data D2 00 FA 17 21 80 80
+[10:45:23.197][D][Communication:226]: Message from 0x180 (Kessel) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property WW_PROGRAMM_DI_3 (0x1722) raw value 32896 (0x8080) data D2 00 FA 17 22 80 80
+[10:45:23.438][D][Communication:226]: Message from 0x180 (Kessel) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property WW_PROGRAMM_MI_1 (0x1730) raw value 32896 (0x8080) data D2 00 FA 17 30 80 80
+[10:45:23.701][D][Communication:226]: Message from 0x180 (Kessel) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property WW_PROGRAMM_MI_2 (0x1731) raw value 32896 (0x8080) data D2 00 FA 17 31 80 80
+[10:45:23.951][D][Communication:226]: Message from 0x180 (Kessel) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property WW_PROGRAMM_MI_3 (0x1732) raw value 32896 (0x8080) data D2 00 FA 17 32 80 80
+[10:45:24.191][D][Communication:226]: Message from 0x180 (Kessel) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property WW_PROGRAMM_DO_1 (0x1740) raw value 32896 (0x8080) data D2 00 FA 17 40 80 80
+[10:45:24.439][D][Communication:226]: Message from 0x180 (Kessel) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property WW_PROGRAMM_DO_2 (0x1741) raw value 32896 (0x8080) data D2 00 FA 17 41 80 80
+[10:45:24.705][D][Communication:226]: Message from 0x180 (Kessel) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property WW_PROGRAMM_DO_3 (0x1742) raw value 32896 (0x8080) data D2 00 FA 17 42 80 80
+[10:45:24.965][D][Communication:226]: Message from 0x180 (Kessel) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property WW_PROGRAMM_FR_1 (0x1750) raw value 32896 (0x8080) data D2 00 FA 17 50 80 80
+[10:45:25.191][D][Communication:226]: Message from 0x180 (Kessel) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property WW_PROGRAMM_FR_2 (0x1751) raw value 32896 (0x8080) data D2 00 FA 17 51 80 80
+[10:45:25.441][D][Communication:226]: Message from 0x180 (Kessel) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property WW_PROGRAMM_FR_3 (0x1752) raw value 32896 (0x8080) data D2 00 FA 17 52 80 80
+[10:45:25.698][D][Communication:226]: Message from 0x180 (Kessel) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property WW_PROGRAMM_SA_1 (0x1760) raw value 32896 (0x8080) data D2 00 FA 17 60 80 80
+[10:45:25.943][D][Communication:226]: Message from 0x180 (Kessel) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property WW_PROGRAMM_SA_2 (0x1761) raw value 32896 (0x8080) data D2 00 FA 17 61 80 80
+[10:45:26.189][D][Communication:226]: Message from 0x180 (Kessel) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property WW_PROGRAMM_SA_3 (0x1762) raw value 32896 (0x8080) data D2 00 FA 17 62 80 80
+[10:45:26.446][D][Communication:226]: Message from 0x180 (Kessel) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property WW_PROGRAMM_SO_1 (0x1770) raw value 32896 (0x8080) data D2 00 FA 17 70 80 80
+[10:45:26.695][D][Communication:226]: Message from 0x180 (Kessel) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property WW_PROGRAMM_SO_2 (0x1771) raw value 32896 (0x8080) data D2 00 FA 17 71 80 80
+[10:45:26.957][D][Communication:226]: Message from 0x180 (Kessel) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property WW_PROGRAMM_SO_3 (0x1772) raw value 32896 (0x8080) data D2 00 FA 17 72 80 80
+[10:45:26.957][V][select:028]: 'Warmwasser Modus' >> Eco (1)
+[10:45:26.957][V][climate:431]: 'Thermostat Warmwasser' >>
+[10:45:28.972][V][climate:049]: 'Thermostat Warmwasser' - Setting
+[10:45:28.982][V][select:067]: 'Warmwasser Modus' - Setting
+[10:45:28.986][V][select:119]: 'Warmwasser Modus' - Set selected option to: Komfort
+[10:45:28.989][I][WW:634]: Warmwasser Modus -> Komfort: Warmwasserprogramm Mo-So window 1 = 0x0060
+[10:45:29.006][V][select:028]: 'Warmwasser Modus' >> Komfort (0)
+[10:45:29.009][V][climate:431]: 'Thermostat Warmwasser' >>
+[10:45:29.031][V][climate:431]: 'Thermostat Warmwasser' >>
+[10:45:29.056][D][Communication:259]: sendData(node=Kessel, property=UNKNOWN (0x17a0), value=96)
+[10:45:29.104][D][Communication:259]: sendData(node=Kessel, property=UNKNOWN (0x17a1), value=32896)
+[10:45:29.154][D][Communication:259]: sendData(node=Kessel, property=UNKNOWN (0x17a2), value=32896)
+[10:45:46.875][I][QUEUE:127]: Requesting data from Kessel for SPEICHERSOLLTEMP
+[10:45:47.188][D][Communication:226]: Message from 0x180 (Kessel) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property UNKNOWN (0x17A0) raw value 96 (0x0060) data D2 00 FA 17 A0 00 60
+[10:45:47.441][D][Communication:226]: Message from 0x180 (Kessel) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property UNKNOWN (0x17A1) raw value 32896 (0x8080) data D2 00 FA 17 A1 80 80
+[10:45:47.690][D][Communication:226]: Message from 0x180 (Kessel) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property UNKNOWN (0x17A2) raw value 32896 (0x8080) data D2 00 FA 17 A2 80 80
+[10:45:47.942][D][Communication:226]: Message from 0x180 (Kessel) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property WW_PROGRAMM_MO_1 (0x1710) raw value 96 (0x0060) data D2 00 FA 17 10 00 60
+[10:45:48.199][D][Communication:226]: Message from 0x180 (Kessel) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property WW_PROGRAMM_MO_2 (0x1711) raw value 32896 (0x8080) data D2 00 FA 17 11 80 80
+[10:45:48.441][D][Communication:226]: Message from 0x180 (Kessel) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property WW_PROGRAMM_MO_3 (0x1712) raw value 32896 (0x8080) data D2 00 FA 17 12 80 80
+[10:45:48.694][D][Communication:226]: Message from 0x180 (Kessel) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property WW_PROGRAMM_DI_1 (0x1720) raw value 96 (0x0060) data D2 00 FA 17 20 00 60
+[10:45:48.953][D][Communication:226]: Message from 0x180 (Kessel) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property WW_PROGRAMM_DI_2 (0x1721) raw value 32896 (0x8080) data D2 00 FA 17 21 80 80
+[10:45:49.213][D][Communication:226]: Message from 0x180 (Kessel) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property WW_PROGRAMM_DI_3 (0x1722) raw value 32896 (0x8080) data D2 00 FA 17 22 80 80
+[10:45:49.452][D][Communication:226]: Message from 0x180 (Kessel) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property WW_PROGRAMM_MI_1 (0x1730) raw value 96 (0x0060) data D2 00 FA 17 30 00 60
+[10:45:49.694][D][Communication:226]: Message from 0x180 (Kessel) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property WW_PROGRAMM_MI_2 (0x1731) raw value 32896 (0x8080) data D2 00 FA 17 31 80 80
+[10:45:49.942][D][Communication:226]: Message from 0x180 (Kessel) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property WW_PROGRAMM_MI_3 (0x1732) raw value 32896 (0x8080) data D2 00 FA 17 32 80 80
+[10:45:50.224][D][Communication:226]: Message from 0x180 (Kessel) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property WW_PROGRAMM_DO_1 (0x1740) raw value 96 (0x0060) data D2 00 FA 17 40 00 60
+[10:45:50.446][D][Communication:226]: Message from 0x180 (Kessel) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property WW_PROGRAMM_DO_2 (0x1741) raw value 32896 (0x8080) data D2 00 FA 17 41 80 80
+[10:45:50.695][D][Communication:226]: Message from 0x180 (Kessel) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property WW_PROGRAMM_DO_3 (0x1742) raw value 32896 (0x8080) data D2 00 FA 17 42 80 80
+[10:45:50.943][D][Communication:226]: Message from 0x180 (Kessel) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property WW_PROGRAMM_FR_1 (0x1750) raw value 96 (0x0060) data D2 00 FA 17 50 00 60
+[10:45:51.200][D][Communication:226]: Message from 0x180 (Kessel) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property WW_PROGRAMM_FR_2 (0x1751) raw value 32896 (0x8080) data D2 00 FA 17 51 80 80
+[10:45:51.449][D][Communication:226]: Message from 0x180 (Kessel) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property WW_PROGRAMM_FR_3 (0x1752) raw value 32896 (0x8080) data D2 00 FA 17 52 80 80
+[10:45:51.698][D][Communication:226]: Message from 0x180 (Kessel) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property WW_PROGRAMM_SA_1 (0x1760) raw value 96 (0x0060) data D2 00 FA 17 60 00 60
+[10:45:51.943][D][Communication:226]: Message from 0x180 (Kessel) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property WW_PROGRAMM_SA_2 (0x1761) raw value 32896 (0x8080) data D2 00 FA 17 61 80 80
+[10:45:52.200][D][Communication:226]: Message from 0x180 (Kessel) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property WW_PROGRAMM_SA_3 (0x1762) raw value 32896 (0x8080) data D2 00 FA 17 62 80 80
+[10:45:52.450][D][Communication:226]: Message from 0x180 (Kessel) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property WW_PROGRAMM_SO_1 (0x1770) raw value 96 (0x0060) data D2 00 FA 17 70 00 60
+[10:45:52.689][D][Communication:226]: Message from 0x180 (Kessel) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property WW_PROGRAMM_SO_2 (0x1771) raw value 32896 (0x8080) data D2 00 FA 17 71 80 80
+[10:45:52.946][D][Communication:226]: Message from 0x180 (Kessel) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property WW_PROGRAMM_SO_3 (0x1772) raw value 32896 (0x8080) data D2 00 FA 17 72 80 80
+[10:45:53.938][D][Communication:226]: Message from 0x180 (Kessel) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property SPEICHERSOLLTEMP (0x0003) raw value 500 (0x01F4) data D2 00 FA 00 03 01 F4
+[10:46:15.671][D][Communication:226]: Message from 0x180 (Kessel) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property WW_PROGRAMM_MO_1 (0x1710) raw value 96 (0x0060) data D2 00 FA 17 10 00 60
+[10:46:15.949][D][Communication:226]: Message from 0x180 (Kessel) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property WW_PROGRAMM_MO_2 (0x1711) raw value 32896 (0x8080) data D2 00 FA 17 11 80 80
+[10:46:16.199][D][Communication:226]: Message from 0x180 (Kessel) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property WW_PROGRAMM_MO_3 (0x1712) raw value 32896 (0x8080) data D2 00 FA 17 12 80 80
+[10:46:16.447][D][Communication:226]: Message from 0x180 (Kessel) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property WW_PROGRAMM_DI_1 (0x1720) raw value 96 (0x0060) data D2 00 FA 17 20 00 60
+[10:46:16.694][D][Communication:226]: Message from 0x180 (Kessel) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property WW_PROGRAMM_DI_2 (0x1721) raw value 32896 (0x8080) data D2 00 FA 17 21 80 80
+[10:46:16.968][D][Communication:226]: Message from 0x180 (Kessel) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property WW_PROGRAMM_DI_3 (0x1722) raw value 32896 (0x8080) data D2 00 FA 17 22 80 80
+[10:46:17.220][D][Communication:226]: Message from 0x180 (Kessel) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property WW_PROGRAMM_MI_1 (0x1730) raw value 96 (0x0060) data D2 00 FA 17 30 00 60
+[10:46:17.453][D][Communication:226]: Message from 0x180 (Kessel) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property WW_PROGRAMM_MI_2 (0x1731) raw value 32896 (0x8080) data D2 00 FA 17 31 80 80
+[10:46:17.702][D][Communication:226]: Message from 0x180 (Kessel) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property WW_PROGRAMM_MI_3 (0x1732) raw value 32896 (0x8080) data D2 00 FA 17 32 80 80
+[10:46:17.968][D][Communication:226]: Message from 0x180 (Kessel) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property WW_PROGRAMM_DO_1 (0x1740) raw value 96 (0x0060) data D2 00 FA 17 40 00 60
+[10:46:18.206][D][Communication:226]: Message from 0x180 (Kessel) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property WW_PROGRAMM_DO_2 (0x1741) raw value 32896 (0x8080) data D2 00 FA 17 41 80 80
+[10:46:18.455][D][Communication:226]: Message from 0x180 (Kessel) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property WW_PROGRAMM_DO_3 (0x1742) raw value 32896 (0x8080) data D2 00 FA 17 42 80 80
+[10:46:18.705][D][Communication:226]: Message from 0x180 (Kessel) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property WW_PROGRAMM_FR_1 (0x1750) raw value 96 (0x0060) data D2 00 FA 17 50 00 60
+[10:46:18.971][D][Communication:226]: Message from 0x180 (Kessel) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property WW_PROGRAMM_FR_2 (0x1751) raw value 32896 (0x8080) data D2 00 FA 17 51 80 80
+[10:46:19.204][D][Communication:226]: Message from 0x180 (Kessel) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property WW_PROGRAMM_FR_3 (0x1752) raw value 32896 (0x8080) data D2 00 FA 17 52 80 80
+[10:46:19.453][D][Communication:226]: Message from 0x180 (Kessel) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property WW_PROGRAMM_SA_1 (0x1760) raw value 96 (0x0060) data D2 00 FA 17 60 00 60
+[10:46:19.718][D][Communication:226]: Message from 0x180 (Kessel) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property WW_PROGRAMM_SA_2 (0x1761) raw value 32896 (0x8080) data D2 00 FA 17 61 80 80
+[10:46:19.967][D][Communication:226]: Message from 0x180 (Kessel) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property WW_PROGRAMM_SA_3 (0x1762) raw value 32896 (0x8080) data D2 00 FA 17 62 80 80
+[10:46:20.216][D][Communication:226]: Message from 0x180 (Kessel) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property WW_PROGRAMM_SO_1 (0x1770) raw value 96 (0x0060) data D2 00 FA 17 70 00 60
+[10:46:20.465][D][Communication:226]: Message from 0x180 (Kessel) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property WW_PROGRAMM_SO_2 (0x1771) raw value 32896 (0x8080) data D2 00 FA 17 71 80 80
+[10:46:20.717][D][Communication:226]: Message from 0x180 (Kessel) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property WW_PROGRAMM_SO_3 (0x1772) raw value 32896 (0x8080) data D2 00 FA 17 72 80 80
+[10:46:46.875][I][QUEUE:127]: Requesting data from Kessel for SPEICHERSOLLTEMP
+[10:46:46.962][D][Communication:226]: Message from 0x180 (Kessel) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property SPEICHERSOLLTEMP (0x0003) raw value 520 (0x0208) data D2 00 FA 00 03 02 08
+[10:46:49.723][V][climate:431]: 'Thermostat Warmwasser' >>
+[10:46:49.745][V][climate:049]: 'Thermostat Warmwasser' - Setting
+[10:46:49.757][V][select:067]: 'Warmwasser Modus' - Setting
+[10:46:49.760][V][select:119]: 'Warmwasser Modus' - Set selected option to: Eco
+[10:46:49.763][I][WW:634]: Warmwasser Modus -> Eco: Warmwasserprogramm Mo-So window 1 = 0x8080
+[10:46:49.779][V][select:028]: 'Warmwasser Modus' >> Eco (1)
+[10:46:49.780][V][climate:431]: 'Thermostat Warmwasser' >>
+[10:46:49.803][V][climate:431]: 'Thermostat Warmwasser' >>
+[10:46:49.826][D][Communication:259]: sendData(node=Kessel, property=UNKNOWN (0x17a0), value=32896)
+[10:46:49.874][D][Communication:259]: sendData(node=Kessel, property=UNKNOWN (0x17a1), value=32896)
+[10:46:49.924][D][Communication:259]: sendData(node=Kessel, property=UNKNOWN (0x17a2), value=32896)
+[10:46:54.966][D][Communication:226]: Message from 0x180 (Kessel) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property WW_PROGRAMM_MO_1 (0x1710) raw value 32896 (0x8080) data D2 00 FA 17 10 80 80
+[10:46:55.224][D][Communication:226]: Message from 0x180 (Kessel) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property WW_PROGRAMM_MO_2 (0x1711) raw value 32896 (0x8080) data D2 00 FA 17 11 80 80
+[10:46:55.474][D][Communication:226]: Message from 0x180 (Kessel) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property WW_PROGRAMM_MO_3 (0x1712) raw value 32896 (0x8080) data D2 00 FA 17 12 80 80
+[10:46:55.721][D][Communication:226]: Message from 0x180 (Kessel) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property WW_PROGRAMM_DI_1 (0x1720) raw value 32896 (0x8080) data D2 00 FA 17 20 80 80
+[10:46:55.963][D][Communication:226]: Message from 0x180 (Kessel) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property WW_PROGRAMM_DI_2 (0x1721) raw value 32896 (0x8080) data D2 00 FA 17 21 80 80
+[10:46:56.212][D][Communication:226]: Message from 0x180 (Kessel) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property WW_PROGRAMM_DI_3 (0x1722) raw value 32896 (0x8080) data D2 00 FA 17 22 80 80
+[10:46:56.504][D][Communication:226]: Message from 0x180 (Kessel) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property WW_PROGRAMM_MI_1 (0x1730) raw value 32896 (0x8080) data D2 00 FA 17 30 80 80
+[10:46:56.717][D][Communication:226]: Message from 0x180 (Kessel) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property WW_PROGRAMM_MI_2 (0x1731) raw value 32896 (0x8080) data D2 00 FA 17 31 80 80
+[10:46:56.966][D][Communication:226]: Message from 0x180 (Kessel) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property WW_PROGRAMM_MI_3 (0x1732) raw value 32896 (0x8080) data D2 00 FA 17 32 80 80
+[10:46:57.144][D][Communication:259]: sendData(node=Manager, property=FEHLERLISTE_INDEX (0x0b9a), value=0)
+[10:46:57.219][D][Communication:226]: Message from 0x180 (Kessel) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property WW_PROGRAMM_DO_1 (0x1740) raw value 32896 (0x8080) data D2 00 FA 17 40 80 80
+[10:46:57.473][D][Communication:226]: Message from 0x180 (Kessel) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property WW_PROGRAMM_DO_2 (0x1741) raw value 32896 (0x8080) data D2 00 FA 17 41 80 80
+[10:46:57.723][D][Communication:226]: Message from 0x180 (Kessel) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property WW_PROGRAMM_DO_3 (0x1742) raw value 32896 (0x8080) data D2 00 FA 17 42 80 80
+[10:46:57.973][V][climate:431]: 'Thermostat Warmwasser' >>
+[10:46:57.999][D][Communication:226]: Message from 0x180 (Kessel) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property WW_PROGRAMM_FR_1 (0x1750) raw value 32896 (0x8080) data D2 00 FA 17 50 80 80
+[10:46:58.224][D][Communication:226]: Message from 0x180 (Kessel) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property WW_PROGRAMM_FR_2 (0x1751) raw value 32896 (0x8080) data D2 00 FA 17 51 80 80
+[10:46:58.473][D][Communication:226]: Message from 0x180 (Kessel) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property WW_PROGRAMM_FR_3 (0x1752) raw value 32896 (0x8080) data D2 00 FA 17 52 80 80
+[10:46:59.159][D][Communication:259]: sendData(node=Manager, property=FEHLERLISTE_INDEX (0x0b9a), value=1)
+[10:46:59.875][D][Communication:226]: Message from 0x180 (Kessel) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property WW_PROGRAMM_SA_1 (0x1760) raw value 32896 (0x8080) data D2 00 FA 17 60 80 80
+[10:46:59.875][D][Communication:226]: Message from 0x180 (Kessel) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property WW_PROGRAMM_SA_2 (0x1761) raw value 32896 (0x8080) data D2 00 FA 17 61 80 80
+[10:46:59.893][D][Communication:226]: Message from 0x180 (Kessel) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property WW_PROGRAMM_SA_3 (0x1762) raw value 32896 (0x8080) data D2 00 FA 17 62 80 80
+[10:46:59.893][D][Communication:226]: Message from 0x180 (Kessel) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property WW_PROGRAMM_SO_1 (0x1770) raw value 32896 (0x8080) data D2 00 FA 17 70 80 80
+[10:46:59.907][D][Communication:226]: Message from 0x180 (Kessel) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property WW_PROGRAMM_SO_2 (0x1771) raw value 32896 (0x8080) data D2 00 FA 17 71 80 80
+[10:46:59.964][D][Communication:226]: Message from 0x180 (Kessel) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property UNKNOWN (0x17A0) raw value 32896 (0x8080) data D2 00 FA 17 A0 80 80
+[10:47:00.222][D][Communication:226]: Message from 0x180 (Kessel) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property UNKNOWN (0x17A1) raw value 32896 (0x8080) data D2 00 FA 17 A1 80 80
+[10:47:00.458][D][Communication:226]: Message from 0x180 (Kessel) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property UNKNOWN (0x17A2) raw value 32896 (0x8080) data D2 00 FA 17 A2 80 80
+[10:47:01.137][D][Communication:259]: sendData(node=Manager, property=FEHLERLISTE_INDEX (0x0b9a), value=2)
+[10:47:03.153][D][Communication:259]: sendData(node=Manager, property=FEHLERLISTE_INDEX (0x0b9a), value=3)
+[10:47:05.152][D][Communication:259]: sendData(node=Manager, property=FEHLERLISTE_INDEX (0x0b9a), value=4)
+[10:47:08.679][V][climate:431]: 'Thermostat Warmwasser' >>
+[10:47:30.946][V][climate:431]: 'Thermostat Warmwasser' >>
+[10:47:46.878][I][QUEUE:127]: Requesting data from Kessel for SPEICHERSOLLTEMP
+[10:47:47.131][D][Communication:226]: Message from 0x180 (Kessel) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property SPEICHERSOLLTEMP (0x0003) raw value 500 (0x01F4) data D2 00 FA 00 03 01 F4

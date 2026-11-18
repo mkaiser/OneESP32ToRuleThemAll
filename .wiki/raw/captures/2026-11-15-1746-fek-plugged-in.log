@@ -1,0 +1,186 @@
+# Source: ESP log 2026-11-15 17:46-18:11 (local), firmware with type-aware CAN log. FEK plugged in ~17:50:30. Filtered: HK1/0x601/0x680 frames, system messages, Betriebsstatus, HK1 requests.
+[17:46:44.210][D][Communication:249]: Message from 0x301 (HK1) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property KOMF_TEMP (0x0005) raw value 230 (0x00E6)
+[17:46:44.466][D][Communication:249]: Message from 0x301 (HK1) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property ECO_TEMP (0x0008) raw value 195 (0x00C3)
+[17:46:47.541][D][Communication:249]: Message from 0x301 (HK1) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property STEIGUNG_HK1 (0x010E) raw value 26 (0x001A)
+[17:46:47.786][D][Communication:249]: Message from 0x301 (HK1) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property RAUMEINFLUSS (0x010F) raw value 2560 (0x0A00)
+[17:46:48.538][D][Communication:249]: Message from 0x480 (Manager) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property BETRIEBS_STATUS_WPM (0x4E5E) raw value 16577 (0x40C1)
+[17:46:52.032][D][Communication:249]: Message from 0x301 (HK1) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property KOMF_TEMP (0x0005) raw value 230 (0x00E6)
+[17:46:52.279][D][Communication:249]: Message from 0x301 (HK1) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property ECO_TEMP (0x0008) raw value 195 (0x00C3)
+[17:46:52.559][D][Communication:249]: Message from 0x301 (HK1) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property STEIGUNG_HK1 (0x010E) raw value 26 (0x001A)
+[17:46:52.809][D][Communication:249]: Message from 0x301 (HK1) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property RAUMEINFLUSS (0x010F) raw value 2560 (0x0A00)
+[17:46:57.544][D][Communication:249]: Message from 0x480 (Manager) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property BETRIEBS_STATUS_WPM (0x4E5E) raw value 16577 (0x40C1)
+[17:46:59.734][D][Communication:249]: Message from 0x601 (unknown) Read/Write ID 0x66 0x01 (to 0x301/HK1, system) property TBD_10 (0x00FE) raw value 256 (0x0100)
+[17:46:59.757][D][Communication:249]: Message from 0x180 (Kessel) Read/Write ID 0x66 0x79 (to 0x379/unknown, system) property TBD_10 (0x00FE) raw value 256 (0x0100)
+[17:46:59.758][D][Communication:249]: Message from 0x480 (Manager) Read/Write ID 0xA6 0x79 (to 0x579/unknown, system) property TBD_10 (0x00FE) raw value 256 (0x0100)
+[17:46:59.758][D][Communication:249]: Message from 0x480 (Manager) Read/Write ID 0x26 0x79 (to 0x179/unknown, system) property TBD_10 (0x00FE) raw value 256 (0x0100)
+[17:46:59.780][D][Communication:249]: Message from 0x301 (HK1) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property VORLAUFSOLLTEMP (0x0004) raw value 229 (0x00E5)
+[17:47:00.311][D][Communication:249]: Message from 0x100 (Bedienteil) Read/Write ID 0x97 0x00 (to 0x480/Manager, system response) property TBD_10 (0x00FE) raw value 256 (0x0100)
+[17:47:03.341][I][QUEUE:127]: Requesting data from Manager for BETRIEBS_STATUS_WPM
+[17:47:03.559][D][Communication:249]: Message from 0x480 (Manager) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property BETRIEBS_STATUS_WPM (0x4E5E) raw value 16577 (0x40C1)
+[17:47:33.341][I][QUEUE:127]: Requesting data from Manager for BETRIEBS_STATUS_WPM
+[17:47:33.606][D][Communication:249]: Message from 0x480 (Manager) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property BETRIEBS_STATUS_WPM (0x4E5E) raw value 16577 (0x40C1)
+[17:47:34.257][I][QUEUE:127]: Requesting data from HK1 for VORLAUFSOLLTEMP
+[17:47:34.860][D][Communication:249]: Message from 0x301 (HK1) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property VORLAUFSOLLTEMP (0x0004) raw value 229 (0x00E5)
+[17:48:03.341][I][QUEUE:127]: Requesting data from Manager for BETRIEBS_STATUS_WPM
+[17:48:03.531][D][Communication:249]: Message from 0x480 (Manager) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property BETRIEBS_STATUS_WPM (0x4E5E) raw value 16577 (0x40C1)
+[17:48:33.344][I][QUEUE:127]: Requesting data from Manager for BETRIEBS_STATUS_WPM
+[17:48:33.820][D][Communication:249]: Message from 0x480 (Manager) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property BETRIEBS_STATUS_WPM (0x4E5E) raw value 16577 (0x40C1)
+[17:48:34.257][I][QUEUE:127]: Requesting data from HK1 for VORLAUFSOLLTEMP
+[17:48:34.823][D][Communication:249]: Message from 0x301 (HK1) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property VORLAUFSOLLTEMP (0x0004) raw value 229 (0x00E5)
+[17:49:03.341][I][QUEUE:127]: Requesting data from Manager for BETRIEBS_STATUS_WPM
+[17:49:03.592][D][Communication:249]: Message from 0x480 (Manager) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property BETRIEBS_STATUS_WPM (0x4E5E) raw value 16577 (0x40C1)
+[17:49:33.356][I][QUEUE:127]: Requesting data from Manager for BETRIEBS_STATUS_WPM
+[17:49:34.096][D][Communication:249]: Message from 0x480 (Manager) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property BETRIEBS_STATUS_WPM (0x4E5E) raw value 16577 (0x40C1)
+[17:49:34.256][I][QUEUE:127]: Requesting data from HK1 for VORLAUFSOLLTEMP
+[17:49:34.839][D][Communication:249]: Message from 0x301 (HK1) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property VORLAUFSOLLTEMP (0x0004) raw value 229 (0x00E5)
+[17:50:03.344][I][QUEUE:127]: Requesting data from Manager for BETRIEBS_STATUS_WPM
+[17:50:03.595][D][Communication:249]: Message from 0x480 (Manager) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property BETRIEBS_STATUS_WPM (0x4E5E) raw value 16577 (0x40C1)
+[17:50:33.344][I][QUEUE:127]: Requesting data from Manager for BETRIEBS_STATUS_WPM
+[17:50:33.639][D][Communication:249]: Message from 0x480 (Manager) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property BETRIEBS_STATUS_WPM (0x4E5E) raw value 16577 (0x40C1)
+[17:50:34.257][I][QUEUE:127]: Requesting data from HK1 for VORLAUFSOLLTEMP
+[17:50:34.892][D][Communication:249]: Message from 0x301 (HK1) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property VORLAUFSOLLTEMP (0x0004) raw value 229 (0x00E5)
+[17:50:35.629][D][Communication:249]: Message from 0x301 (HK1) Read/Write ID 0x66 0x01 (to 0x301/HK1, system) property UNKNOWN (0x00FD) raw value 2304 (0x0900)
+[17:51:03.344][I][QUEUE:127]: Requesting data from Manager for BETRIEBS_STATUS_WPM
+[17:51:03.477][D][Communication:249]: Message from 0x480 (Manager) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property BETRIEBS_STATUS_WPM (0x4E5E) raw value 16577 (0x40C1)
+[17:51:33.335][D][Communication:249]: Message from 0x480 (Manager) Read/Write ID 0x20 0x00 (to 0x100/Bedienteil, write) property BETRIEBS_STATUS_WPM (0x4E5E) raw value 193 (0x00C1)
+[17:51:33.356][I][QUEUE:127]: Requesting data from Manager for BETRIEBS_STATUS_WPM
+[17:51:34.064][D][Communication:249]: Message from 0x480 (Manager) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property BETRIEBS_STATUS_WPM (0x4E5E) raw value 193 (0x00C1)
+[17:51:34.256][I][QUEUE:127]: Requesting data from HK1 for VORLAUFSOLLTEMP
+[17:51:34.353][D][Communication:249]: Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property UNKNOWN (0x0052) raw value 0 (0x0000)
+[17:51:34.365][D][Communication:249]: Message from 0x480 (Manager) Read/Write ID 0x20 0x00 (to 0x100/Bedienteil, write) property BETRIEBS_STATUS_WPM (0x4E5E) raw value 65 (0x0041)
+[17:51:56.813][D][Communication:249]: Message from 0x100 (Bedienteil) Read/Write ID 0x96 0x00 (to 0x480/Manager, system) property TBD_10 (0x00FE) raw value 256 (0x0100)
+[17:51:56.823][D][Communication:249]: Message from 0x480 (Manager) Read/Write ID 0x27 0x00 (to 0x100/Bedienteil, system response) property TBD_10 (0x00FE) raw value 256 (0x0100)
+[17:52:00.367][D][Communication:249]: Message from 0x301 (HK1) Read/Write ID 0x66 0x01 (to 0x301/HK1, system) property UNKNOWN (0x00FD) raw value 2048 (0x0800)
+[17:52:00.378][D][Communication:249]: Message from 0x680 (ESPClient) Read/Write ID 0xD6 0x00 (to 0x680/ESPClient, system) property UNKNOWN (0x00FD) raw value 2048 (0x0800)
+[17:52:00.390][D][Communication:249]: Message from 0x301 (HK1) Read/Write ID 0x67 0x01 (to 0x301/HK1, system response) property UNKNOWN (0x00FD) raw value 256 (0x0100)
+[17:52:03.349][I][QUEUE:127]: Requesting data from Manager for BETRIEBS_STATUS_WPM
+[17:52:03.552][D][Communication:249]: Message from 0x480 (Manager) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property BETRIEBS_STATUS_WPM (0x4E5E) raw value 65 (0x0041)
+[17:52:32.487][D][Communication:249]: Message from 0x480 (Manager) Read/Write ID 0x20 0x00 (to 0x100/Bedienteil, write) property BETRIEBS_STATUS_WPM (0x4E5E) raw value 1 (0x0001)
+[17:52:33.348][I][QUEUE:127]: Requesting data from Manager for BETRIEBS_STATUS_WPM
+[17:52:33.564][D][Communication:249]: Message from 0x480 (Manager) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property BETRIEBS_STATUS_WPM (0x4E5E) raw value 1 (0x0001)
+[17:52:34.259][I][QUEUE:127]: Requesting data from HK1 for VORLAUFSOLLTEMP
+[17:53:03.349][I][QUEUE:127]: Requesting data from Manager for BETRIEBS_STATUS_WPM
+[17:53:03.568][D][Communication:249]: Message from 0x480 (Manager) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property BETRIEBS_STATUS_WPM (0x4E5E) raw value 1 (0x0001)
+[17:53:33.352][I][QUEUE:127]: Requesting data from Manager for BETRIEBS_STATUS_WPM
+[17:53:33.822][D][Communication:249]: Message from 0x480 (Manager) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property BETRIEBS_STATUS_WPM (0x4E5E) raw value 1 (0x0001)
+[17:53:34.262][I][QUEUE:127]: Requesting data from HK1 for VORLAUFSOLLTEMP
+[17:53:59.665][D][Communication:249]: Message from 0x601 (unknown) Read/Write ID 0x66 0x01 (to 0x301/HK1, system) property TBD_10 (0x00FE) raw value 256 (0x0100)
+[17:53:59.677][D][Communication:249]: Message from 0x180 (Kessel) Read/Write ID 0x66 0x79 (to 0x379/unknown, system) property TBD_10 (0x00FE) raw value 256 (0x0100)
+[17:53:59.692][D][Communication:249]: Message from 0x480 (Manager) Read/Write ID 0xA6 0x79 (to 0x579/unknown, system) property TBD_10 (0x00FE) raw value 256 (0x0100)
+[17:53:59.709][D][Communication:249]: Message from 0x480 (Manager) Read/Write ID 0x26 0x79 (to 0x179/unknown, system) property TBD_10 (0x00FE) raw value 256 (0x0100)
+[17:54:00.043][D][Communication:249]: Message from 0x100 (Bedienteil) Read/Write ID 0x97 0x00 (to 0x480/Manager, system response) property TBD_10 (0x00FE) raw value 256 (0x0100)
+[17:54:03.349][I][QUEUE:127]: Requesting data from Manager for BETRIEBS_STATUS_WPM
+[17:54:03.587][D][Communication:249]: Message from 0x480 (Manager) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property BETRIEBS_STATUS_WPM (0x4E5E) raw value 1 (0x0001)
+[17:54:33.377][I][QUEUE:127]: Requesting data from Manager for BETRIEBS_STATUS_WPM
+[17:54:33.585][D][Communication:249]: Message from 0x480 (Manager) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property BETRIEBS_STATUS_WPM (0x4E5E) raw value 1 (0x0001)
+[17:54:34.255][I][QUEUE:127]: Requesting data from HK1 for VORLAUFSOLLTEMP
+[17:55:03.379][I][QUEUE:127]: Requesting data from Manager for BETRIEBS_STATUS_WPM
+[17:55:03.588][D][Communication:249]: Message from 0x480 (Manager) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property BETRIEBS_STATUS_WPM (0x4E5E) raw value 1 (0x0001)
+[17:55:33.401][I][QUEUE:127]: Requesting data from Manager for BETRIEBS_STATUS_WPM
+[17:55:34.088][D][Communication:249]: Message from 0x480 (Manager) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property BETRIEBS_STATUS_WPM (0x4E5E) raw value 1 (0x0001)
+[17:55:34.255][I][QUEUE:127]: Requesting data from HK1 for VORLAUFSOLLTEMP
+[17:56:03.386][I][QUEUE:127]: Requesting data from Manager for BETRIEBS_STATUS_WPM
+[17:56:03.593][D][Communication:249]: Message from 0x480 (Manager) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property BETRIEBS_STATUS_WPM (0x4E5E) raw value 1 (0x0001)
+[17:56:33.385][I][QUEUE:127]: Requesting data from Manager for BETRIEBS_STATUS_WPM
+[17:56:33.441][D][Communication:249]: Message from 0x480 (Manager) Read/Write ID 0x20 0x00 (to 0x100/Bedienteil, write) property BETRIEBS_STATUS_WPM (0x4E5E) raw value 0 (0x0000)
+[17:56:33.583][D][Communication:249]: Message from 0x480 (Manager) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property BETRIEBS_STATUS_WPM (0x4E5E) raw value 0 (0x0000)
+[17:56:34.255][I][QUEUE:127]: Requesting data from HK1 for VORLAUFSOLLTEMP
+[17:57:03.386][I][QUEUE:127]: Requesting data from Manager for BETRIEBS_STATUS_WPM
+[17:57:03.630][D][Communication:249]: Message from 0x480 (Manager) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property BETRIEBS_STATUS_WPM (0x4E5E) raw value 0 (0x0000)
+[17:57:33.385][I][QUEUE:127]: Requesting data from Manager for BETRIEBS_STATUS_WPM
+[17:57:33.535][D][Communication:249]: Message from 0x480 (Manager) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property BETRIEBS_STATUS_WPM (0x4E5E) raw value 0 (0x0000)
+[17:57:34.254][I][QUEUE:127]: Requesting data from HK1 for VORLAUFSOLLTEMP
+[17:58:03.385][I][QUEUE:127]: Requesting data from Manager for BETRIEBS_STATUS_WPM
+[17:58:03.572][D][Communication:249]: Message from 0x480 (Manager) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property BETRIEBS_STATUS_WPM (0x4E5E) raw value 0 (0x0000)
+[17:58:33.393][I][QUEUE:127]: Requesting data from Manager for BETRIEBS_STATUS_WPM
+[17:58:33.568][D][Communication:249]: Message from 0x480 (Manager) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property BETRIEBS_STATUS_WPM (0x4E5E) raw value 0 (0x0000)
+[17:58:34.255][I][QUEUE:127]: Requesting data from HK1 for VORLAUFSOLLTEMP
+[17:58:57.107][D][Communication:249]: Message from 0x100 (Bedienteil) Read/Write ID 0x96 0x00 (to 0x480/Manager, system) property TBD_10 (0x00FE) raw value 256 (0x0100)
+[17:58:57.119][D][Communication:249]: Message from 0x480 (Manager) Read/Write ID 0x27 0x00 (to 0x100/Bedienteil, system response) property TBD_10 (0x00FE) raw value 256 (0x0100)
+[17:59:03.395][I][QUEUE:127]: Requesting data from Manager for BETRIEBS_STATUS_WPM
+[17:59:03.601][D][Communication:249]: Message from 0x480 (Manager) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property BETRIEBS_STATUS_WPM (0x4E5E) raw value 0 (0x0000)
+[17:59:33.424][I][QUEUE:127]: Requesting data from Manager for BETRIEBS_STATUS_WPM
+[17:59:33.795][D][Communication:249]: Message from 0x480 (Manager) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property BETRIEBS_STATUS_WPM (0x4E5E) raw value 0 (0x0000)
+[17:59:34.254][I][QUEUE:127]: Requesting data from HK1 for VORLAUFSOLLTEMP
+[18:00:01.443][D][Communication:249]: Message from 0x301 (HK1) Read/Write ID 0x66 0x01 (to 0x301/HK1, system) property UNKNOWN (0x00FD) raw value 2048 (0x0800)
+[18:00:01.454][D][Communication:249]: Message from 0x301 (HK1) Read/Write ID 0x67 0x01 (to 0x301/HK1, system response) property UNKNOWN (0x00FD) raw value 256 (0x0100)
+[18:00:01.465][D][Communication:249]: Message from 0x680 (ESPClient) Read/Write ID 0xD6 0x00 (to 0x680/ESPClient, system) property UNKNOWN (0x00FD) raw value 2048 (0x0800)
+[18:00:03.420][I][QUEUE:127]: Requesting data from Manager for BETRIEBS_STATUS_WPM
+[18:00:03.561][D][Communication:249]: Message from 0x480 (Manager) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property BETRIEBS_STATUS_WPM (0x4E5E) raw value 0 (0x0000)
+[18:00:33.423][I][QUEUE:127]: Requesting data from Manager for BETRIEBS_STATUS_WPM
+[18:00:33.822][D][Communication:249]: Message from 0x480 (Manager) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property BETRIEBS_STATUS_WPM (0x4E5E) raw value 0 (0x0000)
+[18:00:34.254][I][QUEUE:127]: Requesting data from HK1 for VORLAUFSOLLTEMP
+[18:01:00.494][D][Communication:249]: Message from 0x601 (unknown) Read/Write ID 0x66 0x01 (to 0x301/HK1, system) property TBD_10 (0x00FE) raw value 256 (0x0100)
+[18:01:00.506][D][Communication:249]: Message from 0x180 (Kessel) Read/Write ID 0x66 0x79 (to 0x379/unknown, system) property TBD_10 (0x00FE) raw value 256 (0x0100)
+[18:01:00.521][D][Communication:249]: Message from 0x480 (Manager) Read/Write ID 0xA6 0x79 (to 0x579/unknown, system) property TBD_10 (0x00FE) raw value 256 (0x0100)
+[18:01:00.537][D][Communication:249]: Message from 0x480 (Manager) Read/Write ID 0x26 0x79 (to 0x179/unknown, system) property TBD_10 (0x00FE) raw value 256 (0x0100)
+[18:01:01.305][D][Communication:249]: Message from 0x100 (Bedienteil) Read/Write ID 0x97 0x00 (to 0x480/Manager, system response) property TBD_10 (0x00FE) raw value 256 (0x0100)
+[18:01:03.421][I][QUEUE:127]: Requesting data from Manager for BETRIEBS_STATUS_WPM
+[18:01:03.591][D][Communication:249]: Message from 0x480 (Manager) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property BETRIEBS_STATUS_WPM (0x4E5E) raw value 0 (0x0000)
+[18:01:32.214][I][QUEUE:127]: Requesting data from HK1 for KOMF_TEMP
+[18:01:32.218][I][QUEUE:127]: Requesting data from HK1 for ECO_TEMP
+[18:01:32.221][I][QUEUE:127]: Requesting data from HK1 for STEIGUNG_HK1
+[18:01:32.225][I][QUEUE:127]: Requesting data from HK1 for RAUMEINFLUSS
+[18:01:33.419][I][QUEUE:127]: Requesting data from Manager for BETRIEBS_STATUS_WPM
+[18:01:34.253][I][QUEUE:127]: Requesting data from HK1 for VORLAUFSOLLTEMP
+[18:01:38.094][D][Communication:249]: Message from 0x480 (Manager) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property BETRIEBS_STATUS_WPM (0x4E5E) raw value 0 (0x0000)
+[18:02:03.419][I][QUEUE:127]: Requesting data from Manager for BETRIEBS_STATUS_WPM
+[18:02:03.591][D][Communication:249]: Message from 0x480 (Manager) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property BETRIEBS_STATUS_WPM (0x4E5E) raw value 0 (0x0000)
+[18:02:33.423][I][QUEUE:127]: Requesting data from Manager for BETRIEBS_STATUS_WPM
+[18:02:33.536][D][Communication:249]: Message from 0x480 (Manager) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property BETRIEBS_STATUS_WPM (0x4E5E) raw value 0 (0x0000)
+[18:02:34.253][I][QUEUE:127]: Requesting data from HK1 for VORLAUFSOLLTEMP
+[18:03:03.423][I][QUEUE:127]: Requesting data from Manager for BETRIEBS_STATUS_WPM
+[18:03:03.564][D][Communication:249]: Message from 0x480 (Manager) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property BETRIEBS_STATUS_WPM (0x4E5E) raw value 0 (0x0000)
+[18:03:33.421][I][QUEUE:127]: Requesting data from Manager for BETRIEBS_STATUS_WPM
+[18:03:33.566][D][Communication:249]: Message from 0x480 (Manager) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property BETRIEBS_STATUS_WPM (0x4E5E) raw value 0 (0x0000)
+[18:03:34.252][I][QUEUE:127]: Requesting data from HK1 for VORLAUFSOLLTEMP
+[18:04:03.422][I][QUEUE:127]: Requesting data from Manager for BETRIEBS_STATUS_WPM
+[18:04:03.577][D][Communication:249]: Message from 0x480 (Manager) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property BETRIEBS_STATUS_WPM (0x4E5E) raw value 0 (0x0000)
+[18:04:33.433][I][QUEUE:127]: Requesting data from Manager for BETRIEBS_STATUS_WPM
+[18:04:33.841][D][Communication:249]: Message from 0x480 (Manager) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property BETRIEBS_STATUS_WPM (0x4E5E) raw value 0 (0x0000)
+[18:04:34.252][I][QUEUE:127]: Requesting data from HK1 for VORLAUFSOLLTEMP
+[18:05:03.422][I][QUEUE:127]: Requesting data from Manager for BETRIEBS_STATUS_WPM
+[18:05:03.586][D][Communication:249]: Message from 0x480 (Manager) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property BETRIEBS_STATUS_WPM (0x4E5E) raw value 0 (0x0000)
+[18:05:33.429][I][QUEUE:127]: Requesting data from Manager for BETRIEBS_STATUS_WPM
+[18:05:34.090][D][Communication:249]: Message from 0x480 (Manager) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property BETRIEBS_STATUS_WPM (0x4E5E) raw value 0 (0x0000)
+[18:05:34.252][I][QUEUE:127]: Requesting data from HK1 for VORLAUFSOLLTEMP
+[18:05:56.968][D][Communication:249]: Message from 0x100 (Bedienteil) Read/Write ID 0x96 0x00 (to 0x480/Manager, system) property TBD_10 (0x00FE) raw value 256 (0x0100)
+[18:05:56.980][D][Communication:249]: Message from 0x480 (Manager) Read/Write ID 0x27 0x00 (to 0x100/Bedienteil, system response) property TBD_10 (0x00FE) raw value 256 (0x0100)
+[18:06:03.422][I][QUEUE:127]: Requesting data from Manager for BETRIEBS_STATUS_WPM
+[18:06:03.625][D][Communication:249]: Message from 0x480 (Manager) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property BETRIEBS_STATUS_WPM (0x4E5E) raw value 0 (0x0000)
+[18:06:33.421][I][QUEUE:127]: Requesting data from Manager for BETRIEBS_STATUS_WPM
+[18:06:33.533][D][Communication:249]: Message from 0x480 (Manager) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property BETRIEBS_STATUS_WPM (0x4E5E) raw value 0 (0x0000)
+[18:06:34.253][I][QUEUE:127]: Requesting data from HK1 for VORLAUFSOLLTEMP
+[18:07:03.422][I][QUEUE:127]: Requesting data from Manager for BETRIEBS_STATUS_WPM
+[18:07:03.563][D][Communication:249]: Message from 0x480 (Manager) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property BETRIEBS_STATUS_WPM (0x4E5E) raw value 0 (0x0000)
+[18:07:33.428][I][QUEUE:127]: Requesting data from Manager for BETRIEBS_STATUS_WPM
+[18:07:33.571][D][Communication:249]: Message from 0x480 (Manager) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property BETRIEBS_STATUS_WPM (0x4E5E) raw value 0 (0x0000)
+[18:07:34.252][I][QUEUE:127]: Requesting data from HK1 for VORLAUFSOLLTEMP
+[18:07:59.716][D][Communication:249]: Message from 0x601 (unknown) Read/Write ID 0x66 0x01 (to 0x301/HK1, system) property TBD_10 (0x00FE) raw value 256 (0x0100)
+[18:07:59.728][D][Communication:249]: Message from 0x180 (Kessel) Read/Write ID 0x66 0x79 (to 0x379/unknown, system) property TBD_10 (0x00FE) raw value 256 (0x0100)
+[18:07:59.744][D][Communication:249]: Message from 0x480 (Manager) Read/Write ID 0xA6 0x79 (to 0x579/unknown, system) property TBD_10 (0x00FE) raw value 256 (0x0100)
+[18:07:59.760][D][Communication:249]: Message from 0x480 (Manager) Read/Write ID 0x26 0x79 (to 0x179/unknown, system) property TBD_10 (0x00FE) raw value 256 (0x0100)
+[18:08:00.326][D][Communication:249]: Message from 0x100 (Bedienteil) Read/Write ID 0x97 0x00 (to 0x480/Manager, system response) property TBD_10 (0x00FE) raw value 256 (0x0100)
+[18:08:00.384][D][Communication:249]: Message from 0x301 (HK1) Read/Write ID 0x66 0x01 (to 0x301/HK1, system) property UNKNOWN (0x00FD) raw value 2048 (0x0800)
+[18:08:00.395][D][Communication:249]: Message from 0x301 (HK1) Read/Write ID 0x67 0x01 (to 0x301/HK1, system response) property UNKNOWN (0x00FD) raw value 256 (0x0100)
+[18:08:00.407][D][Communication:249]: Message from 0x680 (ESPClient) Read/Write ID 0xD6 0x00 (to 0x680/ESPClient, system) property UNKNOWN (0x00FD) raw value 2048 (0x0800)
+[18:08:03.421][I][QUEUE:127]: Requesting data from Manager for BETRIEBS_STATUS_WPM
+[18:08:03.577][D][Communication:249]: Message from 0x480 (Manager) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property BETRIEBS_STATUS_WPM (0x4E5E) raw value 0 (0x0000)
+[18:08:33.421][I][QUEUE:127]: Requesting data from Manager for BETRIEBS_STATUS_WPM
+[18:08:33.580][D][Communication:249]: Message from 0x480 (Manager) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property BETRIEBS_STATUS_WPM (0x4E5E) raw value 0 (0x0000)
+[18:08:34.252][I][QUEUE:127]: Requesting data from HK1 for VORLAUFSOLLTEMP
+[18:09:03.422][I][QUEUE:127]: Requesting data from Manager for BETRIEBS_STATUS_WPM
+[18:09:03.612][D][Communication:249]: Message from 0x480 (Manager) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property BETRIEBS_STATUS_WPM (0x4E5E) raw value 0 (0x0000)
+[18:09:33.429][I][QUEUE:127]: Requesting data from Manager for BETRIEBS_STATUS_WPM
+[18:09:33.549][D][Communication:249]: Message from 0x480 (Manager) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property BETRIEBS_STATUS_WPM (0x4E5E) raw value 0 (0x0000)
+[18:09:34.252][I][QUEUE:127]: Requesting data from HK1 for VORLAUFSOLLTEMP
+[18:10:03.422][I][QUEUE:127]: Requesting data from Manager for BETRIEBS_STATUS_WPM
+[18:10:03.600][D][Communication:249]: Message from 0x480 (Manager) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property BETRIEBS_STATUS_WPM (0x4E5E) raw value 0 (0x0000)
+[18:10:33.421][I][QUEUE:127]: Requesting data from Manager for BETRIEBS_STATUS_WPM
+[18:10:33.563][D][Communication:249]: Message from 0x480 (Manager) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property BETRIEBS_STATUS_WPM (0x4E5E) raw value 0 (0x0000)
+[18:10:34.251][I][QUEUE:127]: Requesting data from HK1 for VORLAUFSOLLTEMP
+[18:11:03.421][I][QUEUE:127]: Requesting data from Manager for BETRIEBS_STATUS_WPM
+[18:11:03.569][D][Communication:249]: Message from 0x480 (Manager) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property BETRIEBS_STATUS_WPM (0x4E5E) raw value 0 (0x0000)
+[18:11:33.427][I][QUEUE:127]: Requesting data from Manager for BETRIEBS_STATUS_WPM
+[18:11:33.587][D][Communication:249]: Message from 0x480 (Manager) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property BETRIEBS_STATUS_WPM (0x4E5E) raw value 0 (0x0000)
+[18:11:34.251][I][QUEUE:127]: Requesting data from HK1 for VORLAUFSOLLTEMP
