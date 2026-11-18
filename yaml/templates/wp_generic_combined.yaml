@@ -4,6 +4,7 @@ defaults:
   update_interval: $interval_very_slow
   exposed: "true"
   state_class: "measurement"
+  device_class: ""  # e.g. energy
 
 sensor:
   - platform: template
@@ -23,6 +24,7 @@ sensor:
     name: ${sensor_name}
     id: ${sensor_name}
     unit_of_measurement: ${unit}
+    device_class: ${device_class}
     icon: ${icon}
     accuracy_decimals: ${accuracy_decimals}
     update_interval: ${update_interval}
