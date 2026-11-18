@@ -1,0 +1,226 @@
+# Passive capture 2026-11-17 08:15-11:15 (log clock = local time), heatpump-ttf07c, emulation on, no writes.
+# Excerpt: value changes of 0x0052/0x0010/0x0056/0x0057/0x005A/0x0A20/0x4E5E (analyze script output), then all frames from 0x601 to HK1 and from the Kessel to 0x379 around the compressor start (09:20-09:27) and stop (10:35-10:43).
+
+08:15:22 0x480 -> 0x680 response 0x4E5E BETRIEBS_STATUS_WPM 0x0000 0000000000000000
+08:17:20 0x601 -> 0x301 write 0x0010 UNKNOWN 0x0002 
+08:17:20 0x601 -> 0x301 write 0x0052 FEK_TBD_0052 0x0000 
+08:17:20 0x601 -> 0x301 write 0x0056 UNKNOWN 0x0000 
+08:17:20 0x601 -> 0x301 write 0x0057 UNKNOWN 0x0000 
+08:17:20 0x601 -> 0x301 write 0x005A UNKNOWN 0x0200 
+08:17:23 0x180 -> 0x379 write 0x0010 UNKNOWN 0x0051 
+08:17:24 0x180 -> 0x379 write 0x005A UNKNOWN 0x0200 
+08:17:24 0x180 -> 0x379 write 0x0A20 BETRIEBS_STATUS 0x0000 0000000000000000
+08:18:27 0x180 -> 0x680 response 0x0A20 BETRIEBS_STATUS 0x0000 0000000000000000
+08:30:17 0x180 -> 0x379 write 0x0A20 BETRIEBS_STATUS 0x0020 0000000000100000
+08:30:18 0x480 -> 0x100 write 0x4E5E BETRIEBS_STATUS_WPM 0x0001 0000000000000001
+08:30:32 0x480 -> 0x680 response 0x4E5E BETRIEBS_STATUS_WPM 0x0001 0000000000000001
+08:35:17 0x180 -> 0x379 write 0x0A20 BETRIEBS_STATUS 0x0000 0000000000000000
+08:35:17 0x480 -> 0x100 write 0x4E5E BETRIEBS_STATUS_WPM 0x0000 0000000000000000
+08:35:32 0x480 -> 0x680 response 0x4E5E BETRIEBS_STATUS_WPM 0x0000 0000000000000000
+08:51:41 0x180 -> 0x379 write 0x0A20 BETRIEBS_STATUS 0x0020 0000000000100000
+08:52:02 0x480 -> 0x680 response 0x4E5E BETRIEBS_STATUS_WPM 0x0001 0000000000000001
+08:56:40 0x180 -> 0x379 write 0x0A20 BETRIEBS_STATUS 0x0000 0000000000000000
+08:57:02 0x480 -> 0x680 response 0x4E5E BETRIEBS_STATUS_WPM 0x0000 0000000000000000
+09:13:34 0x180 -> 0x379 write 0x0A20 BETRIEBS_STATUS 0x0020 0000000000100000
+09:13:35 0x480 -> 0x100 write 0x4E5E BETRIEBS_STATUS_WPM 0x0001 0000000000000001
+09:14:02 0x480 -> 0x680 response 0x4E5E BETRIEBS_STATUS_WPM 0x0001 0000000000000001
+09:18:34 0x180 -> 0x379 write 0x0A20 BETRIEBS_STATUS 0x0000 0000000000000000
+09:18:36 0x480 -> 0x100 write 0x4E5E BETRIEBS_STATUS_WPM 0x0000 0000000000000000
+09:19:02 0x480 -> 0x680 response 0x4E5E BETRIEBS_STATUS_WPM 0x0000 0000000000000000
+09:22:41 0x180 -> 0x379 write 0x0A20 BETRIEBS_STATUS 0x0120 0000000100100000
+09:22:41 0x480 -> 0x100 write 0x4E5E BETRIEBS_STATUS_WPM 0x0040 0000000001000000
+09:22:42 0x480 -> 0x100 write 0x4E5E BETRIEBS_STATUS_WPM 0x0041 0000000001000001
+09:23:02 0x480 -> 0x680 response 0x4E5E BETRIEBS_STATUS_WPM 0x0041 0000000001000001
+09:23:11 0x180 -> 0x379 write 0x0A20 BETRIEBS_STATUS 0x016C 0000000101101100
+09:23:11 0x480 -> 0x100 write 0x4E5E BETRIEBS_STATUS_WPM 0x4041 0100000001000001
+09:23:32 0x480 -> 0x680 response 0x4E5E BETRIEBS_STATUS_WPM 0x40C1 0100000011000001
+09:25:04 0x601 -> 0x301 write 0x0052 FEK_TBD_0052 0x0100 
+10:37:40 0x180 -> 0x379 write 0x0A20 BETRIEBS_STATUS 0x006C 0000000001101100
+10:37:40 0x180 -> 0x379 write 0x0A20 BETRIEBS_STATUS 0x0020 0000000000100000
+10:37:41 0x480 -> 0x100 write 0x4E5E BETRIEBS_STATUS_WPM 0x00C1 0000000011000001
+10:37:42 0x480 -> 0x100 write 0x4E5E BETRIEBS_STATUS_WPM 0x0041 0000000001000001
+10:38:02 0x480 -> 0x680 response 0x4E5E BETRIEBS_STATUS_WPM 0x0041 0000000001000001
+10:38:39 0x480 -> 0x100 write 0x4E5E BETRIEBS_STATUS_WPM 0x0001 0000000000000001
+10:39:02 0x480 -> 0x680 response 0x4E5E BETRIEBS_STATUS_WPM 0x0001 0000000000000001
+10:42:04 0x601 -> 0x301 write 0x0052 FEK_TBD_0052 0x0000 
+10:42:39 0x180 -> 0x379 write 0x0A20 BETRIEBS_STATUS 0x0000 0000000000000000
+10:42:41 0x480 -> 0x100 write 0x4E5E BETRIEBS_STATUS_WPM 0x0000 0000000000000000
+10:43:02 0x480 -> 0x680 response 0x4E5E BETRIEBS_STATUS_WPM 0x0000 0000000000000000
+11:00:45 0x180 -> 0x379 write 0x0A20 BETRIEBS_STATUS 0x0020 0000000000100000
+11:01:02 0x480 -> 0x680 response 0x4E5E BETRIEBS_STATUS_WPM 0x0001 0000000000000001
+11:05:45 0x180 -> 0x379 write 0x0A20 BETRIEBS_STATUS 0x0000 0000000000000000
+11:06:02 0x480 -> 0x680 response 0x4E5E BETRIEBS_STATUS_WPM 0x0000 0000000000000000
+
+[09:20:01.015][D][Communication:253]: Message from 0x180 (Kessel) Read/Write ID 0x60 0x79 (to 0x379/unknown, write) property UNKNOWN (0x0073) raw value 0 (0x0000) data 60 79 73 00 00 00 00
+[09:20:01.029][D][Communication:253]: Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property UNKNOWN (0x0010) raw value 2 (0x0002) data 60 01 10 00 02 00 00
+[09:20:01.038][D][Communication:253]: Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property VORLAUFISTTEMP_HK1 (0x000F) raw value 65136 (0xFE70) data 60 01 0F FE 70 00 00
+[09:20:01.051][D][Communication:253]: Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property VORLAUFSOLLTEMP (0x0004) raw value 65136 (0xFE70) data 60 01 04 FE 70 00 00
+[09:20:01.063][D][Communication:253]: Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property FEK_TBD_0052 (0x0052) raw value 0 (0x0000) data 60 01 52 00 00 00 00
+[09:20:01.075][D][Communication:253]: Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property UNKNOWN (0x0056) raw value 0 (0x0000) data 60 01 56 00 00 00 00
+[09:20:01.087][D][Communication:253]: Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property UNKNOWN (0x0057) raw value 0 (0x0000) data 60 01 57 00 00 00 00
+[09:20:01.099][D][Communication:253]: Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property SOLLWERT_MAX_HK1 (0x0028) raw value 300 (0x012C) data 60 01 28 01 2C 00 00
+[09:20:01.107][D][Communication:253]: Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property UNKNOWN (0x005A) raw value 512 (0x0200) data 60 01 5A 02 00 00 00
+[09:20:02.712][D][Communication:253]: Message from 0x480 (Manager) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property BETRIEBS_STATUS_WPM (0x4E5E) raw value 0 (0x0000) data D2 00 FA 4E 5E 00 00
+[09:20:04.971][D][Communication:253]: Message from 0x180 (Kessel) Read/Write ID 0x60 0x79 (to 0x379/unknown, write) property UNKNOWN (0x0010) raw value 81 (0x0051) data 60 79 10 00 51 00 00
+[09:20:04.983][D][Communication:253]: Message from 0x180 (Kessel) Read/Write ID 0x60 0x79 (to 0x379/unknown, write) property AUSSENTEMP (0x000C) raw value 24 (0x0018) data 60 79 0C 00 18 00 00
+[09:20:04.991][D][Communication:253]: Message from 0x180 (Kessel) Read/Write ID 0x60 0x79 (to 0x379/unknown, write) property RUECKLAUFISTTEMP (0x0016) raw value 270 (0x010E) data 60 79 16 01 0E 00 00
+[09:20:05.008][D][Communication:253]: Message from 0x180 (Kessel) Read/Write ID 0x60 0x79 (to 0x379/unknown, write) property SPEICHERISTTEMP (0x000E) raw value 445 (0x01BD) data 60 79 0E 01 BD 00 00
+[09:20:05.016][D][Communication:253]: Message from 0x180 (Kessel) Read/Write ID 0x60 0x79 (to 0x379/unknown, write) property UNKNOWN (0x005E) raw value 0 (0x0000) data 60 79 5E 00 00 00 00
+[09:20:05.028][D][Communication:253]: Message from 0x180 (Kessel) Read/Write ID 0x60 0x79 (to 0x379/unknown, write) property UNKNOWN (0x0053) raw value 0 (0x0000) data 60 79 53 00 00 00 00
+[09:20:05.040][D][Communication:253]: Message from 0x180 (Kessel) Read/Write ID 0x60 0x79 (to 0x379/unknown, write) property ANLAGENFROST (0x0A00) raw value 40 (0x0028) data 60 79 FA 0A 00 00 28
+[09:20:05.052][D][Communication:253]: Message from 0x180 (Kessel) Read/Write ID 0x60 0x79 (to 0x379/unknown, write) property UNKNOWN (0x005A) raw value 512 (0x0200) data 60 79 5A 02 00 00 00
+[09:20:05.064][D][Communication:253]: Message from 0x180 (Kessel) Read/Write ID 0x60 0x79 (to 0x379/unknown, write) property UNKNOWN (0x000A) raw value 4363 (0x110B) data 60 79 0A 11 0B 1A 00
+[09:20:05.075][D][Communication:253]: Message from 0x180 (Kessel) Read/Write ID 0x60 0x79 (to 0x379/unknown, write) property UNKNOWN (0x0009) raw value 5129 (0x1409) data 60 79 09 14 09 00 00
+[09:20:05.087][D][Communication:253]: Message from 0x180 (Kessel) Read/Write ID 0x60 0x79 (to 0x379/unknown, write) property BETRIEBS_STATUS (0x0A20) raw value 0 (0x0000) data 60 79 FA 0A 20 00 00
+[09:20:32.422][D][Communication:253]: Message from 0x480 (Manager) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property BETRIEBS_STATUS_WPM (0x4E5E) raw value 0 (0x0000) data D2 00 FA 4E 5E 00 00
+[09:21:02.565][D][Communication:253]: Message from 0x480 (Manager) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property BETRIEBS_STATUS_WPM (0x4E5E) raw value 0 (0x0000) data D2 00 FA 4E 5E 00 00
+[09:21:32.391][D][Communication:253]: Message from 0x480 (Manager) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property BETRIEBS_STATUS_WPM (0x4E5E) raw value 0 (0x0000) data D2 00 FA 4E 5E 00 00
+[09:22:02.651][D][Communication:253]: Message from 0x480 (Manager) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property BETRIEBS_STATUS_WPM (0x4E5E) raw value 0 (0x0000) data D2 00 FA 4E 5E 00 00
+[09:22:32.446][D][Communication:253]: Message from 0x480 (Manager) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property BETRIEBS_STATUS_WPM (0x4E5E) raw value 0 (0x0000) data D2 00 FA 4E 5E 00 00
+[09:22:41.077][D][Communication:253]: Message from 0x180 (Kessel) Read/Write ID 0x60 0x79 (to 0x379/unknown, write) property BETRIEBS_STATUS (0x0A20) raw value 288 (0x0120) data 60 79 FA 0A 20 01 20
+[09:22:41.088][D][Communication:253]: Message from 0x480 (Manager) Read/Write ID 0x20 0x00 (to 0x100/Bedienteil, write) property BETRIEBS_STATUS_WPM (0x4E5E) raw value 64 (0x0040) data 20 00 FA 4E 5E 00 40
+[09:22:42.145][D][Communication:253]: Message from 0x480 (Manager) Read/Write ID 0x20 0x00 (to 0x100/Bedienteil, write) property BETRIEBS_STATUS_WPM (0x4E5E) raw value 65 (0x0041) data 20 00 FA 4E 5E 00 41
+[09:23:02.660][D][Communication:253]: Message from 0x480 (Manager) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property BETRIEBS_STATUS_WPM (0x4E5E) raw value 65 (0x0041) data D2 00 FA 4E 5E 00 41
+[09:23:11.362][D][Communication:253]: Message from 0x180 (Kessel) Read/Write ID 0x60 0x79 (to 0x379/unknown, write) property BETRIEBS_STATUS (0x0A20) raw value 364 (0x016C) data 60 79 FA 0A 20 01 6C
+[09:23:11.372][D][Communication:253]: Message from 0x480 (Manager) Read/Write ID 0x20 0x00 (to 0x100/Bedienteil, write) property BETRIEBS_STATUS_WPM (0x4E5E) raw value 16449 (0x4041) data 20 00 FA 4E 5E 40 41
+[09:23:32.419][D][Communication:253]: Message from 0x480 (Manager) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property BETRIEBS_STATUS_WPM (0x4E5E) raw value 16577 (0x40C1) data D2 00 FA 4E 5E 40 C1
+[09:24:02.673][D][Communication:253]: Message from 0x480 (Manager) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property BETRIEBS_STATUS_WPM (0x4E5E) raw value 16577 (0x40C1) data D2 00 FA 4E 5E 40 C1
+[09:24:32.429][D][Communication:253]: Message from 0x480 (Manager) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property BETRIEBS_STATUS_WPM (0x4E5E) raw value 16577 (0x40C1) data D2 00 FA 4E 5E 40 C1
+[09:24:59.755][D][Communication:253]: Message from 0x180 (Kessel) Read/Write ID 0x60 0x79 (to 0x379/unknown, write) property RUECKLAUFISTTEMP (0x0016) raw value 271 (0x010F) data 60 79 16 01 0F 00 00
+[09:25:02.741][D][Communication:253]: Message from 0x480 (Manager) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property BETRIEBS_STATUS_WPM (0x4E5E) raw value 16577 (0x40C1) data D2 00 FA 4E 5E 40 C1
+[09:25:03.801][D][Communication:253]: Message from 0x601 (unknown) Read/Write ID 0x67 0x01 (to 0x301/HK1, system response) property TBD_10 (0x00FE) raw value 256 (0x0100) data 67 01 FE 01 00 00 00
+[09:25:04.940][D][Communication:253]: Message from 0x180 (Kessel) Read/Write ID 0x60 0x79 (to 0x379/unknown, write) property UNKNOWN (0x0073) raw value 0 (0x0000) data 60 79 73 00 00 00 00
+[09:25:04.952][D][Communication:253]: Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property UNKNOWN (0x0010) raw value 2 (0x0002) data 60 01 10 00 02 00 00
+[09:25:04.964][D][Communication:253]: Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property VORLAUFISTTEMP_HK1 (0x000F) raw value 65136 (0xFE70) data 60 01 0F FE 70 00 00
+[09:25:04.976][D][Communication:253]: Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property VORLAUFSOLLTEMP (0x0004) raw value 65136 (0xFE70) data 60 01 04 FE 70 00 00
+[09:25:04.987][D][Communication:253]: Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property FEK_TBD_0052 (0x0052) raw value 256 (0x0100) data 60 01 52 01 00 00 00
+[09:25:04.999][D][Communication:253]: Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property UNKNOWN (0x0056) raw value 0 (0x0000) data 60 01 56 00 00 00 00
+[09:25:05.010][D][Communication:253]: Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property UNKNOWN (0x0057) raw value 0 (0x0000) data 60 01 57 00 00 00 00
+[09:25:05.022][D][Communication:253]: Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property SOLLWERT_MAX_HK1 (0x0028) raw value 300 (0x012C) data 60 01 28 01 2C 00 00
+[09:25:05.033][D][Communication:253]: Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property UNKNOWN (0x005A) raw value 512 (0x0200) data 60 01 5A 02 00 00 00
+[09:25:09.010][D][Communication:253]: Message from 0x180 (Kessel) Read/Write ID 0x60 0x79 (to 0x379/unknown, write) property UNKNOWN (0x0010) raw value 81 (0x0051) data 60 79 10 00 51 00 00
+[09:25:09.022][D][Communication:253]: Message from 0x180 (Kessel) Read/Write ID 0x60 0x79 (to 0x379/unknown, write) property AUSSENTEMP (0x000C) raw value 24 (0x0018) data 60 79 0C 00 18 00 00
+[09:25:09.030][D][Communication:253]: Message from 0x180 (Kessel) Read/Write ID 0x60 0x79 (to 0x379/unknown, write) property RUECKLAUFISTTEMP (0x0016) raw value 271 (0x010F) data 60 79 16 01 0F 00 00
+[09:25:09.038][D][Communication:253]: Message from 0x180 (Kessel) Read/Write ID 0x60 0x79 (to 0x379/unknown, write) property SPEICHERISTTEMP (0x000E) raw value 446 (0x01BE) data 60 79 0E 01 BE 00 00
+[09:25:09.047][D][Communication:253]: Message from 0x180 (Kessel) Read/Write ID 0x60 0x79 (to 0x379/unknown, write) property UNKNOWN (0x005E) raw value 0 (0x0000) data 60 79 5E 00 00 00 00
+[09:25:09.058][D][Communication:253]: Message from 0x180 (Kessel) Read/Write ID 0x60 0x79 (to 0x379/unknown, write) property UNKNOWN (0x0053) raw value 0 (0x0000) data 60 79 53 00 00 00 00
+[09:25:09.073][D][Communication:253]: Message from 0x180 (Kessel) Read/Write ID 0x60 0x79 (to 0x379/unknown, write) property ANLAGENFROST (0x0A00) raw value 40 (0x0028) data 60 79 FA 0A 00 00 28
+[09:25:09.083][D][Communication:253]: Message from 0x180 (Kessel) Read/Write ID 0x60 0x79 (to 0x379/unknown, write) property UNKNOWN (0x005A) raw value 512 (0x0200) data 60 79 5A 02 00 00 00
+[09:25:09.095][D][Communication:253]: Message from 0x180 (Kessel) Read/Write ID 0x60 0x79 (to 0x379/unknown, write) property UNKNOWN (0x000A) raw value 4363 (0x110B) data 60 79 0A 11 0B 1A 00
+[09:25:09.107][D][Communication:253]: Message from 0x180 (Kessel) Read/Write ID 0x60 0x79 (to 0x379/unknown, write) property UNKNOWN (0x0009) raw value 6409 (0x1909) data 60 79 09 19 09 00 00
+[09:25:09.119][D][Communication:253]: Message from 0x180 (Kessel) Read/Write ID 0x60 0x79 (to 0x379/unknown, write) property BETRIEBS_STATUS (0x0A20) raw value 364 (0x016C) data 60 79 FA 0A 20 01 6C
+[09:25:32.430][D][Communication:253]: Message from 0x480 (Manager) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property BETRIEBS_STATUS_WPM (0x4E5E) raw value 16577 (0x40C1) data D2 00 FA 4E 5E 40 C1
+[09:26:02.641][D][Communication:253]: Message from 0x480 (Manager) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property BETRIEBS_STATUS_WPM (0x4E5E) raw value 16577 (0x40C1) data D2 00 FA 4E 5E 40 C1
+[09:26:32.415][D][Communication:253]: Message from 0x480 (Manager) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property BETRIEBS_STATUS_WPM (0x4E5E) raw value 16577 (0x40C1) data D2 00 FA 4E 5E 40 C1
+[09:26:59.251][D][Communication:253]: Message from 0x601 (unknown) Read/Write ID 0x66 0x01 (to 0x301/HK1, system) property TBD_10 (0x00FE) raw value 256 (0x0100) data 66 01 FE 01 00 00 00
+[09:26:59.263][D][Communication:253]: Message from 0x180 (Kessel) Read/Write ID 0x66 0x79 (to 0x379/unknown, system) property TBD_10 (0x00FE) raw value 256 (0x0100) data 66 79 FE 01 00 00 00
+[09:27:02.031][D][Communication:253]: Message from 0x180 (Kessel) Read/Write ID 0x60 0x79 (to 0x379/unknown, write) property UNKNOWN (0x0073) raw value 0 (0x0000) data 60 79 73 00 00 00 00
+[09:27:02.043][D][Communication:253]: Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property UNKNOWN (0x0010) raw value 2 (0x0002) data 60 01 10 00 02 00 00
+[09:27:02.055][D][Communication:253]: Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property VORLAUFISTTEMP_HK1 (0x000F) raw value 65136 (0xFE70) data 60 01 0F FE 70 00 00
+[09:27:02.066][D][Communication:253]: Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property VORLAUFSOLLTEMP (0x0004) raw value 65136 (0xFE70) data 60 01 04 FE 70 00 00
+[09:27:02.078][D][Communication:253]: Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property FEK_TBD_0052 (0x0052) raw value 256 (0x0100) data 60 01 52 01 00 00 00
+[09:27:02.090][D][Communication:253]: Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property UNKNOWN (0x0056) raw value 0 (0x0000) data 60 01 56 00 00 00 00
+[09:27:02.101][D][Communication:253]: Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property UNKNOWN (0x0057) raw value 0 (0x0000) data 60 01 57 00 00 00 00
+[09:27:02.113][D][Communication:253]: Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property UNKNOWN (0x005A) raw value 512 (0x0200) data 60 01 5A 02 00 00 00
+[09:27:02.674][D][Communication:253]: Message from 0x480 (Manager) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property BETRIEBS_STATUS_WPM (0x4E5E) raw value 16577 (0x40C1) data D2 00 FA 4E 5E 40 C1
+[09:27:06.006][D][Communication:253]: Message from 0x180 (Kessel) Read/Write ID 0x60 0x79 (to 0x379/unknown, write) property UNKNOWN (0x0010) raw value 81 (0x0051) data 60 79 10 00 51 00 00
+[09:27:06.020][D][Communication:253]: Message from 0x180 (Kessel) Read/Write ID 0x60 0x79 (to 0x379/unknown, write) property AUSSENTEMP (0x000C) raw value 25 (0x0019) data 60 79 0C 00 19 00 00
+[09:27:06.036][D][Communication:253]: Message from 0x180 (Kessel) Read/Write ID 0x60 0x79 (to 0x379/unknown, write) property RUECKLAUFISTTEMP (0x0016) raw value 271 (0x010F) data 60 79 16 01 0F 00 00
+[09:27:06.045][D][Communication:253]: Message from 0x180 (Kessel) Read/Write ID 0x60 0x79 (to 0x379/unknown, write) property SPEICHERISTTEMP (0x000E) raw value 446 (0x01BE) data 60 79 0E 01 BE 00 00
+[09:27:06.081][D][Communication:253]: Message from 0x180 (Kessel) Read/Write ID 0x60 0x79 (to 0x379/unknown, write) property UNKNOWN (0x005E) raw value 0 (0x0000) data 60 79 5E 00 00 00 00
+[09:27:06.093][D][Communication:253]: Message from 0x180 (Kessel) Read/Write ID 0x60 0x79 (to 0x379/unknown, write) property UNKNOWN (0x0053) raw value 0 (0x0000) data 60 79 53 00 00 00 00
+[09:27:06.105][D][Communication:253]: Message from 0x180 (Kessel) Read/Write ID 0x60 0x79 (to 0x379/unknown, write) property ANLAGENFROST (0x0A00) raw value 40 (0x0028) data 60 79 FA 0A 00 00 28
+[09:27:06.116][D][Communication:253]: Message from 0x180 (Kessel) Read/Write ID 0x60 0x79 (to 0x379/unknown, write) property UNKNOWN (0x005A) raw value 512 (0x0200) data 60 79 5A 02 00 00 00
+[09:27:06.128][D][Communication:253]: Message from 0x180 (Kessel) Read/Write ID 0x60 0x79 (to 0x379/unknown, write) property UNKNOWN (0x000A) raw value 4363 (0x110B) data 60 79 0A 11 0B 1A 00
+[09:27:10.459][D][Communication:253]: Message from 0x180 (Kessel) Read/Write ID 0x60 0x79 (to 0x379/unknown, write) property RUECKLAUFISTTEMP (0x0016) raw value 271 (0x010F) data 60 79 16 01 0F 00 00
+[09:27:32.405][D][Communication:253]: Message from 0x480 (Manager) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property BETRIEBS_STATUS_WPM (0x4E5E) raw value 16577 (0x40C1) data D2 00 FA 4E 5E 40 C1
+[10:35:02.676][D][Communication:253]: Message from 0x480 (Manager) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property BETRIEBS_STATUS_WPM (0x4E5E) raw value 16577 (0x40C1) data D2 00 FA 4E 5E 40 C1
+[10:35:03.711][D][Communication:253]: Message from 0x601 (unknown) Read/Write ID 0x67 0x01 (to 0x301/HK1, system response) property TBD_10 (0x00FE) raw value 256 (0x0100) data 67 01 FE 01 00 00 00
+[10:35:04.958][D][Communication:253]: Message from 0x180 (Kessel) Read/Write ID 0x60 0x79 (to 0x379/unknown, write) property UNKNOWN (0x0073) raw value 0 (0x0000) data 60 79 73 00 00 00 00
+[10:35:04.970][D][Communication:253]: Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property UNKNOWN (0x0010) raw value 2 (0x0002) data 60 01 10 00 02 00 00
+[10:35:04.982][D][Communication:253]: Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property VORLAUFISTTEMP_HK1 (0x000F) raw value 65136 (0xFE70) data 60 01 0F FE 70 00 00
+[10:35:04.993][D][Communication:253]: Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property VORLAUFSOLLTEMP (0x0004) raw value 65136 (0xFE70) data 60 01 04 FE 70 00 00
+[10:35:05.005][D][Communication:253]: Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property FEK_TBD_0052 (0x0052) raw value 256 (0x0100) data 60 01 52 01 00 00 00
+[10:35:05.016][D][Communication:253]: Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property UNKNOWN (0x0056) raw value 0 (0x0000) data 60 01 56 00 00 00 00
+[10:35:05.028][D][Communication:253]: Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property UNKNOWN (0x0057) raw value 0 (0x0000) data 60 01 57 00 00 00 00
+[10:35:05.039][D][Communication:253]: Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property SOLLWERT_MAX_HK1 (0x0028) raw value 300 (0x012C) data 60 01 28 01 2C 00 00
+[10:35:05.051][D][Communication:253]: Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property UNKNOWN (0x005A) raw value 512 (0x0200) data 60 01 5A 02 00 00 00
+[10:35:08.929][D][Communication:253]: Message from 0x180 (Kessel) Read/Write ID 0x60 0x79 (to 0x379/unknown, write) property UNKNOWN (0x0010) raw value 81 (0x0051) data 60 79 10 00 51 00 00
+[10:35:08.940][D][Communication:253]: Message from 0x180 (Kessel) Read/Write ID 0x60 0x79 (to 0x379/unknown, write) property AUSSENTEMP (0x000C) raw value 30 (0x001E) data 60 79 0C 00 1E 00 00
+[10:35:08.949][D][Communication:253]: Message from 0x180 (Kessel) Read/Write ID 0x60 0x79 (to 0x379/unknown, write) property RUECKLAUFISTTEMP (0x0016) raw value 291 (0x0123) data 60 79 16 01 23 00 00
+[10:35:08.957][D][Communication:253]: Message from 0x180 (Kessel) Read/Write ID 0x60 0x79 (to 0x379/unknown, write) property SPEICHERISTTEMP (0x000E) raw value 445 (0x01BD) data 60 79 0E 01 BD 00 00
+[10:35:08.965][D][Communication:253]: Message from 0x180 (Kessel) Read/Write ID 0x60 0x79 (to 0x379/unknown, write) property UNKNOWN (0x005E) raw value 0 (0x0000) data 60 79 5E 00 00 00 00
+[10:35:08.977][D][Communication:253]: Message from 0x180 (Kessel) Read/Write ID 0x60 0x79 (to 0x379/unknown, write) property UNKNOWN (0x0053) raw value 0 (0x0000) data 60 79 53 00 00 00 00
+[10:35:08.989][D][Communication:253]: Message from 0x180 (Kessel) Read/Write ID 0x60 0x79 (to 0x379/unknown, write) property ANLAGENFROST (0x0A00) raw value 40 (0x0028) data 60 79 FA 0A 00 00 28
+[10:35:09.000][D][Communication:253]: Message from 0x180 (Kessel) Read/Write ID 0x60 0x79 (to 0x379/unknown, write) property UNKNOWN (0x005A) raw value 512 (0x0200) data 60 79 5A 02 00 00 00
+[10:35:09.012][D][Communication:253]: Message from 0x180 (Kessel) Read/Write ID 0x60 0x79 (to 0x379/unknown, write) property UNKNOWN (0x000A) raw value 4363 (0x110B) data 60 79 0A 11 0B 1A 00
+[10:35:09.024][D][Communication:253]: Message from 0x180 (Kessel) Read/Write ID 0x60 0x79 (to 0x379/unknown, write) property UNKNOWN (0x0009) raw value 8970 (0x230A) data 60 79 09 23 0A 00 00
+[10:35:09.036][D][Communication:253]: Message from 0x180 (Kessel) Read/Write ID 0x60 0x79 (to 0x379/unknown, write) property BETRIEBS_STATUS (0x0A20) raw value 364 (0x016C) data 60 79 FA 0A 20 01 6C
+[10:35:32.451][D][Communication:253]: Message from 0x480 (Manager) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property BETRIEBS_STATUS_WPM (0x4E5E) raw value 16577 (0x40C1) data D2 00 FA 4E 5E 40 C1
+[10:36:02.629][D][Communication:253]: Message from 0x480 (Manager) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property BETRIEBS_STATUS_WPM (0x4E5E) raw value 16577 (0x40C1) data D2 00 FA 4E 5E 40 C1
+[10:36:32.459][D][Communication:253]: Message from 0x480 (Manager) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property BETRIEBS_STATUS_WPM (0x4E5E) raw value 16577 (0x40C1) data D2 00 FA 4E 5E 40 C1
+[10:36:59.246][D][Communication:253]: Message from 0x601 (unknown) Read/Write ID 0x66 0x01 (to 0x301/HK1, system) property TBD_10 (0x00FE) raw value 256 (0x0100) data 66 01 FE 01 00 00 00
+[10:36:59.258][D][Communication:253]: Message from 0x180 (Kessel) Read/Write ID 0x66 0x79 (to 0x379/unknown, system) property TBD_10 (0x00FE) raw value 256 (0x0100) data 66 79 FE 01 00 00 00
+[10:37:02.039][D][Communication:253]: Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property UNKNOWN (0x0010) raw value 2 (0x0002) data 60 01 10 00 02 00 00
+[10:37:02.050][D][Communication:253]: Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property VORLAUFISTTEMP_HK1 (0x000F) raw value 65136 (0xFE70) data 60 01 0F FE 70 00 00
+[10:37:02.061][D][Communication:253]: Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property VORLAUFSOLLTEMP (0x0004) raw value 65136 (0xFE70) data 60 01 04 FE 70 00 00
+[10:37:02.073][D][Communication:253]: Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property FEK_TBD_0052 (0x0052) raw value 256 (0x0100) data 60 01 52 01 00 00 00
+[10:37:02.085][D][Communication:253]: Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property UNKNOWN (0x0056) raw value 0 (0x0000) data 60 01 56 00 00 00 00
+[10:37:02.098][D][Communication:253]: Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property UNKNOWN (0x0057) raw value 0 (0x0000) data 60 01 57 00 00 00 00
+[10:37:02.109][D][Communication:253]: Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property SOLLWERT_MAX_HK1 (0x0028) raw value 300 (0x012C) data 60 01 28 01 2C 00 00
+[10:37:02.121][D][Communication:253]: Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property UNKNOWN (0x005A) raw value 512 (0x0200) data 60 01 5A 02 00 00 00
+[10:37:02.668][D][Communication:253]: Message from 0x480 (Manager) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property BETRIEBS_STATUS_WPM (0x4E5E) raw value 16577 (0x40C1) data D2 00 FA 4E 5E 40 C1
+[10:37:06.001][D][Communication:253]: Message from 0x180 (Kessel) Read/Write ID 0x60 0x79 (to 0x379/unknown, write) property UNKNOWN (0x0010) raw value 81 (0x0051) data 60 79 10 00 51 00 00
+[10:37:06.013][D][Communication:253]: Message from 0x180 (Kessel) Read/Write ID 0x60 0x79 (to 0x379/unknown, write) property AUSSENTEMP (0x000C) raw value 30 (0x001E) data 60 79 0C 00 1E 00 00
+[10:37:06.021][D][Communication:253]: Message from 0x180 (Kessel) Read/Write ID 0x60 0x79 (to 0x379/unknown, write) property RUECKLAUFISTTEMP (0x0016) raw value 291 (0x0123) data 60 79 16 01 23 00 00
+[10:37:06.029][D][Communication:253]: Message from 0x180 (Kessel) Read/Write ID 0x60 0x79 (to 0x379/unknown, write) property SPEICHERISTTEMP (0x000E) raw value 445 (0x01BD) data 60 79 0E 01 BD 00 00
+[10:37:06.038][D][Communication:253]: Message from 0x180 (Kessel) Read/Write ID 0x60 0x79 (to 0x379/unknown, write) property UNKNOWN (0x005E) raw value 0 (0x0000) data 60 79 5E 00 00 00 00
+[10:37:06.051][D][Communication:253]: Message from 0x180 (Kessel) Read/Write ID 0x60 0x79 (to 0x379/unknown, write) property UNKNOWN (0x0053) raw value 0 (0x0000) data 60 79 53 00 00 00 00
+[10:37:06.062][D][Communication:253]: Message from 0x180 (Kessel) Read/Write ID 0x60 0x79 (to 0x379/unknown, write) property ANLAGENFROST (0x0A00) raw value 40 (0x0028) data 60 79 FA 0A 00 00 28
+[10:37:06.073][D][Communication:253]: Message from 0x180 (Kessel) Read/Write ID 0x60 0x79 (to 0x379/unknown, write) property UNKNOWN (0x005A) raw value 512 (0x0200) data 60 79 5A 02 00 00 00
+[10:37:06.085][D][Communication:253]: Message from 0x180 (Kessel) Read/Write ID 0x60 0x79 (to 0x379/unknown, write) property UNKNOWN (0x000A) raw value 4363 (0x110B) data 60 79 0A 11 0B 1A 00
+[10:37:06.099][D][Communication:253]: Message from 0x180 (Kessel) Read/Write ID 0x60 0x79 (to 0x379/unknown, write) property UNKNOWN (0x0009) raw value 9482 (0x250A) data 60 79 09 25 0A 00 00
+[10:37:06.111][D][Communication:253]: Message from 0x180 (Kessel) Read/Write ID 0x60 0x79 (to 0x379/unknown, write) property BETRIEBS_STATUS (0x0A20) raw value 364 (0x016C) data 60 79 FA 0A 20 01 6C
+[10:37:32.573][D][Communication:253]: Message from 0x480 (Manager) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property BETRIEBS_STATUS_WPM (0x4E5E) raw value 16577 (0x40C1) data D2 00 FA 4E 5E 40 C1
+[10:37:40.003][D][Communication:253]: Message from 0x180 (Kessel) Read/Write ID 0x60 0x79 (to 0x379/unknown, write) property BETRIEBS_STATUS (0x0A20) raw value 108 (0x006C) data 60 79 FA 0A 20 00 6C
+[10:37:40.993][D][Communication:253]: Message from 0x180 (Kessel) Read/Write ID 0x60 0x79 (to 0x379/unknown, write) property BETRIEBS_STATUS (0x0A20) raw value 32 (0x0020) data 60 79 FA 0A 20 00 20
+[10:37:41.005][D][Communication:253]: Message from 0x480 (Manager) Read/Write ID 0x20 0x00 (to 0x100/Bedienteil, write) property BETRIEBS_STATUS_WPM (0x4E5E) raw value 193 (0x00C1) data 20 00 FA 4E 5E 00 C1
+[10:37:42.133][D][Communication:253]: Message from 0x480 (Manager) Read/Write ID 0x20 0x00 (to 0x100/Bedienteil, write) property BETRIEBS_STATUS_WPM (0x4E5E) raw value 65 (0x0041) data 20 00 FA 4E 5E 00 41
+[10:38:02.646][D][Communication:253]: Message from 0x480 (Manager) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property BETRIEBS_STATUS_WPM (0x4E5E) raw value 65 (0x0041) data D2 00 FA 4E 5E 00 41
+[10:38:32.405][D][Communication:253]: Message from 0x480 (Manager) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property BETRIEBS_STATUS_WPM (0x4E5E) raw value 65 (0x0041) data D2 00 FA 4E 5E 00 41
+[10:38:39.927][D][Communication:253]: Message from 0x480 (Manager) Read/Write ID 0x20 0x00 (to 0x100/Bedienteil, write) property BETRIEBS_STATUS_WPM (0x4E5E) raw value 1 (0x0001) data 20 00 FA 4E 5E 00 01
+[10:39:02.664][D][Communication:253]: Message from 0x480 (Manager) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property BETRIEBS_STATUS_WPM (0x4E5E) raw value 1 (0x0001) data D2 00 FA 4E 5E 00 01
+[10:39:32.396][D][Communication:253]: Message from 0x480 (Manager) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property BETRIEBS_STATUS_WPM (0x4E5E) raw value 1 (0x0001) data D2 00 FA 4E 5E 00 01
+[10:40:02.647][D][Communication:253]: Message from 0x480 (Manager) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property BETRIEBS_STATUS_WPM (0x4E5E) raw value 1 (0x0001) data D2 00 FA 4E 5E 00 01
+[10:40:32.401][D][Communication:253]: Message from 0x480 (Manager) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property BETRIEBS_STATUS_WPM (0x4E5E) raw value 1 (0x0001) data D2 00 FA 4E 5E 00 01
+[10:41:02.666][D][Communication:253]: Message from 0x480 (Manager) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property BETRIEBS_STATUS_WPM (0x4E5E) raw value 1 (0x0001) data D2 00 FA 4E 5E 00 01
+[10:41:32.413][D][Communication:253]: Message from 0x480 (Manager) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property BETRIEBS_STATUS_WPM (0x4E5E) raw value 1 (0x0001) data D2 00 FA 4E 5E 00 01
+[10:42:02.667][D][Communication:253]: Message from 0x480 (Manager) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property BETRIEBS_STATUS_WPM (0x4E5E) raw value 1 (0x0001) data D2 00 FA 4E 5E 00 01
+[10:42:03.719][D][Communication:253]: Message from 0x601 (unknown) Read/Write ID 0x67 0x01 (to 0x301/HK1, system response) property TBD_10 (0x00FE) raw value 256 (0x0100) data 67 01 FE 01 00 00 00
+[10:42:04.934][D][Communication:253]: Message from 0x180 (Kessel) Read/Write ID 0x60 0x79 (to 0x379/unknown, write) property UNKNOWN (0x0073) raw value 0 (0x0000) data 60 79 73 00 00 00 00
+[10:42:04.946][D][Communication:253]: Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property UNKNOWN (0x0010) raw value 2 (0x0002) data 60 01 10 00 02 00 00
+[10:42:04.953][D][Communication:253]: Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property VORLAUFISTTEMP_HK1 (0x000F) raw value 65136 (0xFE70) data 60 01 0F FE 70 00 00
+[10:42:04.964][D][Communication:253]: Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property VORLAUFSOLLTEMP (0x0004) raw value 65136 (0xFE70) data 60 01 04 FE 70 00 00
+[10:42:04.976][D][Communication:253]: Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property FEK_TBD_0052 (0x0052) raw value 0 (0x0000) data 60 01 52 00 00 00 00
+[10:42:04.987][D][Communication:253]: Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property UNKNOWN (0x0056) raw value 0 (0x0000) data 60 01 56 00 00 00 00
+[10:42:04.999][D][Communication:253]: Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property UNKNOWN (0x0057) raw value 0 (0x0000) data 60 01 57 00 00 00 00
+[10:42:05.011][D][Communication:253]: Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property SOLLWERT_MAX_HK1 (0x0028) raw value 300 (0x012C) data 60 01 28 01 2C 00 00
+[10:42:05.031][D][Communication:253]: Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property UNKNOWN (0x005A) raw value 512 (0x0200) data 60 01 5A 02 00 00 00
+[10:42:09.000][D][Communication:253]: Message from 0x180 (Kessel) Read/Write ID 0x60 0x79 (to 0x379/unknown, write) property UNKNOWN (0x0010) raw value 81 (0x0051) data 60 79 10 00 51 00 00
+[10:42:09.012][D][Communication:253]: Message from 0x180 (Kessel) Read/Write ID 0x60 0x79 (to 0x379/unknown, write) property AUSSENTEMP (0x000C) raw value 30 (0x001E) data 60 79 0C 00 1E 00 00
+[10:42:09.021][D][Communication:253]: Message from 0x180 (Kessel) Read/Write ID 0x60 0x79 (to 0x379/unknown, write) property RUECKLAUFISTTEMP (0x0016) raw value 286 (0x011E) data 60 79 16 01 1E 00 00
+[10:42:09.029][D][Communication:253]: Message from 0x180 (Kessel) Read/Write ID 0x60 0x79 (to 0x379/unknown, write) property SPEICHERISTTEMP (0x000E) raw value 445 (0x01BD) data 60 79 0E 01 BD 00 00
+[10:42:09.037][D][Communication:253]: Message from 0x180 (Kessel) Read/Write ID 0x60 0x79 (to 0x379/unknown, write) property UNKNOWN (0x005E) raw value 0 (0x0000) data 60 79 5E 00 00 00 00
+[10:42:09.049][D][Communication:253]: Message from 0x180 (Kessel) Read/Write ID 0x60 0x79 (to 0x379/unknown, write) property UNKNOWN (0x0053) raw value 0 (0x0000) data 60 79 53 00 00 00 00
+[10:42:09.061][D][Communication:253]: Message from 0x180 (Kessel) Read/Write ID 0x60 0x79 (to 0x379/unknown, write) property ANLAGENFROST (0x0A00) raw value 40 (0x0028) data 60 79 FA 0A 00 00 28
+[10:42:09.073][D][Communication:253]: Message from 0x180 (Kessel) Read/Write ID 0x60 0x79 (to 0x379/unknown, write) property UNKNOWN (0x005A) raw value 512 (0x0200) data 60 79 5A 02 00 00 00
+[10:42:09.084][D][Communication:253]: Message from 0x180 (Kessel) Read/Write ID 0x60 0x79 (to 0x379/unknown, write) property UNKNOWN (0x000A) raw value 4363 (0x110B) data 60 79 0A 11 0B 1A 00
+[10:42:09.097][D][Communication:253]: Message from 0x180 (Kessel) Read/Write ID 0x60 0x79 (to 0x379/unknown, write) property UNKNOWN (0x0009) raw value 10762 (0x2A0A) data 60 79 09 2A 0A 00 00
+[10:42:09.109][D][Communication:253]: Message from 0x180 (Kessel) Read/Write ID 0x60 0x79 (to 0x379/unknown, write) property BETRIEBS_STATUS (0x0A20) raw value 32 (0x0020) data 60 79 FA 0A 20 00 20
+[10:42:32.420][D][Communication:253]: Message from 0x480 (Manager) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property BETRIEBS_STATUS_WPM (0x4E5E) raw value 1 (0x0001) data D2 00 FA 4E 5E 00 01
+[10:42:39.918][D][Communication:253]: Message from 0x180 (Kessel) Read/Write ID 0x60 0x79 (to 0x379/unknown, write) property BETRIEBS_STATUS (0x0A20) raw value 0 (0x0000) data 60 79 FA 0A 20 00 00
+[10:42:41.056][D][Communication:253]: Message from 0x480 (Manager) Read/Write ID 0x20 0x00 (to 0x100/Bedienteil, write) property BETRIEBS_STATUS_WPM (0x4E5E) raw value 0 (0x0000) data 20 00 FA 4E 5E 00 00
+[10:43:02.677][D][Communication:253]: Message from 0x480 (Manager) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property BETRIEBS_STATUS_WPM (0x4E5E) raw value 0 (0x0000) data D2 00 FA 4E 5E 00 00
+[10:43:32.428][D][Communication:253]: Message from 0x480 (Manager) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property BETRIEBS_STATUS_WPM (0x4E5E) raw value 0 (0x0000) data D2 00 FA 4E 5E 00 00
+[10:43:59.229][D][Communication:253]: Message from 0x601 (unknown) Read/Write ID 0x66 0x01 (to 0x301/HK1, system) property TBD_10 (0x00FE) raw value 256 (0x0100) data 66 01 FE 01 00 00 00
+[10:43:59.241][D][Communication:253]: Message from 0x180 (Kessel) Read/Write ID 0x66 0x79 (to 0x379/unknown, system) property TBD_10 (0x00FE) raw value 256 (0x0100) data 66 79 FE 01 00 00 00

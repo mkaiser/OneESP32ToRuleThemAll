@@ -1,0 +1,26 @@
+# Minimal device for upstream's ttf07.yaml; copy to /config/esphome/.ttf07check/ (paths are relative to that folder).
+esphome:
+  name: ttf07-check
+esp32:
+  board: esp32-s3-devkitc-1
+  framework:
+    type: esp-idf
+logger:
+api:
+wifi:
+  ssid: "x"
+  password: "xxxxxxxx"
+substitutions:
+  entity_room_temperature: "sensor.x"
+  entity_humidity: "sensor.y"
+  timezone: "Europe/Berlin"
+external_components:
+  - source: { type: local, path: ../OneESP32ToRuleThemAll/components }
+    components: ["wp_core"]
+canbus:
+  - id: !extend wp_can
+    platform: esp32_can
+    tx_pin: GPIO15
+    rx_pin: GPIO16
+packages:
+  ttf07: !include ../OneESP32ToRuleThemAll/yaml/ttf07.yaml
