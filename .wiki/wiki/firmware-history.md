@@ -1,6 +1,6 @@
 # Firmware history and decisions
 
-See also: [Device](device-heatpump-ttf07c.md), [development](../../dev/development.md) (branches and commit topics).
+See also: [Device](../../doc/ttf07c/.wiki/wiki/device-heatpump-ttf07c.md), [development](../../dev/development.md) (branches and commit topics).
 
 ## Old implementation (branch `archive/ttf07-old`, named `ttf07` until 2026-11-18; used until 2026-11-15)
 
@@ -40,11 +40,11 @@ Dropped or changed compared to the old firmware:
 
 Verified after the flash (2026-11-15): all values plausible, no writes from the ESP at boot, 119 of 123 entity
 names unchanged. The only firmware-caused difference was the missing `0x100` node for three debug sensors
-([raw](../raw/2026-11-15-ha-history-observations.md)).
+([raw](../../doc/ttf07c/.wiki/raw/2026-11-15-ha-history-observations.md)).
 
 ## 2026-11-16: emulation in daily use, esp-idf
 
-- FEK emulation with flow setpoint passed its test and is the selected heating control ([Heating control](heating-control.md)).
+- FEK emulation with flow setpoint passed its test and is the selected heating control ([Heating control](../../doc/ttf07c/.wiki/wiki/heating-control.md)).
 - The emulation answers reads addressed to HK1 (the panel lagged ~10 s per screen without it).
 - **Framework esp-idf** (decision: follow upstream). The Arduino decision of the port is reverted; the switch was
   one line in the device file plus an OTA flash, no code changes needed.
@@ -52,3 +52,17 @@ names unchanged. The only firmware-caused difference was the missing `0x100` nod
 - Deprecated "Energie Summe" removed; FEK protocol properties named (`KESSELSOLLTEMP`, …).
 - Flashing while emulating: the WPM3i keeps HK1 reserved until its next presence check, so the emulation pauses for
   up to 8 min (observed 1–5 min); the compressor is not affected.
+
+## 2026-11-20: Nachheizstufe
+- Text sensor "Nachheizstufe" (`NHZ_STUFE`: Aus / Stufe 1-3 = 3, 6, 9 kW) from the `0x4e5e` bits; Nachheizregister 1-3
+  stay as they are (HA history). The three entities are stages of one heater, only one is on at a time, so one tile shows it
+  ([Betriebsstatus](../../doc/ttf07c/.wiki/wiki/betriebsstatus.md)).
+
+## 2026-11-22: phase always Komfort, cooling numbers unknown, MFG software
+
+- The FEK emulation always sends phase Komfort (`0x0058` = `0x0200`); "FEK Emulation Betriebsart" Eco only selects
+  the Eco temperature. Reason: in phase Eco the WPM3i switches the heating circuit pump off whatever the setpoint
+  (test 2026-11-22, [heating control](../../doc/ttf07c/.wiki/wiki/heating-control.md)).
+- `wp_number` option `no_value_unknown` (default off, upstream behaviour unchanged): the TTF07 C cooling numbers
+  publish `0x8000` as unknown instead of -3276.8.
+- `0x000A` = `DATUM`, `0xFE4C` = `MFG_SOFTWARE` (sensor "Software MFG").

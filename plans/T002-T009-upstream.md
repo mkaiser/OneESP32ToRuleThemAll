@@ -1,6 +1,6 @@
 # Plan: upstream PRs for TTF07 C / WPM3i (kr0ner/OneESP32ToRuleThemAll)
 
-T002, T009. Fork only. History of the earlier rebuilds (2026-11-17, 2026-11-18 twice): `.wiki/wiki/log.md` and git.
+T002, T009. Fork only. History of the earlier rebuilds: git.
 
 ## Goal
 
@@ -16,15 +16,16 @@ sensors, as separate packages later); upstream's `ttf07.yaml` is **not replaced*
 | 1 | Add detailed CAN message logging | 1 |
 | 2 | Add CanNode Bedienteil and apply control panel writes at once | 1 |
 | 3 | Analytics: publish under the entity id | 1 |
-| 4 | Templates: number mode and write lock, device class for wp_generic_combined | 1 |
+| 4 | Templates: number mode, write lock and no-value option, device class for wp_generic_combined | 1 |
 | 5 | Templates: add wp_power and wp_debug | 1 |
 | 6 | wp_climate: add preset thermostat type | 1 |
 | 7 | txx_base: configurable VORLAUFISTTEMP target and HK1 settings write lock | 1 |
 | 8 | Introduce ttf07_base.yaml as the shared base for TTF07 variants | 2a |
 | 9 | Add TTF07 C properties (WPM3i) | 2b |
 | 10 | Add TTF07 C with WPM3i manager | 2b |
-| 11 | Add TTF07 C dashboard example | 2b |
-| 12 | Add TTF07 C user guide (`docs/ttf07c.md`, `docs/images/ttf07c/`, README link) | 2b |
+| 11 | Add TTF07 C dashboard example (`doc/ttf07c/dashboard-example/`) | 2b |
+| 12 | Add TTF07 C user guide (`doc/ttf07c.md`, `doc/ttf07c/images/`, README link) | 2b |
+| 12b | Add TTF07 C knowledge base (`doc/ttf07c/`: README, control panel menu, llmwiki `.wiki/`) | 2b |
 | 13 | docs: AGENTS.md, workflow.md, TODO, wiki, skills, plans, dev, tools (fork only) | never |
 
 The list with one-line descriptions is in [`dev/development.md`](../dev/development.md) "Commits"; keep both in step.
@@ -41,7 +42,7 @@ from a fork show the earlier commits until those are merged: say so in the text)
 - **PR 2a, `ttf07_base.yaml` (8).** Pure refactor, independent of PR 1. Proof for the description: `esphome config`
   of a plain TTF07 device before/after, all 61 entities identical (name, domain, unit, state class, device class,
   icon, interval); only the boot lambdas are split over two files.
-- **PR 2b, TTF07 C with WPM3i (9–12).** The guide `docs/ttf07c.md` is the description's base. The `docs/` folder is
+- **PR 2b, TTF07 C with WPM3i (9–12).** The guide `doc/ttf07c.md` is the description's base. The `doc/` folder is
   new upstream: ask kr0ner whether he wants it; if not, drop commit 12 and upload the screenshots into the PR
   description instead.
 - **Follow-ups, one PR each, only after asking kr0ner:** HK1 room values (`RAUMISTTEMP`, `VERSTELLTE_RAUMSOLLTEMP`,

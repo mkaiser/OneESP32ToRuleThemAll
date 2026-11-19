@@ -1,17 +1,17 @@
-"""Retake the TTF07 C dashboard screenshots into docs/images/ttf07c/ (run on the HA host, e.g. the SSH add-on).
+"""Retake the TTF07 C dashboard screenshots into doc/ttf07c/images/ (run on the HA host, e.g. the SSH add-on).
 
     python3 .claude/tools/dashboard/take_screenshots.py
 
 Steps: create a temporary local-only admin user with a random password (HA websocket API through the
 Supervisor proxy), run screenshots_playwright.py in the Playwright container (docker create / cp / start,
 because the Docker daemon resolves bind mounts on the host OS, not in this add-on), copy the PNGs out,
-delete the container and the user (also on failure). Details: .wiki/wiki/screenshots.md.
+delete the container and the user (also on failure). Details: doc/ttf07c/.wiki/wiki/screenshots.md.
 """
 import os, sys, secrets, subprocess
 sys.path.insert(0, '/homeassistant/.claude/tools/naming')  # ws(): HA websocket helper of the HA config repo
 from ha import ws
 HERE = os.path.dirname(os.path.abspath(__file__))
-DST = os.path.join(HERE, '..', '..', '..', 'docs', 'images', 'ttf07c') + '/'
+DST = os.path.join(HERE, '..', '..', '..', 'doc', 'ttf07c', 'images') + '/'
 IMAGE = 'mcr.microsoft.com/playwright/python:v1.49.1-noble'
 def run(*a, **k):
     p = subprocess.run(list(a), capture_output=True, text=True, **k)

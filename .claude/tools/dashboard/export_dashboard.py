@@ -1,4 +1,4 @@
-"""Export a Home Assistant dashboard as the TTF07 C example (yaml/examples/ttf07_wpm3i_dashboard.yaml). Fork only.
+"""Export a Home Assistant dashboard as the TTF07 C example (doc/ttf07c/dashboard-example/ttf07_wpm3i_dashboard.yaml). Fork only.
 
 Input: two JSON files from the Home Assistant websocket API,
   - the dashboard:        {"type": "lovelace/config", "url_path": "<dashboard>"}
@@ -13,7 +13,7 @@ fresh install with the friendly name "Wärmepumpe" gets. Entities from elsewhere
 
 Usage:
   python3 export_dashboard.py dashboard.json registry.json --device-entity climate.<any entity of the device> \
-      --map sensor.my_house_temperature=sensor.HOUSE_TEMPERATURE > ../../../yaml/examples/ttf07_wpm3i_dashboard.yaml
+      --map sensor.my_house_temperature=sensor.HOUSE_TEMPERATURE > ../../ttf07c/dashboard-example/ttf07_wpm3i_dashboard.yaml
 """
 
 import argparse

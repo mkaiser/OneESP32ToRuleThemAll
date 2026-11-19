@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Value series per CAN register from a firmware log capture (plans/register-decoding.md, phase 2).
+"""Value series per CAN register from a firmware log capture (plans/T001-register-decoding.md, phase 2).
 
 Input: an ESPHome log of heatpump-ttf07c, raw or filtered to the `Communication` lines, e.g.
-/share/heatpump-capture/2026-11-18-passive-24h.log or .wiki/raw/captures/*.log. Line format: can-bus.md,
+/share/heatpump-capture/2026-11-18-passive-24h.log or doc/ttf07c/.wiki/raw/captures/*.log. Line format: can-bus.md,
 "Observing the bus":
     [12:29:50.018] Message from 0x180 (Kessel) Read/Write ID 0x67 0x01 (to 0x301/HK1, system response)
                    property SYSTEM_PRAESENZ (0x00FE) raw value 256 (0x0100) data ...

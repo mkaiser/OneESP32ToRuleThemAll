@@ -16,7 +16,7 @@ keeps working for this device, and decide what the TTF07 C's new entities send.
   "Numeric Sensor": select one this device sends (e.g. `&var-measurement=AUSSENTEMP`); the default `ABLUFTFEUCHTE`
   (THZ only) shows "No data" everywhere. Panel queries are readable anonymously (`/api/dashboards/uid/advz2wx`).
 - 2026-11-18: CoP WW 2.45 vs community 2.96, heating 5.25 vs 5.62
-  ([screenshot](../.wiki/raw/2026-11-18-community-grafana.png)).
+  (screenshot, not kept).
 - Possible hint upstream: default the numeric sensor to one every variant sends (e.g. `AUSSENTEMP`).
 - To leave analytics: comment out the `analytics` line in `heatpump-ttf07c.yaml` (HA config repo) and flash.
 - New entities (Taupunkt, Raum WPM3i, Partyprogramm, NHZ heat totals, …) are published under their firmware ids,

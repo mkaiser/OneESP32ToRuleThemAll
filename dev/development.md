@@ -30,7 +30,7 @@ docker exec $C timeout 60 esphome logs --device 192.168.178.37 /config/esphome/h
 ```
 - OTA is encrypted with the API key (no password).
 - Flashing reboots the ESP. Fine for testing, but say when you do it. After a flash the FEK emulation is off for
-  up to ~8 min ([heating control](../.wiki/wiki/heating-control.md)).
+  up to ~8 min ([heating control](../doc/ttf07c/.wiki/wiki/heating-control.md)).
 - After a flash, check: the log has no errors, the entities have values in HA, nothing writes to the heat pump
   unintentionally.
 - Home Assistant states: `curl -H "Authorization: Bearer $SUPERVISOR_TOKEN" http://supervisor/core/api/states`.
@@ -52,7 +52,7 @@ register; `--unknown`, `--changes`, `--csv`, `--gaps`, `--exclude HH:MM-HH:MM`).
 
 - The SSH add-on's shell tools are BusyBox: no `grep --line-buffered`, no `sed -u`. Use Python for stream filters.
 - Docker bind mounts (`-v`) are resolved on the host OS, not in the add-on: use `docker cp`
-  (see `.claude/tools/dashboard/take_screenshots.py`, [screenshots](../.wiki/wiki/screenshots.md)).
+  (see `.claude/tools/dashboard/take_screenshots.py`, [screenshots](../doc/ttf07c/.wiki/wiki/screenshots.md)).
 - The login shell is zsh: `$VAR:c…` is a modifier (`$FINAL:components/…` breaks). Write `${VAR}` or run such
   scripts with `bash`.
 - HA websocket from the host: `/homeassistant/.claude/tools/naming/ha.py` (`ws([...])`).
@@ -60,32 +60,33 @@ register; `--unknown`, `--changes`, `--csv`, `--gaps`, `--exclude HH:MM-HH:MM`).
 ## Dashboard and screenshots
 
 After a change that adds, renames or removes entities: update `lovelace.dashboard_warmepumpe`, re-export
-`yaml/examples/ttf07_wpm3i_dashboard.yaml` with `.claude/tools/dashboard/export_dashboard.py`, retake
-`docs/images/ttf07c/` with `.claude/tools/dashboard/take_screenshots.py` ([screenshots](../.wiki/wiki/screenshots.md)).
+`doc/ttf07c/dashboard-example/ttf07_wpm3i_dashboard.yaml` with `.claude/tools/dashboard/export_dashboard.py`, retake
+`doc/ttf07c/images/` with `.claude/tools/dashboard/take_screenshots.py` ([screenshots](../doc/ttf07c/.wiki/wiki/screenshots.md)).
 
 ## Commits
 
 `ttf07-port` is a stack of topic commits on top of upstream `master`, so it can go upstream as is
-([`plans/upstream.md`](../plans/upstream.md)). Commits 1–7 are PR 1 (shared code), 8 is PR 2a (TTF07 refactor, no
+([`plans/T002-T009-upstream.md`](../plans/T002-T009-upstream.md)). Commits 1–7 are PR 1 (shared code), 8 is PR 2a (TTF07 refactor, no
 entity change), 9–12 PR 2b (TTF07 C):
 
 1. Add detailed CAN message logging
 2. Add CanNode Bedienteil and apply control panel writes at once
 3. Analytics: publish under the entity id
-4. Templates: number mode and write lock, device class for wp_generic_combined
+4. Templates: number mode, write lock and no-value option, device class for wp_generic_combined
 5. Templates: add wp_power and wp_debug
 6. wp_climate: add preset thermostat type (upstream's `heating`/`hot_water` stay unchanged)
 7. txx_base: configurable VORLAUFISTTEMP target and HK1 settings write lock
 8. Introduce ttf07_base.yaml as the shared base for TTF07 variants (`ttf07.yaml` becomes a variant, entities unchanged)
 9. Add TTF07 C properties (WPM3i)
 10. Add TTF07 C with WPM3i manager (`yaml/ttf07_wpm3i.yaml` on `ttf07_base.yaml`, names and debug packages, README, esp32-*.yaml)
-11. Add TTF07 C dashboard example (`yaml/examples/ttf07_wpm3i_dashboard.yaml`)
-12. Add TTF07 C user guide (`docs/ttf07c.md`, `docs/images/ttf07c/`, README link)
+11. Add TTF07 C dashboard example (`doc/ttf07c/dashboard-example/ttf07_wpm3i_dashboard.yaml`)
+12. Add TTF07 C user guide (`doc/ttf07c.md`, `doc/ttf07c/images/`, README link)
+12b. Add TTF07 C knowledge base (`doc/ttf07c/`: README, control panel menu, llmwiki `.wiki/` with pages and sources); goes upstream with PR 2b (self-contained: no links out of `doc/ttf07c/`)
 13. docs: AGENTS.md, workflow.md, TODO, wiki, skills, plans, dev, tools (fork only, never upstream)
 
 - **Upstream style:** subjects like upstream's history; C++ formatted with `.clang-format` on changed lines only
   (`git clang-format`).
 - **New work goes into its topic commit.** `git rebase -i --autosquash` is not available here: rebuild with
-  `git checkout <final> -- <files>` per topic ([`plans/upstream.md`](../plans/upstream.md), "Reorganizing commits").
+  `git checkout <final> -- <files>` per topic ([`plans/T002-T009-upstream.md`](../plans/T002-T009-upstream.md), "Reorganizing commits").
   While commit 13 is the last one, fork-only doc changes go in with `git commit --amend -- <paths>`.
 - **Update from upstream:** `git fetch upstream && git rebase upstream/master`, then compile and flash-test.

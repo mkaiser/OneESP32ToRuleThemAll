@@ -29,7 +29,7 @@ reflash, unless the user explicitly asks for that specific action. Read requests
 
 CAN nodes: Kessel `0x180`, HK1 `0x301`, Manager/WPM3i `0x480`, MFG `0x700`, Bedienteil `0x100` (most likely the
 control panel: settings changed on the panel probably show up as writes from `0x100`), ESPClient (the ESP) `0x680`,
-`0x601` (FEK2?). Details and message types: `.wiki/wiki/can-bus.md`.
+`0x601` (FEK2?). Details and message types: `doc/ttf07c/.wiki/wiki/can-bus.md`.
 
 The firmware logs every CAN frame (needs the detailed CAN logging, commit `516ea7c` or later on `ttf07-port`):
 ```
@@ -116,9 +116,9 @@ Then give the evidence (the relevant frames with times), the decoding, and a con
 
 Then file the result (firmware repo, see `.wiki/AGENTS.md` and `workflow.md`):
 - **Ingest:** copy the relevant capture lines (the `Communication` and `>>` lines around the change) to
-  `.wiki/raw/captures/YYYY-MM-DD-HHMM-<parameter>.log`. Update every affected wiki page (usually
-  `ttf07c-registers.md`, plus `can-bus.md`, `cooling.md`, … as needed) and `index.md` if you add a page. Append a
-  `test` entry to `.wiki/wiki/log.md`: parameter, change made, address/node/type found, verdict.
+  `doc/ttf07c/.wiki/raw/captures/YYYY-MM-DD-HHMM-<parameter>.log`. Update every affected wiki page (usually
+  `ttf07c-registers.md`, plus `can-bus.md`, `cooling.md`, … as needed) and `index.md` if you add a page. The TTF07 C
+  wiki keeps no log: the verdict goes to the registers page, the test details to the commit message.
 - **TODO.md:** use the `todo-housekeeping` skill. Remove a planned test that was run, and add new open questions or fixes
   as items.
 - Don't commit unless the user asks.

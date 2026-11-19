@@ -1,7 +1,7 @@
 # Plan: decode the unknown registers in the regular bus traffic (TTF07 C / WPM3i)
 
-T001. Registers and their evidence: [`.wiki/wiki/ttf07c-registers.md`](../.wiki/wiki/ttf07c-registers.md)
-(source of truth; update it with every result). Bus basics: [`.wiki/wiki/can-bus.md`](../.wiki/wiki/can-bus.md).
+T001. Registers and their evidence: [`doc/ttf07c/.wiki/wiki/ttf07c-registers.md`](../doc/ttf07c/.wiki/wiki/ttf07c-registers.md)
+(source of truth; update it with every result). Bus basics: [`doc/ttf07c/.wiki/wiki/can-bus.md`](../doc/ttf07c/.wiki/wiki/can-bus.md).
 
 **Scope:** unknown registers that the heat pump's own nodes send **on their own, all the time**, without the panel
 menus being open or the ESP asking. Registers read only in the panel menus (`0x068E`, `0x0074`, `0x0294`, `0x06AE`,
@@ -12,12 +12,12 @@ nothing (`AGENTS.md`). Times in CET.
 
 ## Inventory (passive capture 2026-11-18 12:07–12:17, heating idle, emulation on)
 
-10-min capture, 2389 frames. Rates from that capture; values also checked against all captures in `.wiki/raw/captures/`.
+10-min capture, 2389 frames. Rates from that capture; values also checked against all captures in `doc/ttf07c/.wiki/raw/captures/`.
 
 | Group | Register | Path | Rate | Values seen | First hypothesis |
 |---|---|---|---|---|---|
 | A: WPM3i ↔ MFG | `0xFE4C` | WPM3i reads MFG | every 5 s | always 18 | **MFG software version** (Busteilnehmer: "04 MFG 18") |
-| | `0xFE09` | WPM3i reads MFG | every 6 s | 18.5–18.9 °C (`et_dec_val`) | internal temperature (inverter/heat sink?), follows the compressor ([analysis](../.wiki/raw/2026-11-17-tbd-temp-03-and-constants.md)) |
+| | `0xFE09` | WPM3i reads MFG | every 6 s | 18.5–18.9 °C (`et_dec_val`) | internal temperature (inverter/heat sink?), follows the compressor ([analysis](../doc/ttf07c/.wiki/raw/2026-11-17-tbd-temp-03-and-constants.md)) |
 | | `0xFE1E` | WPM3i writes MFG | every ~20 s | always 0 | 4th actuator next to `PWM_LADEPUMPE`, `PWM_QUELLENPUMPE`, `UMSCHALTVENTIL_WW` (cooling valve? NHZ?) |
 | B: Kessel block → `0x379` | `0x000A` | Kessel broadcast | every ~2.5 min | `0x110B` (2026-11-17), `0x120B` (2026-11-18) | **date**: high byte = day, low byte = month (like `0x0009` = minute/hour) |
 | | `0x0010` | Kessel broadcast | every ~2.5 min | always `0x0051` = 81 | open (not the same as `0x601`'s `0x0010` = 2) |
@@ -25,12 +25,12 @@ nothing (`AGENTS.md`). Times in CET.
 | | `0x005A` | Kessel broadcast, also `0x601` → HK1 | every ~2.5 min | always `0x0200` | open; same value from both senders |
 | C: `0x601` block → HK1 | `0x0010` | `0x601` → HK1 | every ~2.5 min | always 2 | open (HK number? heating circuit type?) |
 | | `0x0056`, `0x0057` | `0x601` → HK1 | every ~2.5 min | always 0 | open |
-| D: FEK / emulation → `0x601`, Kessel | `0x0029`, `0x002A` | FEK → `0x601` | FEK block | `0x0A00`, `0x1E00` (10, 30) | `0x002A` very likely room setpoint max (30 °C); `0x0029` open ([FEK2](../.wiki/wiki/fek2.md)) |
+| D: FEK / emulation → `0x601`, Kessel | `0x0029`, `0x002A` | FEK → `0x601` | FEK block | `0x0A00`, `0x1E00` (10, 30) | `0x002A` very likely room setpoint max (30 °C); `0x0029` open ([FEK2](../doc/ttf07c/.wiki/wiki/fek2.md)) |
 | | `0x006E` | FEK → Kessel | FEK block | `0x0100` / `0x0200` | changes only after plug-in; open |
 | E: panel ↔ WPM3i | `0x06AF` | panel writes WPM3i | every 60 s | always 1 | keep-alive / "panel present" |
 | | `0x4E8B` | panel writes WPM3i | every ~2.5 min | always 2 | open; sent together with `0x1388`/`0x080E` |
 | | `0x080E` | WPM3i writes panel | every ~2.5 min | always 0 | goes with the error number `0x1388`: error sub-code or error count? |
-| | `0x0B9D` | WPM3i writes panel | with the error list | 0 | error list related ([errors](../.wiki/wiki/errors.md)) |
+| | `0x0B9D` | WPM3i writes panel | with the error list | 0 | error list related ([errors](../doc/ttf07c/.wiki/wiki/errors.md)) |
 | F: rare | `0x4E5C`, `0x4E61`, `0x0645` | WPM3i writes panel | rare | `0x4E5C` 0x40/0x44, `0x4E61` 2254/2503, `0x0645` 1 | `0x4E61` changes: a counter or energy value? |
 
 Group D does not show in this capture: the emulation runs and only the real FEK sends these.
@@ -65,7 +65,7 @@ the registers page, `property.h` and the device file, and remove the debug senso
   leaves the client connected). **Flash 2026-11-18
   16:42:29–16:42:51** (ttf07_base refactor): ESP reboot, the capture continued without a reconnect; the FEK emulation
   re-registers within 8 min, so ignore FEK/`0x601`/HK1 traffic 16:42–16:51 in phase 2. Afterwards copy it to
-  `.wiki/raw/captures/` (filtered if too large).
+  `doc/ttf07c/.wiki/raw/captures/` (filtered if too large).
 - Done: `.claude/tools/can-capture/capture_series.py` (summary per register/sender/target, `--unknown`, `--changes
   0xFE09,...` with the status words and compressor current at each change, `--csv`, `--gaps`, `--exclude HH:MM-HH:MM`,
   midnight rollover). First look (12:29–17:00, heat pump idle): `0xFE09` flickers 18.7/18.8 °C, `0x4E5C`/`0x4E61`
@@ -76,8 +76,7 @@ the registers page, `property.h` and the device file, and remove the debug senso
 - `0x000A` = date: **confirmed at midnight** (`0x120B` → `0x130B` between 23:57:04 and 00:04:04, 2026-11-19, 24 h
   capture). The frame's 6th data byte is `0x1A` = 26 = year (only `0x000A` has it in the Kessel block). Still to see:
   month change (2026-12-01 → `0x010C`). Firmware name goes into the phase 2 batch.
-- `0xFE4C` = MFG software version: **checked 2026-11-18 17:15**, the panel shows "MFG 18" (photo
-  `.wiki/raw/2026-11-18-busteilnehmer-panel.jpg`), read from the Manager's `0x4E69` = 18; the MFG answers `0xFE4C` = 18.
+- `0xFE4C` = MFG software version: **checked 2026-11-18 17:15**, the panel shows "MFG 18" (panel photo, not kept), read from the Manager's `0x4E69` = 18; the MFG answers `0xFE4C` = 18.
   Status ◻️ plausible (same value, no change possible). Firmware: name it (e.g. `MFG_SOFTWARE`) with a diagnostic
   entity next to "Software WPM3i" and drop the debug sensor, batched with the phase 2 results (one flash, one
   dashboard update).
@@ -108,6 +107,29 @@ Ordered by what a single action can tell:
 | Heizkreis settings (HK1 Einstellungen) | `0x601` `0x0010`/`0x0056`/`0x0057`/`0x005A` | HK1 configuration values |
 | Real FEK plugged in (only if needed) | `0x0029`, `0x006E` | FEK values (group D) |
 
+**Run sheet (one action per `/test-sensor` run; the maintainer acts on the panel, the ESP only records):**
+
+Before each run: heat pump not in a compressor lock-out (`Verdichter Reststillstand` = 0) and no hot water cycle running;
+after: restore the setting and check it in HA.
+
+1. **Hot water boost** (Programmschalter WW Komfort, or WW boost): watch `0xFE1E`, `0x0053`, `0x005E`, `0x0073`,
+   `UMSCHALTVENTIL_WW`. Also tells whether `0x0053` pulses with the valve (the 19.11 burst).
+2. **Sommerbetrieb on/off** (Heizen > Grundeinstellung > Sommerbetrieb; changes heating, restore at once): watch
+   `0x0053`/`0x005E`/`0x0073`, `0x005A`, `0xFDB4`. Also answers whether Sommerbetrieb "on" means "enabled" or "active".
+3. **Notbetrieb (NHZ)**: watch `0xFE1E`, the Kessel flags. Only with the maintainer present; the heating element runs.
+4. **HK1 settings** (only without emulation: Heizungssteuerung "Wärmepumpe"): watch `0x601` `0x0010`/`0x0056`/`0x0057`/`0x005A`.
+5. **Antilegionellen** (`0x0101`, Kessel; the panel switch only set the flag for 2 s on 2026-11-17 20:14, no run):
+   a) look first, no change: the maintainer reads the panel's Warmwasser/Antilegionellen menu (day, time, temperature,
+   interval, start function) and photographs it into `doc/ttf07c/.wiki/raw/`; b) passive: the ESP polls `0x0101` only every 15 min,
+   so a short run can be missed; the 24 h capture shows 97 reads, all 0, and HA shows no "on" since 2026-11-17 22:26, so no
+   run in 4 days (a weekly schedule is possible); capture ≥ 8 days or log the Kessel status changes; c) run only if
+   a) shows a start function: the tank is heated to the disinfection temperature, the heating element (3-9 kW) may
+   run, so start it in the afternoon after a hot water cycle, with the maintainer present. Watch `0x0101`, `0x4E5E`,
+   Speicher-Ist (`0x000E`), Nachheizstufe, `UMSCHALTVENTIL_WW`.
+6. **Real FEK** (group D): last, only if needed.
+Passive extras that need no action: another 24 h capture (a second `0x0053` burst, month change `0x010C` on
+2026-12-01).
+
 Cooling-related candidates wait for the cooling season (T003–T005); EVU block and defrost cannot be
 triggered on purpose and are covered by the 24 h captures as they happen.
 
@@ -121,9 +143,23 @@ triggered on purpose and are covered by the 24 h captures as they happen.
 
 Newest first.
 
+- **2026-11-22 (evening):** batch flashed and confirmed ("Software MFG" = 18). Also named from panel photos:
+  `0x0658`–`0x065a` = Sensor Abgleich Vorlauf WP / Vorlauf NHZ / Rücklauf WP (registers page). Nothing uncommitted.
+  **Next:** phase 3 step 1 (hot water boost) with the maintainer at the panel.
+
+- **2026-11-22:** firmware batch: `0x000A` = `DATUM` (`et_datum`, no entity), `0xFE4C` = `MFG_SOFTWARE` (sensor
+  "Software MFG"), debug sensor removed; config valid, compile running, flash waits for the maintainer's go. **Next:**
+  phase 3 (run sheet), one panel action per run with the maintainer.
+
+- **2026-11-21 (later):** the `0x0053` burst (19.11 09:43:21-09:45:16) coincides with `UMSCHALTVENTIL_WW` = 100 % and
+  `0x4E5E` = `0x0200`, compressor off: a valve run without hot water production. Needs a second occurrence to confirm.
+- **2026-11-21:** phase 2 run on the 24 h capture (not copied to git). Only `0x0053` (one burst 19.11 09:43-09:45,
+  idle) and `0xFE09` (18.6-18.8 °C) changed besides time/date; all others constant. Results in the registers page and
+  log. **Next:** phase 3 for the constant ones; decide whether to look at the `0x0053` burst in the HA history.
+
 - **2026-11-19 ~12:45:** 24 h capture finished (12:29, one ~30 s gap at 07:47:33), `0x000A` = date confirmed at
   midnight; nothing committed from the capture. **Next:** copy it to
-  `.wiki/raw/captures/2026-11-18-1229-passive-24h.log` (proposed: only a filtered copy without the WPM3i → MFG read
+  `doc/ttf07c/.wiki/raw/captures/2026-11-18-1229-passive-24h.log` (proposed: only a filtered copy without the WPM3i → MFG read
   requests goes to git, the raw 62 MB stay in `/share/heatpump-capture/`; ask the maintainer before committing it),
   run `capture_series.py --unknown --exclude 16:42-16:51` and `--changes` on the registers that changed, then
   phase 2. Most promising: `0xFE09` (follows the compressor), `0xFE1E` (WPM3i command to the MFG), `0x4E61`
