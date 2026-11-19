@@ -66,7 +66,7 @@ After a change that adds, renames or removes entities: update `lovelace.dashboar
 ## Commits
 
 `ttf07-port` is a stack of topic commits on top of upstream `master`, so it can go upstream as is
-([`plans/upstream.md`](../plans/upstream.md)). Commits 1–7 are PR 1 (shared code), 8 is PR 2a (TTF07 refactor, no
+([`plans/T002-T009-upstream.md`](../plans/T002-T009-upstream.md)). Commits 1–7 are PR 1 (shared code), 8 is PR 2a (TTF07 refactor, no
 entity change), 9–12 PR 2b (TTF07 C):
 
 1. Add detailed CAN message logging
@@ -86,6 +86,6 @@ entity change), 9–12 PR 2b (TTF07 C):
 - **Upstream style:** subjects like upstream's history; C++ formatted with `.clang-format` on changed lines only
   (`git clang-format`).
 - **New work goes into its topic commit.** `git rebase -i --autosquash` is not available here: rebuild with
-  `git checkout <final> -- <files>` per topic ([`plans/upstream.md`](../plans/upstream.md), "Reorganizing commits").
+  `git checkout <final> -- <files>` per topic ([`plans/T002-T009-upstream.md`](../plans/T002-T009-upstream.md), "Reorganizing commits").
   While commit 13 is the last one, fork-only doc changes go in with `git commit --amend -- <paths>`.
 - **Update from upstream:** `git fetch upstream && git rebase upstream/master`, then compile and flash-test.

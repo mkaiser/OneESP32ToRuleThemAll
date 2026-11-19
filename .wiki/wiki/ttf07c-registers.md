@@ -12,7 +12,7 @@ Unidentified registers have no property: they are debug sensors by address in `y
 See also: [CAN bus](can-bus.md) (nodes, frame format), [Betriebsstatus](betriebsstatus.md) (bits of `0x4e5e` /
 `0x0A20`, relay test), [Errors](errors.md), [FEK2](fek2.md), [Cooling](cooling.md), [Heating control](heating-control.md).
 Plan for the unknown registers in the regular bus traffic (inventory with rates, phases):
-[`plans/register-decoding.md`](../../plans/register-decoding.md) (2026-11-18).
+[`plans/T001-register-decoding.md`](../../plans/T001-register-decoding.md) (2026-11-18).
 
 ## Conventions
 
@@ -131,7 +131,7 @@ Rows (updated 2026-11-17 evening): ✅ test 30, ✅ panel 55, ✅ analysis 8, �
 | `0x071c / 0x071d` | VERDICHTER_STARTS_K / _STARTS | `et_default` | Kessel | Panel reads Kessel | Verdichterstarts | ✅ panel | 24 × 1000 + 198 = 24198 |
 | `0x4eb2` | (upstream WW_ANFORDERUNG) |  | Kessel, Manager, HK1 | ESP reads only | – | – no value | read 2026-11-17 |
 | `0x000a` | (date, not named yet) |  | Kessel → 0x379 | Kessel→0x379 write | – | ✅ analysis | date: high byte = day, low byte = month; the frame's 6th data byte = year − 2000 (`60 79 0A 12 0B 1A 00` = 18.11.(20)26). Changed `0x120B` → `0x130B` between 23:57:04 and 00:04:04 on 2026-11-19 (24 h capture); every ~7 min. Month change (2026-12-01 → `0x010C`) and year byte still to see |
-| `0x0010, 0x0053, 0x005a, 0x005e, 0x0073` | – |  | Kessel → 0x379 | Kessel→0x379 write; 0x601→HK1 write; Kessel→0x679 write | – | ❓ open | sent all the time; 0x0009 = time, `0x000a` = date; see [plan](../../plans/register-decoding.md) |
+| `0x0010, 0x0053, 0x005a, 0x005e, 0x0073` | – |  | Kessel → 0x379 | Kessel→0x379 write; 0x601→HK1 write; Kessel→0x679 write | – | ❓ open | sent all the time; 0x0009 = time, `0x000a` = date; see [plan](../../plans/T001-register-decoding.md) |
 | `0x06aa` | `KUEHLEN_EINGESCHALTET` | `et_little_bool` | Kessel | ESP reads only | – | – no value | upstream's cooling address; does not react on this heat pump (2026-11-16); `KUEHLEN_EIN` `0x06a4` is used |
 | `0x03e3` | – |  | Kessel | Panel reads Kessel | – | – no value | read by the panel in the Kühlen menu |
 | `0x059d` | `ANTEIL_VORLAUF_HK1` | `et_default` | Kessel | Panel reads Kessel | – | – no value | read by the panel (expert menus) |
@@ -174,7 +174,7 @@ Rows (updated 2026-11-17 evening): ✅ test 30, ✅ panel 55, ✅ analysis 8, �
 | `0x0074, 0x0294, 0x06ae` | – |  | Manager | Panel reads Manager; Manager→Panel write | – | ❓ open | 1, 63, 0; read in the Diagnose menus; debug sensors "Debug Manager 0x0074/0x0294/0x06AE" (disabled by default) |
 | `0x0669, 0x4e5a, 0x0658–0x065a` | – |  | Manager | Panel reads Manager; Panel→Manager write | – | ❓ open | 0; read in the expert menus; `0x0669` = Quick start, `0x0658`–`0x065a` = sensor offsets (own rows); debug sensor "Debug Manager 0x4E5A" |
 | `0x0030, 0x4eba` | – |  | Manager | Panel reads Manager | – | – no value | read in the expert menus |
-| `0x4e5c, 0x4e61, 0x0645` | – |  | Manager | Manager→Panel write | – | ❓ open | seen only rarely (Manager → panel); 2026-11-18 only at 16:44:03 and 16:47:23 after a flash of the ESP, sent by the WPM3i on its own (not when the panel menu was opened at 17:15): `0x0645` = 1, `0x4e5c` `0x0040`→`0x0044`, `0x4e61` 2503→2254; each time the panel then read `0x4e69` (MFG software), at 16:47 also the HK1/FEK software. Hypothesis: a "bus participants changed" notification while the FEK emulation re-registered; `0x4e5c` bit 2 = FEK present? ([plan](../../plans/register-decoding.md)) |
+| `0x4e5c, 0x4e61, 0x0645` | – |  | Manager | Manager→Panel write | – | ❓ open | seen only rarely (Manager → panel); 2026-11-18 only at 16:44:03 and 16:47:23 after a flash of the ESP, sent by the WPM3i on its own (not when the panel menu was opened at 17:15): `0x0645` = 1, `0x4e5c` `0x0040`→`0x0044`, `0x4e61` 2503→2254; each time the panel then read `0x4e69` (MFG software), at 16:47 also the HK1/FEK software. Hypothesis: a "bus participants changed" notification while the FEK emulation re-registered; `0x4e5c` bit 2 = FEK present? ([plan](../../plans/T001-register-decoding.md)) |
 | `0x080e` | – (debug) | | Manager | Manager→Panel write | Debug Manager 0x080E | ❓ open | 0; Manager → panel with the error number |
 | `0xfe1e` | – (debug) | | Manager, MFG | Manager→MFG write | Debug Manager 0xFE1E, Debug MFG 0xFE1E | ❓ open | 0 |
 | `0xfe1b` | `PWM_LADEPUMPE` | `et_default` | Manager, MFG | Manager→MFG write | Ladepumpe PWM | ✅ analysis | inverted PWM; history analysis 2026-11-16 ([analysis](../raw/2026-11-16-tbd-history-analysis.md)) |

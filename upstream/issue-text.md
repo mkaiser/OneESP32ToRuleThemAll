@@ -3,7 +3,7 @@
 Hey,
 
 the 'ttf07 cool submarine engineer' is back. With some time and Claude's help I made big progress ([my branch](https://github.com/mkaiser/OneESP32ToRuleThemAll/tree/ttf07-port)):
-- [FEK emulation](https://github.com/mkaiser/OneESP32ToRuleThemAll/blob/749f69f/yaml/ttf07_wpm3i.yaml#L573-L600) fully working
+- [FEK emulation](https://github.com/mkaiser/OneESP32ToRuleThemAll/blob/749f69f/yaml/ttf07_wpm3i.yaml#L573-L600) is fully working. Also working as my 'primary heating controller' now. (The FEK subsitutes the heatpumps controller by design once plugged in)
 - Turns out my pump has a WPM3i controller (not WPM2): [ttf07_wpm3i.yaml](https://github.com/mkaiser/OneESP32ToRuleThemAll/blob/ttf07-port/yaml/ttf07_wpm3i.yaml)
 - [Thermostats](https://github.com/mkaiser/OneESP32ToRuleThemAll/blob/749f69f/yaml/ttf07_wpm3i.yaml#L1303-L1337) for heating and hot water with some eco/komf/heating time window quirks (new [`preset` type](https://github.com/mkaiser/OneESP32ToRuleThemAll/commit/75ac683) in wp_climate)
 - Many more registers decoded: [property.h](https://github.com/mkaiser/OneESP32ToRuleThemAll/commit/c3e7001), [register notes](https://github.com/mkaiser/OneESP32ToRuleThemAll/blob/ttf07-port/.wiki/wiki/ttf07c-registers.md)

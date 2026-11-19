@@ -733,7 +733,7 @@ renaming the entity ID in the HA registry keeps history, renaming the ESPHome na
 Maintainer: the HEISSGAS reading of 76.6 °C with the compressor off (2026-11-17 20:23:55) was a one-off event, not
 followed up. The fault list is empty after the heat pump reset, so the open question about the ESP's error-list
 request (no answer at 20:38–20:40, "keine" at 21:17) is dropped; the missing-fields item waits for a new fault entry
-(blocker). New plan [`plans/register-decoding.md`](../../plans/register-decoding.md) for the unknown registers that are
+(blocker). New plan [`plans/T001-register-decoding.md`](../../plans/T001-register-decoding.md) for the unknown registers that are
 sent regularly on the bus (Kessel block to `0x379`, `0x601` block to HK1, FEK/emulation frames, WPM3i ↔ MFG,
 panel keep-alives), based on a 10-min passive capture (12:07–12:17). TODO: the FEK-unknowns item merged into the
 plan item 1; the open-questions section removed; items renumbered (1–21).
@@ -741,7 +741,7 @@ plan item 1; the open-questions section removed; items renumbered (1–21).
 ## 2026-11-18 change: register decoding phase 0 started
 All "Debug …" sensors enabled in HA 12:23 (the 5 Manager menu registers were disabled by default; values at once:
 `0x0074` 1, `0x0294` 63, `0x4E68` 2, `0x4E5A` 0, `0x06AE` 0). 24 h passive capture started 12:29
-(`/share/heatpump-capture/`, see [plan](../../plans/register-decoding.md) phase 0). Lesson: killing the host-side
+(`/share/heatpump-capture/`, see [plan](../../plans/T001-register-decoding.md) phase 0). Lesson: killing the host-side
 `docker exec … esphome logs` leaves the client running inside the ESPHome container with its API connection; 7 such
 clients had piled up during the start attempts and were killed there.
 
@@ -808,7 +808,7 @@ Maintainer's photo of Diagnose > System > Busteilnehmer (17:15, [photo](../raw/2
 (◻️ plausible; firmware naming batched with phase 2). `0x0645`/`0x4E5C`/`0x4E61`: sent by the WPM3i only at 16:44 and
 16:47 after the ESP flash, each followed by the panel's `0x4E69` read, not when the menu was opened → probably a
 "bus participants changed" notice (`0x4E5C` 0x40 → 0x44 when the FEK emulation was back). Pages:
-[registers](ttf07c-registers.md), [plan](../../plans/register-decoding.md).
+[registers](ttf07c-registers.md), [plan](../../plans/T001-register-decoding.md).
 
 ## 2026-11-18 change: TTF07 C user guide in docs/, tools moved, plans and TODO tidied
 - User guide [`docs/ttf07c.md`](../../docs/ttf07c.md) (was TODO 2 "README for TTF07 C users"): installation,
@@ -867,3 +867,11 @@ New: `workflow.md` (how work is written down, multi-agent git rules, `TODO.md` i
 wiki pages [writes](writes.md) and [entity names](entity-names.md). `plan/` → `plans/` (handover folded into the
 status log of `plans/register-decoding.md`; new `plans/analytics.md`); `TODO.md` items 1–17 became T001–T017 with a
 **From the maintainer** inbox; skill `revise-todo` → `todo-housekeeping`.
+
+## 2026-11-19 change: workflow updated (incoming items, T### plan names, close-session)
+`workflow.md` replaced by the newer project-independent version: the inbox is now **Incoming items by maintainer**, a
+holding area taken in only when the maintainer asks; plan filenames start with their `T###`
+(`plans/T001-register-decoding.md`, `plans/T002-T009-upstream.md`, `plans/T007-T008-analytics.md`). `TODO.md` gains a
+**Release** section (T002, T009, T010: the upstream PRs). Skill `todo-housekeeping` rewritten from the shared template,
+new skill `close-session`; `AGENTS.md` "Workflow in this project" names gate, generated files and where decisions and
+facts go.

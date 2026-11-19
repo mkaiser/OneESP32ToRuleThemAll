@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Value series per CAN register from a firmware log capture (plans/register-decoding.md, phase 2).
+"""Value series per CAN register from a firmware log capture (plans/T001-register-decoding.md, phase 2).
 
 Input: an ESPHome log of heatpump-ttf07c, raw or filtered to the `Communication` lines, e.g.
 /share/heatpump-capture/2026-11-18-passive-24h.log or .wiki/raw/captures/*.log. Line format: can-bus.md,

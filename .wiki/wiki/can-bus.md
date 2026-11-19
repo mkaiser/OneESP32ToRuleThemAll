@@ -126,7 +126,7 @@ Meaning of `0x379` and the unknown values open ([excerpt](../raw/captures/2026-1
 2026-11-18 12:12: `0x000A` = `0x120B` (2026-11-17: `0x110B`), so `0x000A` is probably the **date** (high byte day,
 low byte month; unconfirmed until the next day change); the block came every ~2.5 min
 ([capture](../raw/captures/2026-11-18-1207-passive-10min.log)). Decoding plan for all regularly sent unknown
-registers: [`plans/register-decoding.md`](../../plans/register-decoding.md).
+registers: [`plans/T001-register-decoding.md`](../../plans/T001-register-decoding.md).
 
 ## WPM3i boot: node scan (2026-11-17)
 

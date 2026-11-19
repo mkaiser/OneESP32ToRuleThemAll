@@ -15,11 +15,11 @@ happens on `ttf07-port`: upstream `master` plus a stack of topic commits that go
 | What we know about the heat pump, the CAN bus and this firmware | the wiki: start at `.wiki/wiki/index.md`; its schema and ingest rules are `.wiki/AGENTS.md` |
 | Every CAN register (source of truth) | `.wiki/wiki/ttf07c-registers.md`, kept in step with `components/wp_core/property.h` |
 | Branches, build, flash, logs, CAN captures, environment pitfalls, the commit stack | `dev/development.md` |
-| What is next, open decisions, planned tests, what waits on the season | `TODO.md` |
-| How work is written down and how agents share one tree: `TODO.md`, `plans/`, `T###` numbers, commits | `workflow.md` |
-| Plans of running work, each with its status log | `plans/` (`upstream.md`: the upstream PRs; `register-decoding.md`: unknown registers) |
+| What is next, open decisions, planned tests, what waits on the season, the upstream release | `TODO.md` |
+| How work is written down and how agents share one tree: `TODO.md`, `plans/`, `T###` numbers, commits, closing a session (project-independent; this file's "Workflow in this project" fills it in) | `workflow.md` |
+| Plans of running work, each with its status log, named by the `T###` they serve | `plans/` (`T002-T009-upstream.md`: the upstream PRs; `T001-register-decoding.md`: unknown registers; `T007-T008-analytics.md`) |
 | Ready-to-paste upstream PR texts | `upstream/issue-text.md` |
-| Recurring procedures: verify a sensor on the CAN bus, TODO housekeeping | `.claude/skills/` (`test-sensor`, `todo-housekeeping`) |
+| Recurring procedures: verify a sensor on the CAN bus, TODO housekeeping, closing a session | `.claude/skills/` (`test-sensor`, `todo-housekeeping`, `close-session`) |
 | Tools: config compare, CAN capture, dashboard export and screenshots | `.claude/tools/` |
 | C++ core: CAN nodes, communication, properties, types | `components/wp_core/` |
 | Climates (upstream's `heating`/`hot_water` plus `preset`) | `components/wp_climate/` |
@@ -52,7 +52,7 @@ without a failing build.
 | **The heat pump is live.** Write to it (numbers, switches, selects, `can_send_value`, write frames) only when the maintainer asked for that specific change; read requests are fine. A new automatic write needs the maintainer's approval first | [writes](.wiki/wiki/writes.md) |
 | **"Heizungssteuerung" writes to the heat pump**: change the selection only on the maintainer's request | [heating control](.wiki/wiki/heating-control.md) |
 | **HA history is keyed by the entity `name`**: never rename an entity; template entities are named by id like upstream, readable names only in the German names package (same change); never change the scale of a `total_increasing` sensor, add a new one | [entity names](.wiki/wiki/entity-names.md) |
-| **Shared code stays upstream compatible**: `components/`, `yaml/core.yaml`, `yaml/templates/` keep upstream behaviour by default (new parameters default to the old behaviour); TTF07 C specifics go into `TTF_07_C` sections and `yaml/ttf07_wpm3i.yaml` | `plans/upstream.md` |
+| **Shared code stays upstream compatible**: `components/`, `yaml/core.yaml`, `yaml/templates/` keep upstream behaviour by default (new parameters default to the old behaviour); TTF07 C specifics go into `TTF_07_C` sections and `yaml/ttf07_wpm3i.yaml` | `plans/T002-T009-upstream.md` |
 | **Never push to upstream; never `git push` without asking the maintainer first**, every time; commit only the paths you changed | `workflow.md` |
 | **No attribution trailers**: no `Co-Authored-By:` or other agent/tool lines in commit messages, also when a tool suggests them. The author is the maintainer | `dev/development.md` |
 | **Flashing reboots the ESP**: say when you do it, and check the result | `dev/development.md` |
@@ -84,11 +84,23 @@ without a failing build.
 
 Both are redone after a change that adds, renames or removes entities (`dev/development.md`).
 
-## TODO.md
+## Workflow in this project
 
-`workflow.md` says what belongs in it; `todo-housekeeping` is how to revise it. This project's file is `TODO.md`
-(not `Todo.md`), its inbox is **From the maintainer**, it adds **Planned tests** (runs on the heat pump, removed once
-run and ingested), and groups items by area: Heat pump, Cooling, Firmware, Home Assistant, Upstream.
+`workflow.md` is the same in every project; this section is its detail here, and outranks it.
+
+- **TODO file:** `TODO.md` (workflow.md's `Todo.md`), revised with `/todo-housekeeping`; sessions end with
+  `/close-session`. Its first section is **Incoming items by maintainer**.
+- **Extra sections:** **Planned tests** (runs on the heat pump, removed once run and ingested) between Open decisions
+  and Blockers; **Release** is the upstream PR series (`plans/T002-T009-upstream.md`). Next steps, Blockers and Future
+  work are grouped by area: Heat pump, Cooling, Firmware, Home Assistant, Analytics, Energy management.
+- **Gate:** fast `esphome config`, full `esphome compile` (~10 min, give it a 20 min timeout), both under "Commands";
+  docs-only: links resolve.
+- **Generated files:** "Do not hand-edit" above. No gate catches a hand edit there; the tools redo them.
+- **A decision about the code:** `.wiki/wiki/firmware-history.md`, or `plans/T002-T009-upstream.md` for the series,
+  plus a `decision` entry in `.wiki/wiki/log.md`.
+- **A measured or external fact:** its wiki page under `.wiki/wiki/`, cited, plus `.wiki/wiki/log.md` (the one
+  history file).
+- **A trap in the development loop:** `dev/development.md`.
 
 ## The wiki
 
