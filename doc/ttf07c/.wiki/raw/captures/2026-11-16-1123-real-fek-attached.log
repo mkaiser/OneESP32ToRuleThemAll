@@ -1,0 +1,578 @@
+# 2026-11-16 11:03-11:46 local, firmware on esp-idf. 11:03 boot after OTA, 11:05 emulation registered; 11:23:18 real FEK2 plugged in (detected, emulation stopped, WPM2 accepts the FEK at once); 11:32 panel HK1 menu with FEK; 11:34:57 Raumeinfluss 2->4 on the FEK, later back to 2; ~11:38 FEK unplugged; 11:44 WPM2 releases HK1; 11:45:02 emulation registers again.
+[11:03:01.596][I][app:164]: ESPHome version 2026.10.2 compiled on 2026-11-16 11:01:46 +0100
+[11:03:01.596][W][app:189]: Set flash_chip: generic under esp32 > framework > advanced to save IRAM
+[11:03:30.347] Message from 0x480 (Manager) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property FET_SOFTWARE (0x0199) raw value 391 (0x0187) data D2 00 FA 01 99 01 87
+[11:03:31.152] Message from 0x601 (unknown) Read/Write ID 0x66 0x01 (to 0x301/HK1, system) property TBD_10 (0x00FE) raw value 256 (0x0100) data 66 01 FE 01 00 00 00
+[11:04:00.183] Message from 0x301 (HK1) Read/Write ID 0x66 0x01 (to 0x301/HK1, system) property ANMELDUNG (0x00FD) raw value 2048 (0x0800) data 66 01 FD 08 00 00 00
+[11:04:00.189][I][FEK:082]: Presence check for 0x301 (ANMELDUNG 0x0800), emulation off
+[11:04:00.203] Message from 0x680 (ESPClient) Read/Write ID 0xD6 0x00 (to 0x680/ESPClient, system) property ANMELDUNG (0x00FD) raw value 2048 (0x0800) data D6 00 FD 08 00 00 00
+[11:04:05.193] Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property FEK_TBD_0052 (0x0052) raw value 0 (0x0000) data 60 01 52 00 00 00 00
+[11:04:56.112] Message from 0x301 (HK1) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property VORLAUFSOLLTEMP (0x0004) raw value 225 (0x00E1) data D2 00 FA 00 04 00 E1
+[11:05:02.356] Message from 0x301 (HK1) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property FET_SOFTWARE (0x0199) raw value 391 (0x0187) data D2 00 FA 01 99 01 87
+[11:05:02.362][I][FEK:100]: No FEK installed: HK1 is the WPM2's (software 391)
+[11:05:02.369][I][FEK:428]: Starting the FEK emulation
+[11:05:02.375][I][FEK:455]: Registering as FEK on 0x301
+[11:05:02.380][V][text_sensor:033]: 'Heizungssteuerung aktiv': Received new state FEK Emulation
+[11:05:02.394][V][binary_sensor:041]: 'FEK installiert' >> OFF
+[11:05:02.401][D][FEK:539]: Sending as 0x301: 66 01 FD 09 00 00 00
+[11:05:12.383][D][FEK:539]: Sending as 0x301: 36 00 FE 01 00 00 00
+[11:05:12.412] Message from 0x180 (Kessel) Read/Write ID 0x67 0x01 (to 0x301/HK1, system response) property TBD_10 (0x00FE) raw value 256 (0x0100) data 67 01 FE 01 00 00 00
+[11:05:12.438][D][FEK:539]: Sending as 0x301: C6 01 FE 01 00 00 00
+[11:05:12.468] Message from 0x601 (unknown) Read/Write ID 0x67 0x01 (to 0x301/HK1, system response) property TBD_10 (0x00FE) raw value 256 (0x0100) data 67 01 FE 01 00 00 00
+[11:05:13.382][I][FEK:481]: Sending flow setpoint 24.4 °C (outdoor 9.0 °C, room 20.5 °C)
+[11:05:13.413][D][FEK:539]: Sending as 0x301: 30 00 02 00 F4 00 00
+[11:05:13.443][D][FEK:539]: Sending as 0x301: 30 00 58 02 00 00 00
+[11:05:13.474][D][FEK:539]: Sending as 0x301: 30 00 6E 01 00 00 00
+[11:05:14.207] Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property UNKNOWN (0x0010) raw value 2 (0x0002) data 60 01 10 00 02 00 00
+[11:05:14.207] Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property UNKNOWN (0x000F) raw value 65136 (0xFE70) data 60 01 0F FE 70 00 00
+[11:05:14.207] Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property VORLAUFSOLLTEMP (0x0004) raw value 65136 (0xFE70) data 60 01 04 FE 70 00 00
+[11:05:14.208] Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property FEK_TBD_0052 (0x0052) raw value 0 (0x0000) data 60 01 52 00 00 00 00
+[11:05:14.213] Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property UNKNOWN (0x0056) raw value 0 (0x0000) data 60 01 56 00 00 00 00
+[11:05:14.213] Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property UNKNOWN (0x0057) raw value 0 (0x0000) data 60 01 57 00 00 00 00
+[11:05:14.213] Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property UNKNOWN (0x0028) raw value 300 (0x012C) data 60 01 28 01 2C 00 00
+[11:05:14.258] Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property UNKNOWN (0x005A) raw value 512 (0x0200) data 60 01 5A 02 00 00 00
+[11:05:15.417][D][FEK:539]: Sending as 0x301: C0 01 58 02 00 00 00
+[11:05:15.448][D][FEK:539]: Sending as 0x301: C0 01 29 0A 00 00 00
+[11:05:15.478][D][FEK:539]: Sending as 0x301: C0 01 2A 1E 00 00 00
+[11:05:15.508][D][FEK:539]: Sending as 0x301: C0 01 FA 01 0F 02 00
+[11:05:15.537][D][FEK:539]: Sending as 0x301: C0 01 12 00 D2 00 00
+[11:05:15.568][D][FEK:539]: Sending as 0x301: C0 01 11 00 CD 00 00
+[11:05:15.605][D][FEK:539]: Sending as 0x301: C0 01 75 02 0F 00 00
+[11:05:23.433][D][FEK:539]: Sending as 0x301: C0 01 04 00 F4 00 00
+[11:05:24.868] Request (dropped) from 0x100 (Bedienteil) Read/Write ID 0x61 0x01 (to 0x301/HK1, read) property FET_SOFTWARE (0x0199) raw value 0 (0x0000) data 61 01 FA 01 99 00 00
+[11:05:24.874][D][FEK:192]: Read of 0x0199 from 0x100: answered 416
+[11:05:24.954][D][FEK:539]: Sending as 0x301: 22 00 FA 01 99 01 A0
+[11:05:54.386][I][FEK:481]: Sending flow setpoint 24.4 °C (outdoor 8.9 °C, room 20.5 °C)
+[11:05:54.438][D][FEK:539]: Sending as 0x301: 30 00 02 00 F4 00 00
+[11:05:54.446][D][FEK:539]: Sending as 0x301: 30 00 58 02 00 00 00
+[11:05:54.463][D][FEK:539]: Sending as 0x301: 30 00 6E 01 00 00 00
+[11:05:55.479][D][FEK:539]: Sending as 0x301: C0 01 11 00 CD 00 00
+[11:05:55.507][D][FEK:539]: Sending as 0x301: C0 01 75 02 0F 00 00
+[11:05:56.432][D][FEK:539]: Sending as 0x301: C0 01 58 02 00 00 00
+[11:05:56.461][D][FEK:539]: Sending as 0x301: C0 01 29 0A 00 00 00
+[11:05:56.493][D][FEK:539]: Sending as 0x301: C0 01 2A 1E 00 00 00
+[11:05:56.521][D][FEK:539]: Sending as 0x301: C0 01 FA 01 0F 02 00
+[11:05:56.558][D][FEK:539]: Sending as 0x301: C0 01 12 00 D2 00 00
+[11:06:04.429][D][FEK:539]: Sending as 0x301: C0 01 04 00 F4 00 00
+[11:06:55.486][D][FEK:539]: Sending as 0x301: C0 01 11 00 CE 00 00
+[11:06:55.512][D][FEK:539]: Sending as 0x301: C0 01 75 02 0F 00 00
+[11:07:55.484][D][FEK:539]: Sending as 0x301: C0 01 11 00 CE 00 00
+[11:07:55.514][D][FEK:539]: Sending as 0x301: C0 01 75 02 0F 00 00
+[11:08:54.386][I][FEK:481]: Sending flow setpoint 24.3 °C (outdoor 8.9 °C, room 20.5 °C)
+[11:08:54.437][D][FEK:539]: Sending as 0x301: 30 00 02 00 F3 00 00
+[11:08:54.449][D][FEK:539]: Sending as 0x301: 30 00 58 02 00 00 00
+[11:08:54.480][D][FEK:539]: Sending as 0x301: 30 00 6E 01 00 00 00
+[11:08:55.483][D][FEK:539]: Sending as 0x301: C0 01 11 00 CE 00 00
+[11:08:55.511][D][FEK:539]: Sending as 0x301: C0 01 75 02 0F 00 00
+[11:08:56.455][D][FEK:539]: Sending as 0x301: C0 01 58 02 00 00 00
+[11:08:56.487][D][FEK:539]: Sending as 0x301: C0 01 29 0A 00 00 00
+[11:08:56.540][D][FEK:539]: Sending as 0x301: C0 01 2A 1E 00 00 00
+[11:08:56.571][D][FEK:539]: Sending as 0x301: C0 01 FA 01 0F 02 00
+[11:08:56.601][D][FEK:539]: Sending as 0x301: C0 01 12 00 D2 00 00
+[11:09:04.432][D][FEK:539]: Sending as 0x301: C0 01 04 00 F3 00 00
+[11:09:55.231][D][FEK:539]: Sending as 0x301: 36 00 FE 01 00 00 00
+[11:09:55.266] Message from 0x180 (Kessel) Read/Write ID 0x67 0x01 (to 0x301/HK1, system response) property TBD_10 (0x00FE) raw value 256 (0x0100) data 67 01 FE 01 00 00 00
+[11:09:55.320][D][FEK:539]: Sending as 0x301: C6 01 FE 01 00 00 00
+[11:09:55.335] Message from 0x601 (unknown) Read/Write ID 0x67 0x01 (to 0x301/HK1, system response) property TBD_10 (0x00FE) raw value 256 (0x0100) data 67 01 FE 01 00 00 00
+[11:09:55.561][D][FEK:539]: Sending as 0x301: C0 01 11 00 CE 00 00
+[11:09:55.573][D][FEK:539]: Sending as 0x301: C0 01 75 02 14 00 00
+[11:09:57.218] Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property UNKNOWN (0x0010) raw value 2 (0x0002) data 60 01 10 00 02 00 00
+[11:09:57.237] Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property UNKNOWN (0x000F) raw value 65136 (0xFE70) data 60 01 0F FE 70 00 00
+[11:09:57.256] Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property VORLAUFSOLLTEMP (0x0004) raw value 65136 (0xFE70) data 60 01 04 FE 70 00 00
+[11:09:57.277] Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property FEK_TBD_0052 (0x0052) raw value 0 (0x0000) data 60 01 52 00 00 00 00
+[11:09:57.291] Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property UNKNOWN (0x0056) raw value 0 (0x0000) data 60 01 56 00 00 00 00
+[11:09:57.313] Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property UNKNOWN (0x0057) raw value 0 (0x0000) data 60 01 57 00 00 00 00
+[11:09:57.332] Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property UNKNOWN (0x0028) raw value 300 (0x012C) data 60 01 28 01 2C 00 00
+[11:09:59.489] Message from 0x601 (unknown) Read/Write ID 0x66 0x01 (to 0x301/HK1, system) property TBD_10 (0x00FE) raw value 256 (0x0100) data 66 01 FE 01 00 00 00
+[11:09:59.610][D][FEK:539]: Sending as 0x301: C7 01 FE 01 00 00 00
+[11:09:59.616][D][FEK:539]: Sending as 0x301: 37 00 FE 01 00 00 00
+[11:10:01.245] Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property UNKNOWN (0x0010) raw value 2 (0x0002) data 60 01 10 00 02 00 00
+[11:10:01.265] Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property UNKNOWN (0x000F) raw value 65136 (0xFE70) data 60 01 0F FE 70 00 00
+[11:10:01.287] Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property VORLAUFSOLLTEMP (0x0004) raw value 65136 (0xFE70) data 60 01 04 FE 70 00 00
+[11:10:01.293] Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property FEK_TBD_0052 (0x0052) raw value 0 (0x0000) data 60 01 52 00 00 00 00
+[11:10:01.314] Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property UNKNOWN (0x0057) raw value 0 (0x0000) data 60 01 57 00 00 00 00
+[11:10:34.686] Request (dropped) from 0x100 (Bedienteil) Read/Write ID 0x31 0x00 (to 0x180/Kessel, read) property FET_SOFTWARESTAND (0x019A) raw value 0 (0x0000) data 31 00 FA 01 9A 00 00
+[11:10:34.712] Message from 0x180 (Kessel) Read/Write ID 0x22 0x00 (to 0x100/Bedienteil, response) property FET_SOFTWARESTAND (0x019A) raw value 10 (0x000A) data 22 00 FA 01 9A 00 0A
+[11:10:55.479][D][FEK:539]: Sending as 0x301: C0 01 11 00 CE 00 00
+[11:10:55.533][D][FEK:539]: Sending as 0x301: C0 01 75 02 14 00 00
+[11:11:19.231][W][api.connection:2822]: ESPHome Logs 2026.10.2 (192.168.178.125): Reading failed CONNECTION_CLOSED errno=128
+[11:11:54.382][I][FEK:481]: Sending flow setpoint 24.3 °C (outdoor 8.9 °C, room 20.5 °C)
+[11:11:54.402][D][FEK:539]: Sending as 0x301: 30 00 02 00 F3 00 00
+[11:11:54.431][D][FEK:539]: Sending as 0x301: 30 00 58 02 00 00 00
+[11:11:54.462][D][FEK:539]: Sending as 0x301: 30 00 6E 01 00 00 00
+[11:11:55.485][D][FEK:539]: Sending as 0x301: C0 01 11 00 CE 00 00
+[11:11:55.513][D][FEK:539]: Sending as 0x301: C0 01 75 02 14 00 00
+[11:11:56.415][D][FEK:539]: Sending as 0x301: C0 01 58 02 00 00 00
+[11:11:56.466][D][FEK:539]: Sending as 0x301: C0 01 29 0A 00 00 00
+[11:11:56.474][D][FEK:539]: Sending as 0x301: C0 01 2A 1E 00 00 00
+[11:11:56.503][D][FEK:539]: Sending as 0x301: C0 01 FA 01 0F 02 00
+[11:11:56.534][D][FEK:539]: Sending as 0x301: C0 01 12 00 D2 00 00
+[11:12:00.137] Message from 0x301 (HK1) Read/Write ID 0x66 0x01 (to 0x301/HK1, system) property ANMELDUNG (0x00FD) raw value 2048 (0x0800) data 66 01 FD 08 00 00 00
+[11:12:00.141][I][FEK:082]: Presence check for 0x301 (ANMELDUNG 0x0800), emulation registered
+[11:12:00.149] Message from 0x680 (ESPClient) Read/Write ID 0xD6 0x00 (to 0x680/ESPClient, system) property ANMELDUNG (0x00FD) raw value 2048 (0x0800) data D6 00 FD 08 00 00 00
+[11:12:00.157][D][FEK:539]: Sending as 0x301: 67 01 FD 01 00 00 00
+[11:12:04.414][D][FEK:539]: Sending as 0x301: C0 01 04 00 F3 00 00
+[11:12:55.483][D][FEK:539]: Sending as 0x301: C0 01 11 00 CE 00 00
+[11:12:55.562][D][FEK:539]: Sending as 0x301: C0 01 75 02 14 00 00
+[11:13:55.502][D][FEK:539]: Sending as 0x301: C0 01 11 00 CF 00 00
+[11:13:55.530][D][FEK:539]: Sending as 0x301: C0 01 75 02 14 00 00
+[11:14:54.382][I][FEK:481]: Sending flow setpoint 24.3 °C (outdoor 8.9 °C, room 20.6 °C)
+[11:14:54.401][D][FEK:539]: Sending as 0x301: 30 00 02 00 F3 00 00
+[11:14:54.431][D][FEK:539]: Sending as 0x301: 30 00 58 02 00 00 00
+[11:14:54.461][D][FEK:539]: Sending as 0x301: 30 00 6E 01 00 00 00
+[11:14:55.482][D][FEK:539]: Sending as 0x301: C0 01 11 00 CF 00 00
+[11:14:55.512][D][FEK:539]: Sending as 0x301: C0 01 75 02 14 00 00
+[11:14:56.414][D][FEK:539]: Sending as 0x301: C0 01 58 02 00 00 00
+[11:14:56.443][D][FEK:539]: Sending as 0x301: C0 01 29 0A 00 00 00
+[11:14:56.473][D][FEK:539]: Sending as 0x301: C0 01 2A 1E 00 00 00
+[11:14:56.503][D][FEK:539]: Sending as 0x301: C0 01 FA 01 0F 02 00
+[11:14:56.533][D][FEK:539]: Sending as 0x301: C0 01 12 00 D2 00 00
+[11:15:04.415][D][FEK:539]: Sending as 0x301: C0 01 04 00 F3 00 00
+[11:15:55.492][D][FEK:539]: Sending as 0x301: C0 01 11 00 CF 00 00
+[11:15:55.522][D][FEK:539]: Sending as 0x301: C0 01 75 02 14 00 00
+[11:16:55.239][D][FEK:539]: Sending as 0x301: 36 00 FE 01 00 00 00
+[11:16:55.267] Message from 0x180 (Kessel) Read/Write ID 0x67 0x01 (to 0x301/HK1, system response) property TBD_10 (0x00FE) raw value 256 (0x0100) data 67 01 FE 01 00 00 00
+[11:16:55.279][D][FEK:539]: Sending as 0x301: C6 01 FE 01 00 00 00
+[11:16:55.314] Message from 0x601 (unknown) Read/Write ID 0x67 0x01 (to 0x301/HK1, system response) property TBD_10 (0x00FE) raw value 256 (0x0100) data 67 01 FE 01 00 00 00
+[11:16:55.488][D][FEK:539]: Sending as 0x301: C0 01 11 00 CF 00 00
+[11:16:55.518][D][FEK:539]: Sending as 0x301: C0 01 75 02 14 00 00
+[11:16:57.132] Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property UNKNOWN (0x0010) raw value 2 (0x0002) data 60 01 10 00 02 00 00
+[11:16:57.144] Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property UNKNOWN (0x000F) raw value 65136 (0xFE70) data 60 01 0F FE 70 00 00
+[11:16:57.159] Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property VORLAUFSOLLTEMP (0x0004) raw value 65136 (0xFE70) data 60 01 04 FE 70 00 00
+[11:16:57.170] Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property FEK_TBD_0052 (0x0052) raw value 0 (0x0000) data 60 01 52 00 00 00 00
+[11:16:57.222] Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property UNKNOWN (0x0056) raw value 0 (0x0000) data 60 01 56 00 00 00 00
+[11:16:57.222] Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property UNKNOWN (0x0057) raw value 0 (0x0000) data 60 01 57 00 00 00 00
+[11:16:57.222] Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property UNKNOWN (0x0028) raw value 300 (0x012C) data 60 01 28 01 2C 00 00
+[11:16:57.222] Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property UNKNOWN (0x005A) raw value 512 (0x0200) data 60 01 5A 02 00 00 00
+[11:16:59.525] Message from 0x601 (unknown) Read/Write ID 0x66 0x01 (to 0x301/HK1, system) property TBD_10 (0x00FE) raw value 256 (0x0100) data 66 01 FE 01 00 00 00
+[11:16:59.573][D][FEK:539]: Sending as 0x301: C7 01 FE 01 00 00 00
+[11:16:59.603][D][FEK:539]: Sending as 0x301: 37 00 FE 01 00 00 00
+[11:17:02.215] Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property UNKNOWN (0x0010) raw value 2 (0x0002) data 60 01 10 00 02 00 00
+[11:17:02.220] Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property UNKNOWN (0x000F) raw value 65136 (0xFE70) data 60 01 0F FE 70 00 00
+[11:17:02.229] Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property VORLAUFSOLLTEMP (0x0004) raw value 65136 (0xFE70) data 60 01 04 FE 70 00 00
+[11:17:02.239] Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property FEK_TBD_0052 (0x0052) raw value 0 (0x0000) data 60 01 52 00 00 00 00
+[11:17:02.243] Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property UNKNOWN (0x0056) raw value 0 (0x0000) data 60 01 56 00 00 00 00
+[11:17:02.249] Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property UNKNOWN (0x0057) raw value 0 (0x0000) data 60 01 57 00 00 00 00
+[11:17:02.259] Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property UNKNOWN (0x0028) raw value 300 (0x012C) data 60 01 28 01 2C 00 00
+[11:17:02.277] Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property UNKNOWN (0x005A) raw value 512 (0x0200) data 60 01 5A 02 00 00 00
+[11:17:54.381][I][FEK:481]: Sending flow setpoint 24.2 °C (outdoor 9.1 °C, room 20.6 °C)
+[11:17:54.400][D][FEK:539]: Sending as 0x301: 30 00 02 00 F2 00 00
+[11:17:54.426][D][FEK:539]: Sending as 0x301: 30 00 58 02 00 00 00
+[11:17:54.457][D][FEK:539]: Sending as 0x301: 30 00 6E 01 00 00 00
+[11:17:55.481][D][FEK:539]: Sending as 0x301: C0 01 11 00 CF 00 00
+[11:17:55.512][D][FEK:539]: Sending as 0x301: C0 01 75 02 14 00 00
+[11:17:56.426][D][FEK:539]: Sending as 0x301: C0 01 58 02 00 00 00
+[11:17:56.457][D][FEK:539]: Sending as 0x301: C0 01 29 0A 00 00 00
+[11:17:56.489][D][FEK:539]: Sending as 0x301: C0 01 2A 1E 00 00 00
+[11:17:56.516][D][FEK:539]: Sending as 0x301: C0 01 FA 01 0F 02 00
+[11:17:56.550][D][FEK:539]: Sending as 0x301: C0 01 12 00 D2 00 00
+[11:17:59.200][W][component:419]: interval took a long time for an operation (69 ms), max is 50 ms
+[11:18:04.428][D][FEK:539]: Sending as 0x301: C0 01 04 00 F3 00 00
+[11:18:55.478][D][FEK:539]: Sending as 0x301: C0 01 11 00 CF 00 00
+[11:18:55.508][D][FEK:539]: Sending as 0x301: C0 01 75 02 14 00 00
+[11:19:55.478][D][FEK:539]: Sending as 0x301: C0 01 11 00 CF 00 00
+[11:19:55.505][D][FEK:539]: Sending as 0x301: C0 01 75 02 14 00 00
+[11:20:00.180] Message from 0x301 (HK1) Read/Write ID 0x66 0x01 (to 0x301/HK1, system) property ANMELDUNG (0x00FD) raw value 2048 (0x0800) data 66 01 FD 08 00 00 00
+[11:20:00.184][I][FEK:082]: Presence check for 0x301 (ANMELDUNG 0x0800), emulation registered
+[11:20:00.192] Message from 0x680 (ESPClient) Read/Write ID 0xD6 0x00 (to 0x680/ESPClient, system) property ANMELDUNG (0x00FD) raw value 2048 (0x0800) data D6 00 FD 08 00 00 00
+[11:20:00.199][D][FEK:539]: Sending as 0x301: 67 01 FD 01 00 00 00
+[11:20:35.352] Request (dropped) from 0x100 (Bedienteil) Read/Write ID 0x31 0x00 (to 0x180/Kessel, read) property FET_SOFTWARESTAND (0x019A) raw value 0 (0x0000) data 31 00 FA 01 9A 00 00
+[11:20:35.360] Message from 0x180 (Kessel) Read/Write ID 0x22 0x00 (to 0x100/Bedienteil, response) property FET_SOFTWARESTAND (0x019A) raw value 10 (0x000A) data 22 00 FA 01 9A 00 0A
+[11:20:54.380][I][FEK:481]: Sending flow setpoint 24.2 °C (outdoor 9.1 °C, room 20.6 °C)
+[11:20:54.398][D][FEK:539]: Sending as 0x301: 30 00 02 00 F2 00 00
+[11:20:54.424][D][FEK:539]: Sending as 0x301: 30 00 58 02 00 00 00
+[11:20:54.455][D][FEK:539]: Sending as 0x301: 30 00 6E 01 00 00 00
+[11:20:55.493][D][FEK:539]: Sending as 0x301: C0 01 11 00 CF 00 00
+[11:20:55.523][D][FEK:539]: Sending as 0x301: C0 01 75 02 14 00 00
+[11:20:56.395][D][FEK:539]: Sending as 0x301: C0 01 58 02 00 00 00
+[11:20:56.425][D][FEK:539]: Sending as 0x301: C0 01 29 0A 00 00 00
+[11:20:56.455][D][FEK:539]: Sending as 0x301: C0 01 2A 1E 00 00 00
+[11:20:56.485][D][FEK:539]: Sending as 0x301: C0 01 FA 01 0F 02 00
+[11:20:56.515][D][FEK:539]: Sending as 0x301: C0 01 12 00 D2 00 00
+[11:21:04.407][D][FEK:539]: Sending as 0x301: C0 01 04 00 F2 00 00
+[11:21:55.492][D][FEK:539]: Sending as 0x301: C0 01 11 00 CF 00 00
+[11:21:55.520][D][FEK:539]: Sending as 0x301: C0 01 75 02 14 00 00
+[11:22:55.477][D][FEK:539]: Sending as 0x301: C0 01 11 00 CF 00 00
+[11:22:55.507][D][FEK:539]: Sending as 0x301: C0 01 75 02 14 00 00
+[11:23:18.271] Message from 0x301 (HK1) Read/Write ID 0x66 0x01 (to 0x301/HK1, system) property ANMELDUNG (0x00FD) raw value 2304 (0x0900) data 66 01 FD 09 00 00 00
+[11:23:18.274][I][FEK:082]: Presence check for 0x301 (ANMELDUNG 0x0900), emulation registered
+[11:23:18.278][W][FEK:1015]: Real FEK detected (registration): it controls heating, HK1 settings locked
+[11:23:18.281][E][FEK:1018]: Real FEK detected while emulating: stopping the emulation
+[11:23:27.429][V][text_sensor:033]: 'Heizungssteuerung aktiv': Received new state FEK installiert
+[11:23:27.435][V][binary_sensor:041]: 'FEK installiert' >> ON
+[11:23:28.247] Message from 0x301 (HK1) Read/Write ID 0x36 0x00 (to 0x180/Kessel, system) property TBD_10 (0x00FE) raw value 256 (0x0100) data 36 00 FE 01 00 00 00
+[11:23:28.249] Message from 0x180 (Kessel) Read/Write ID 0x67 0x01 (to 0x301/HK1, system response) property TBD_10 (0x00FE) raw value 256 (0x0100) data 67 01 FE 01 00 00 00
+[11:23:28.259] Message from 0x301 (HK1) Read/Write ID 0xC6 0x01 (to 0x601/unknown, system) property TBD_10 (0x00FE) raw value 256 (0x0100) data C6 01 FE 01 00 00 00
+[11:23:28.267] Request (dropped) from 0x301 (HK1) Read/Write ID 0x31 0x00 (to 0x180/Kessel, read) property JAHR (0x0124) raw value 0 (0x0000) data 31 00 FA 01 24 00 00
+[11:23:28.274] Request (dropped) from 0x301 (HK1) Read/Write ID 0x31 0x00 (to 0x180/Kessel, read) property MONAT (0x0123) raw value 0 (0x0000) data 31 00 FA 01 23 00 00
+[11:23:28.282] Request (dropped) from 0x301 (HK1) Read/Write ID 0x31 0x00 (to 0x180/Kessel, read) property TAG (0x0122) raw value 0 (0x0000) data 31 00 FA 01 22 00 00
+[11:23:28.295] Request (dropped) from 0x301 (HK1) Read/Write ID 0x31 0x00 (to 0x180/Kessel, read) property UNKNOWN (0x0009) raw value 0 (0x0000) data 31 00 09 00 00 00 00
+[11:23:28.296] Message from 0x601 (unknown) Read/Write ID 0x67 0x01 (to 0x301/HK1, system response) property TBD_10 (0x00FE) raw value 256 (0x0100) data 67 01 FE 01 00 00 00
+[11:23:28.307] Message from 0x180 (Kessel) Read/Write ID 0x62 0x01 (to 0x301/HK1, response) property JAHR (0x0124) raw value 6656 (0x1A00) data 62 01 FA 01 24 1A 00
+[11:23:28.316] Request (dropped) from 0x301 (HK1) Read/Write ID 0x31 0x00 (to 0x180/Kessel, read) property AUSSENTEMP (0x000C) raw value 0 (0x0000) data 31 00 0C 00 00 00 00
+[11:23:28.326] Message from 0x180 (Kessel) Read/Write ID 0x62 0x01 (to 0x301/HK1, response) property MONAT (0x0123) raw value 2816 (0x0B00) data 62 01 FA 01 23 0B 00
+[11:23:28.336] Message from 0x180 (Kessel) Read/Write ID 0x62 0x01 (to 0x301/HK1, response) property TAG (0x0122) raw value 4096 (0x1000) data 62 01 FA 01 22 10 00
+[11:23:28.344] Request (dropped) from 0x301 (HK1) Read/Write ID 0x31 0x00 (to 0x180/Kessel, read) property UNKNOWN (0x000B) raw value 0 (0x0000) data 31 00 0B 00 00 00 00
+[11:23:28.386] Message from 0x180 (Kessel) Read/Write ID 0x62 0x01 (to 0x301/HK1, response) property UNKNOWN (0x0009) raw value 5899 (0x170B) data 62 01 09 17 0B 00 00
+[11:23:28.386] Message from 0x180 (Kessel) Read/Write ID 0x62 0x01 (to 0x301/HK1, response) property AUSSENTEMP (0x000C) raw value 92 (0x005C) data 62 01 0C 00 5C 00 00
+[11:23:28.390] Message from 0x180 (Kessel) Read/Write ID 0x62 0x01 (to 0x301/HK1, response) property UNKNOWN (0x000B) raw value 32768 (0x8000) data 62 01 0B 80 00 00 00
+[11:23:29.236] Message from 0x301 (HK1) Read/Write ID 0x30 0x00 (to 0x180/Kessel, write) property UNKNOWN (0x0002) raw value 247 (0x00F7) data 30 00 02 00 F7 00 00
+[11:23:29.248] Message from 0x301 (HK1) Read/Write ID 0x30 0x00 (to 0x180/Kessel, write) property UNKNOWN (0x0058) raw value 512 (0x0200) data 30 00 58 02 00 00 00
+[11:23:29.276] Message from 0x301 (HK1) Read/Write ID 0x30 0x00 (to 0x180/Kessel, write) property UNKNOWN (0x006E) raw value 512 (0x0200) data 30 00 6E 02 00 00 00
+[11:23:30.140] Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property UNKNOWN (0x0010) raw value 2 (0x0002) data 60 01 10 00 02 00 00
+[11:23:30.151] Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property UNKNOWN (0x000F) raw value 65136 (0xFE70) data 60 01 0F FE 70 00 00
+[11:23:30.166] Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property VORLAUFSOLLTEMP (0x0004) raw value 65136 (0xFE70) data 60 01 04 FE 70 00 00
+[11:23:30.175] Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property FEK_TBD_0052 (0x0052) raw value 0 (0x0000) data 60 01 52 00 00 00 00
+[11:23:30.187] Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property UNKNOWN (0x0056) raw value 0 (0x0000) data 60 01 56 00 00 00 00
+[11:23:30.198] Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property UNKNOWN (0x0057) raw value 0 (0x0000) data 60 01 57 00 00 00 00
+[11:23:30.209] Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property UNKNOWN (0x0028) raw value 300 (0x012C) data 60 01 28 01 2C 00 00
+[11:23:30.221] Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property UNKNOWN (0x005A) raw value 512 (0x0200) data 60 01 5A 02 00 00 00
+[11:23:31.230] Message from 0x301 (HK1) Read/Write ID 0xC0 0x01 (to 0x601/unknown, write) property UNKNOWN (0x0058) raw value 512 (0x0200) data C0 01 58 02 00 00 00
+[11:23:31.241] Message from 0x301 (HK1) Read/Write ID 0xC0 0x01 (to 0x601/unknown, write) property UNKNOWN (0x0029) raw value 2560 (0x0A00) data C0 01 29 0A 00 00 00
+[11:23:31.252] Message from 0x301 (HK1) Read/Write ID 0xC0 0x01 (to 0x601/unknown, write) property UNKNOWN (0x002A) raw value 7680 (0x1E00) data C0 01 2A 1E 00 00 00
+[11:23:31.268] Message from 0x301 (HK1) Read/Write ID 0xC0 0x01 (to 0x601/unknown, write) property RAUMEINFLUSS (0x010F) raw value 512 (0x0200) data C0 01 FA 01 0F 02 00
+[11:23:31.275] Message from 0x301 (HK1) Read/Write ID 0xC0 0x01 (to 0x601/unknown, write) property VERSTELLTE_RAUMSOLLTEMP (0x0012) raw value 210 (0x00D2) data C0 01 12 00 D2 00 00
+[11:23:31.294] Request (dropped) from 0x301 (HK1) Read/Write ID 0xC1 0x01 (to 0x601/unknown, read) property RAUMISTTEMP (0x0011) raw value 0 (0x0000) data C1 01 11 00 00 00 00
+[11:23:31.296] Request (dropped) from 0x301 (HK1) Read/Write ID 0xC1 0x01 (to 0x601/unknown, read) property VERSTELLTE_RAUMSOLLTEMP (0x0012) raw value 0 (0x0000) data C1 01 12 00 00 00 00
+[11:23:31.301] Request (dropped) from 0x301 (HK1) Read/Write ID 0xC1 0x01 (to 0x601/unknown, read) property UNKNOWN (0x000F) raw value 0 (0x0000) data C1 01 0F 00 00 00 00
+[11:23:31.309] Request (dropped) from 0x301 (HK1) Read/Write ID 0xC1 0x01 (to 0x601/unknown, read) property VORLAUFSOLLTEMP (0x0004) raw value 0 (0x0000) data C1 01 04 00 00 00 00
+[11:23:31.319] Message from 0x301 (HK1) Read/Write ID 0x30 0x00 (to 0x180/Kessel, write) property UNKNOWN (0x0002) raw value 247 (0x00F7) data 30 00 02 00 F7 00 00
+[11:23:31.329] Message from 0x601 (unknown) Read/Write ID 0x62 0x01 (to 0x301/HK1, response) property RAUMISTTEMP (0x0011) raw value 65136 (0xFE70) data 62 01 11 FE 70 00 00
+[11:23:31.341] Message from 0x601 (unknown) Read/Write ID 0x62 0x01 (to 0x301/HK1, response) property VERSTELLTE_RAUMSOLLTEMP (0x0012) raw value 65136 (0xFE70) data 62 01 12 FE 70 00 00
+[11:23:31.350] Message from 0x601 (unknown) Read/Write ID 0x62 0x01 (to 0x301/HK1, response) property UNKNOWN (0x000F) raw value 65136 (0xFE70) data 62 01 0F FE 70 00 00
+[11:23:31.361] Message from 0x601 (unknown) Read/Write ID 0x62 0x01 (to 0x301/HK1, response) property VORLAUFSOLLTEMP (0x0004) raw value 65136 (0xFE70) data 62 01 04 FE 70 00 00
+[11:23:32.496] Message from 0x301 (HK1) Read/Write ID 0xC0 0x01 (to 0x601/unknown, write) property RAUMISTTEMP (0x0011) raw value 198 (0x00C6) data C0 01 11 00 C6 00 00
+[11:23:32.511] Message from 0x301 (HK1) Read/Write ID 0xC0 0x01 (to 0x601/unknown, write) property RAUMFEUCHTE (0x0075) raw value 586 (0x024A) data C0 01 75 02 4A 00 00
+[11:23:37.503] Message from 0x301 (HK1) Read/Write ID 0xC0 0x01 (to 0x601/unknown, write) property RAUMFEUCHTE (0x0075) raw value 570 (0x023A) data C0 01 75 02 3A 00 00
+[11:23:39.319] Message from 0x301 (HK1) Read/Write ID 0xC0 0x01 (to 0x601/unknown, write) property VORLAUFSOLLTEMP (0x0004) raw value 246 (0x00F6) data C0 01 04 00 F6 00 00
+[11:23:39.334] Message from 0x301 (HK1) Read/Write ID 0xC0 0x01 (to 0x601/unknown, write) property VORLAUFSOLLTEMP (0x0004) raw value 246 (0x00F6) data C0 01 04 00 F6 00 00
+[11:23:48.229] Message from 0x301 (HK1) Read/Write ID 0xC0 0x01 (to 0x601/unknown, write) property RAUMFEUCHTE (0x0075) raw value 556 (0x022C) data C0 01 75 02 2C 00 00
+[11:23:56.095] Message from 0x301 (HK1) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property VORLAUFSOLLTEMP (0x0004) raw value 246 (0x00F6) data D2 00 FA 00 04 00 F6
+[11:23:58.237] Message from 0x301 (HK1) Read/Write ID 0xC0 0x01 (to 0x601/unknown, write) property RAUMFEUCHTE (0x0075) raw value 542 (0x021E) data C0 01 75 02 1E 00 00
+[11:23:59.445] Message from 0x601 (unknown) Read/Write ID 0x66 0x01 (to 0x301/HK1, system) property TBD_10 (0x00FE) raw value 256 (0x0100) data 66 01 FE 01 00 00 00
+[11:24:00.041] Message from 0x301 (HK1) Read/Write ID 0xC7 0x01 (to 0x601/unknown, system response) property TBD_10 (0x00FE) raw value 256 (0x0100) data C7 01 FE 01 00 00 00
+[11:24:00.052] Message from 0x301 (HK1) Read/Write ID 0x37 0x00 (to 0x180/Kessel, system response) property TBD_10 (0x00FE) raw value 256 (0x0100) data 37 00 FE 01 00 00 00
+[11:24:01.029] Message from 0x301 (HK1) Read/Write ID 0x30 0x00 (to 0x180/Kessel, write) property UNKNOWN (0x0002) raw value 246 (0x00F6) data 30 00 02 00 F6 00 00
+[11:24:01.038] Message from 0x301 (HK1) Read/Write ID 0x30 0x00 (to 0x180/Kessel, write) property UNKNOWN (0x0058) raw value 512 (0x0200) data 30 00 58 02 00 00 00
+[11:24:01.050] Message from 0x301 (HK1) Read/Write ID 0x30 0x00 (to 0x180/Kessel, write) property UNKNOWN (0x006E) raw value 512 (0x0200) data 30 00 6E 02 00 00 00
+[11:24:01.165] Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property UNKNOWN (0x0010) raw value 2 (0x0002) data 60 01 10 00 02 00 00
+[11:24:01.177] Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property UNKNOWN (0x000F) raw value 65136 (0xFE70) data 60 01 0F FE 70 00 00
+[11:24:01.193] Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property VORLAUFSOLLTEMP (0x0004) raw value 65136 (0xFE70) data 60 01 04 FE 70 00 00
+[11:24:01.200] Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property FEK_TBD_0052 (0x0052) raw value 0 (0x0000) data 60 01 52 00 00 00 00
+[11:24:01.212] Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property UNKNOWN (0x0056) raw value 0 (0x0000) data 60 01 56 00 00 00 00
+[11:24:01.223] Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property UNKNOWN (0x0057) raw value 0 (0x0000) data 60 01 57 00 00 00 00
+[11:24:01.235] Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property UNKNOWN (0x0028) raw value 300 (0x012C) data 60 01 28 01 2C 00 00
+[11:24:01.247] Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property UNKNOWN (0x005A) raw value 512 (0x0200) data 60 01 5A 02 00 00 00
+[11:24:03.041] Message from 0x301 (HK1) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property FET_SOFTWARE (0x0199) raw value 416 (0x01A0) data D2 00 FA 01 99 01 A0
+[11:24:03.050] Message from 0x301 (HK1) Read/Write ID 0xC0 0x01 (to 0x601/unknown, write) property UNKNOWN (0x0058) raw value 512 (0x0200) data C0 01 58 02 00 00 00
+[11:24:03.062] Message from 0x301 (HK1) Read/Write ID 0xC0 0x01 (to 0x601/unknown, write) property UNKNOWN (0x0029) raw value 2560 (0x0A00) data C0 01 29 0A 00 00 00
+[11:24:03.073] Message from 0x301 (HK1) Read/Write ID 0xC0 0x01 (to 0x601/unknown, write) property UNKNOWN (0x002A) raw value 7680 (0x1E00) data C0 01 2A 1E 00 00 00
+[11:24:03.085] Message from 0x301 (HK1) Read/Write ID 0xC0 0x01 (to 0x601/unknown, write) property RAUMEINFLUSS (0x010F) raw value 512 (0x0200) data C0 01 FA 01 0F 02 00
+[11:24:03.094] Message from 0x301 (HK1) Read/Write ID 0xC0 0x01 (to 0x601/unknown, write) property VERSTELLTE_RAUMSOLLTEMP (0x0012) raw value 210 (0x00D2) data C0 01 12 00 D2 00 00
+[11:24:03.105] Request (dropped) from 0x301 (HK1) Read/Write ID 0xC1 0x01 (to 0x601/unknown, read) property RAUMISTTEMP (0x0011) raw value 0 (0x0000) data C1 01 11 00 00 00 00
+[11:24:03.116] Request (dropped) from 0x301 (HK1) Read/Write ID 0xC1 0x01 (to 0x601/unknown, read) property VERSTELLTE_RAUMSOLLTEMP (0x0012) raw value 0 (0x0000) data C1 01 12 00 00 00 00
+[11:24:03.120] Message from 0x601 (unknown) Read/Write ID 0x62 0x01 (to 0x301/HK1, response) property RAUMISTTEMP (0x0011) raw value 65136 (0xFE70) data 62 01 11 FE 70 00 00
+[11:24:03.132] Message from 0x601 (unknown) Read/Write ID 0x62 0x01 (to 0x301/HK1, response) property VERSTELLTE_RAUMSOLLTEMP (0x0012) raw value 65136 (0xFE70) data 62 01 12 FE 70 00 00
+[11:24:03.144] Message from 0x601 (unknown) Read/Write ID 0x62 0x01 (to 0x301/HK1, response) property UNKNOWN (0x000F) raw value 65136 (0xFE70) data 62 01 0F FE 70 00 00
+[11:24:03.156] Message from 0x601 (unknown) Read/Write ID 0x62 0x01 (to 0x301/HK1, response) property VORLAUFSOLLTEMP (0x0004) raw value 65136 (0xFE70) data 62 01 04 FE 70 00 00
+[11:24:04.237] Message from 0x301 (HK1) Read/Write ID 0xC0 0x01 (to 0x601/unknown, write) property RAUMISTTEMP (0x0011) raw value 199 (0x00C7) data C0 01 11 00 C7 00 00
+[11:24:04.253] Message from 0x301 (HK1) Read/Write ID 0xC0 0x01 (to 0x601/unknown, write) property RAUMFEUCHTE (0x0075) raw value 541 (0x021D) data C0 01 75 02 1D 00 00
+[11:24:11.043] Message from 0x301 (HK1) Read/Write ID 0xC0 0x01 (to 0x601/unknown, write) property VORLAUFSOLLTEMP (0x0004) raw value 246 (0x00F6) data C0 01 04 00 F6 00 00
+[11:24:18.439] Message from 0x301 (HK1) Read/Write ID 0xC0 0x01 (to 0x601/unknown, write) property RAUMISTTEMP (0x0011) raw value 199 (0x00C7) data C0 01 11 00 C7 00 00
+[11:24:19.290] Message from 0x301 (HK1) Read/Write ID 0xC0 0x01 (to 0x601/unknown, write) property RAUMFEUCHTE (0x0075) raw value 539 (0x021B) data C0 01 75 02 1B 00 00
+[11:24:38.279] Message from 0x301 (HK1) Read/Write ID 0xC0 0x01 (to 0x601/unknown, write) property RAUMFEUCHTE (0x0075) raw value 533 (0x0215) data C0 01 75 02 15 00 00
+[11:24:56.104] Message from 0x301 (HK1) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property VORLAUFSOLLTEMP (0x0004) raw value 245 (0x00F5) data D2 00 FA 00 04 00 F5
+[11:25:03.072] Message from 0x301 (HK1) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property FET_SOFTWARE (0x0199) raw value 416 (0x01A0) data D2 00 FA 01 99 01 A0
+[11:25:06.070] Request (dropped) from 0x301 (HK1) Read/Write ID 0x31 0x00 (to 0x180/Kessel, read) property UNKNOWN (0x0009) raw value 0 (0x0000) data 31 00 09 00 00 00 00
+[11:25:06.079] Message from 0x180 (Kessel) Read/Write ID 0x62 0x01 (to 0x301/HK1, response) property UNKNOWN (0x0009) raw value 6411 (0x190B) data 62 01 09 19 0B 00 00
+[11:25:08.272] Message from 0x301 (HK1) Read/Write ID 0xC0 0x01 (to 0x601/unknown, write) property RAUMFEUCHTE (0x0075) raw value 527 (0x020F) data C0 01 75 02 0F 00 00
+[11:25:18.482] Message from 0x301 (HK1) Read/Write ID 0xC0 0x01 (to 0x601/unknown, write) property RAUMISTTEMP (0x0011) raw value 201 (0x00C9) data C0 01 11 00 C9 00 00
+[11:25:19.330] Message from 0x301 (HK1) Read/Write ID 0xC0 0x01 (to 0x601/unknown, write) property RAUMFEUCHTE (0x0075) raw value 526 (0x020E) data C0 01 75 02 0E 00 00
+[11:25:56.112] Message from 0x301 (HK1) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property VORLAUFSOLLTEMP (0x0004) raw value 245 (0x00F5) data D2 00 FA 00 04 00 F5
+[11:26:03.148] Message from 0x301 (HK1) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property FET_SOFTWARE (0x0199) raw value 416 (0x01A0) data D2 00 FA 01 99 01 A0
+[11:26:06.124] Request (dropped) from 0x301 (HK1) Read/Write ID 0x31 0x00 (to 0x180/Kessel, read) property UNKNOWN (0x0009) raw value 0 (0x0000) data 31 00 09 00 00 00 00
+[11:26:06.129] Message from 0x180 (Kessel) Read/Write ID 0x62 0x01 (to 0x301/HK1, response) property UNKNOWN (0x0009) raw value 6667 (0x1A0B) data 62 01 09 1A 0B 00 00
+[11:26:08.322] Message from 0x301 (HK1) Read/Write ID 0xC0 0x01 (to 0x601/unknown, write) property RAUMFEUCHTE (0x0075) raw value 520 (0x0208) data C0 01 75 02 08 00 00
+[11:26:18.520] Message from 0x301 (HK1) Read/Write ID 0xC0 0x01 (to 0x601/unknown, write) property RAUMISTTEMP (0x0011) raw value 201 (0x00C9) data C0 01 11 00 C9 00 00
+[11:26:19.374] Message from 0x301 (HK1) Read/Write ID 0xC0 0x01 (to 0x601/unknown, write) property RAUMFEUCHTE (0x0075) raw value 520 (0x0208) data C0 01 75 02 08 00 00
+[11:26:56.169] Message from 0x301 (HK1) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property VORLAUFSOLLTEMP (0x0004) raw value 244 (0x00F4) data D2 00 FA 00 04 00 F4
+[11:27:03.168] Message from 0x301 (HK1) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property FET_SOFTWARE (0x0199) raw value 416 (0x01A0) data D2 00 FA 01 99 01 A0
+[11:27:06.150] Request (dropped) from 0x301 (HK1) Read/Write ID 0x31 0x00 (to 0x180/Kessel, read) property UNKNOWN (0x0009) raw value 0 (0x0000) data 31 00 09 00 00 00 00
+[11:27:06.158] Message from 0x180 (Kessel) Read/Write ID 0x62 0x01 (to 0x301/HK1, response) property UNKNOWN (0x0009) raw value 6923 (0x1B0B) data 62 01 09 1B 0B 00 00
+[11:27:18.552] Message from 0x301 (HK1) Read/Write ID 0xC0 0x01 (to 0x601/unknown, write) property RAUMISTTEMP (0x0011) raw value 202 (0x00CA) data C0 01 11 00 CA 00 00
+[11:27:19.403] Message from 0x301 (HK1) Read/Write ID 0xC0 0x01 (to 0x601/unknown, write) property RAUMFEUCHTE (0x0075) raw value 516 (0x0204) data C0 01 75 02 04 00 00
+[11:27:56.202] Message from 0x301 (HK1) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property VORLAUFSOLLTEMP (0x0004) raw value 244 (0x00F4) data D2 00 FA 00 04 00 F4
+[11:28:00.161] Message from 0x301 (HK1) Read/Write ID 0x66 0x01 (to 0x301/HK1, system) property ANMELDUNG (0x00FD) raw value 2048 (0x0800) data 66 01 FD 08 00 00 00
+[11:28:00.166][I][FEK:082]: Presence check for 0x301 (ANMELDUNG 0x0800), emulation off
+[11:28:00.173] Message from 0x680 (ESPClient) Read/Write ID 0xD6 0x00 (to 0x680/ESPClient, system) property ANMELDUNG (0x00FD) raw value 2048 (0x0800) data D6 00 FD 08 00 00 00
+[11:28:00.198] Message from 0x301 (HK1) Read/Write ID 0x67 0x01 (to 0x301/HK1, system response) property ANMELDUNG (0x00FD) raw value 256 (0x0100) data 67 01 FD 01 00 00 00
+[11:28:00.201][I][FEK:082]: Presence check for 0x301 (ANMELDUNG 0x0100), emulation off
+[11:28:02.310] Message from 0x301 (HK1) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property FET_SOFTWARE (0x0199) raw value 416 (0x01A0) data D2 00 FA 01 99 01 A0
+[11:28:06.193] Request (dropped) from 0x301 (HK1) Read/Write ID 0x31 0x00 (to 0x180/Kessel, read) property UNKNOWN (0x0009) raw value 0 (0x0000) data 31 00 09 00 00 00 00
+[11:28:06.201] Message from 0x180 (Kessel) Read/Write ID 0x62 0x01 (to 0x301/HK1, response) property UNKNOWN (0x0009) raw value 7179 (0x1C0B) data 62 01 09 1C 0B 00 00
+[11:28:18.590] Message from 0x301 (HK1) Read/Write ID 0xC0 0x01 (to 0x601/unknown, write) property RAUMISTTEMP (0x0011) raw value 202 (0x00CA) data C0 01 11 00 CA 00 00
+[11:28:19.447] Message from 0x301 (HK1) Read/Write ID 0xC0 0x01 (to 0x601/unknown, write) property RAUMFEUCHTE (0x0075) raw value 514 (0x0202) data C0 01 75 02 02 00 00
+[11:28:56.238] Message from 0x301 (HK1) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property VORLAUFSOLLTEMP (0x0004) raw value 244 (0x00F4) data D2 00 FA 00 04 00 F4
+[11:29:02.387] Message from 0x301 (HK1) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property FET_SOFTWARE (0x0199) raw value 416 (0x01A0) data D2 00 FA 01 99 01 A0
+[11:29:06.243] Request (dropped) from 0x301 (HK1) Read/Write ID 0x31 0x00 (to 0x180/Kessel, read) property UNKNOWN (0x0009) raw value 0 (0x0000) data 31 00 09 00 00 00 00
+[11:29:06.250] Message from 0x180 (Kessel) Read/Write ID 0x62 0x01 (to 0x301/HK1, response) property UNKNOWN (0x0009) raw value 7435 (0x1D0B) data 62 01 09 1D 0B 00 00
+[11:29:18.640] Message from 0x301 (HK1) Read/Write ID 0xC0 0x01 (to 0x601/unknown, write) property RAUMISTTEMP (0x0011) raw value 203 (0x00CB) data C0 01 11 00 CB 00 00
+[11:29:19.484] Message from 0x301 (HK1) Read/Write ID 0xC0 0x01 (to 0x601/unknown, write) property RAUMFEUCHTE (0x0075) raw value 512 (0x0200) data C0 01 75 02 00 00 00
+[11:29:56.286] Message from 0x301 (HK1) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property VORLAUFSOLLTEMP (0x0004) raw value 244 (0x00F4) data D2 00 FA 00 04 00 F4
+[11:30:02.406] Message from 0x301 (HK1) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property FET_SOFTWARE (0x0199) raw value 416 (0x01A0) data D2 00 FA 01 99 01 A0
+[11:30:06.281] Request (dropped) from 0x301 (HK1) Read/Write ID 0x31 0x00 (to 0x180/Kessel, read) property UNKNOWN (0x0009) raw value 0 (0x0000) data 31 00 09 00 00 00 00
+[11:30:06.289] Message from 0x180 (Kessel) Read/Write ID 0x62 0x01 (to 0x301/HK1, response) property UNKNOWN (0x0009) raw value 7691 (0x1E0B) data 62 01 09 1E 0B 00 00
+[11:30:18.680] Message from 0x301 (HK1) Read/Write ID 0x36 0x00 (to 0x180/Kessel, system) property TBD_10 (0x00FE) raw value 256 (0x0100) data 36 00 FE 01 00 00 00
+[11:30:18.692] Message from 0x180 (Kessel) Read/Write ID 0x67 0x01 (to 0x301/HK1, system response) property TBD_10 (0x00FE) raw value 256 (0x0100) data 67 01 FE 01 00 00 00
+[11:30:19.527] Message from 0x301 (HK1) Read/Write ID 0xC6 0x01 (to 0x601/unknown, system) property TBD_10 (0x00FE) raw value 256 (0x0100) data C6 01 FE 01 00 00 00
+[11:30:19.539] Message from 0x601 (unknown) Read/Write ID 0x67 0x01 (to 0x301/HK1, system response) property TBD_10 (0x00FE) raw value 256 (0x0100) data 67 01 FE 01 00 00 00
+[11:30:20.365] Message from 0x301 (HK1) Read/Write ID 0xC0 0x01 (to 0x601/unknown, write) property RAUMISTTEMP (0x0011) raw value 203 (0x00CB) data C0 01 11 00 CB 00 00
+[11:30:20.381] Message from 0x301 (HK1) Read/Write ID 0xC0 0x01 (to 0x601/unknown, write) property RAUMFEUCHTE (0x0075) raw value 510 (0x01FE) data C0 01 75 01 FE 00 00
+[11:30:21.151] Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property UNKNOWN (0x0010) raw value 2 (0x0002) data 60 01 10 00 02 00 00
+[11:30:21.156] Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property UNKNOWN (0x000F) raw value 65136 (0xFE70) data 60 01 0F FE 70 00 00
+[11:30:21.168] Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property VORLAUFSOLLTEMP (0x0004) raw value 65136 (0xFE70) data 60 01 04 FE 70 00 00
+[11:30:21.180] Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property FEK_TBD_0052 (0x0052) raw value 0 (0x0000) data 60 01 52 00 00 00 00
+[11:30:21.191] Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property UNKNOWN (0x0056) raw value 0 (0x0000) data 60 01 56 00 00 00 00
+[11:30:21.204] Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property UNKNOWN (0x0057) raw value 0 (0x0000) data 60 01 57 00 00 00 00
+[11:30:21.216] Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property UNKNOWN (0x0028) raw value 300 (0x012C) data 60 01 28 01 2C 00 00
+[11:30:21.228] Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property UNKNOWN (0x005A) raw value 512 (0x0200) data 60 01 5A 02 00 00 00
+[11:30:21.323] Message from 0x301 (HK1) Read/Write ID 0x30 0x00 (to 0x180/Kessel, write) property UNKNOWN (0x0002) raw value 244 (0x00F4) data 30 00 02 00 F4 00 00
+[11:30:21.336] Message from 0x301 (HK1) Read/Write ID 0x30 0x00 (to 0x180/Kessel, write) property UNKNOWN (0x0058) raw value 512 (0x0200) data 30 00 58 02 00 00 00
+[11:30:21.346] Message from 0x301 (HK1) Read/Write ID 0x30 0x00 (to 0x180/Kessel, write) property UNKNOWN (0x006E) raw value 512 (0x0200) data 30 00 6E 02 00 00 00
+[11:30:23.308] Message from 0x301 (HK1) Read/Write ID 0xC0 0x01 (to 0x601/unknown, write) property UNKNOWN (0x0058) raw value 512 (0x0200) data C0 01 58 02 00 00 00
+[11:30:23.321] Message from 0x301 (HK1) Read/Write ID 0xC0 0x01 (to 0x601/unknown, write) property UNKNOWN (0x0029) raw value 2560 (0x0A00) data C0 01 29 0A 00 00 00
+[11:30:23.330] Message from 0x301 (HK1) Read/Write ID 0xC0 0x01 (to 0x601/unknown, write) property UNKNOWN (0x002A) raw value 7680 (0x1E00) data C0 01 2A 1E 00 00 00
+[11:30:23.340] Message from 0x301 (HK1) Read/Write ID 0xC0 0x01 (to 0x601/unknown, write) property RAUMEINFLUSS (0x010F) raw value 512 (0x0200) data C0 01 FA 01 0F 02 00
+[11:30:23.351] Message from 0x301 (HK1) Read/Write ID 0xC0 0x01 (to 0x601/unknown, write) property VERSTELLTE_RAUMSOLLTEMP (0x0012) raw value 210 (0x00D2) data C0 01 12 00 D2 00 00
+[11:30:23.361] Request (dropped) from 0x301 (HK1) Read/Write ID 0xC1 0x01 (to 0x601/unknown, read) property RAUMISTTEMP (0x0011) raw value 0 (0x0000) data C1 01 11 00 00 00 00
+[11:30:23.367] Request (dropped) from 0x301 (HK1) Read/Write ID 0xC1 0x01 (to 0x601/unknown, read) property VERSTELLTE_RAUMSOLLTEMP (0x0012) raw value 0 (0x0000) data C1 01 12 00 00 00 00
+[11:30:23.376] Request (dropped) from 0x301 (HK1) Read/Write ID 0xC1 0x01 (to 0x601/unknown, read) property UNKNOWN (0x000F) raw value 0 (0x0000) data C1 01 0F 00 00 00 00
+[11:30:23.387] Request (dropped) from 0x301 (HK1) Read/Write ID 0xC1 0x01 (to 0x601/unknown, read) property VORLAUFSOLLTEMP (0x0004) raw value 0 (0x0000) data C1 01 04 00 00 00 00
+[11:30:23.397] Message from 0x601 (unknown) Read/Write ID 0x62 0x01 (to 0x301/HK1, response) property VORLAUFSOLLTEMP (0x0004) raw value 65136 (0xFE70) data 62 01 04 FE 70 00 00
+[11:30:24.471] Message from 0x301 (HK1) Read/Write ID 0xC0 0x01 (to 0x601/unknown, write) property RAUMISTTEMP (0x0011) raw value 203 (0x00CB) data C0 01 11 00 CB 00 00
+[11:30:24.487] Message from 0x301 (HK1) Read/Write ID 0xC0 0x01 (to 0x601/unknown, write) property RAUMFEUCHTE (0x0075) raw value 510 (0x01FE) data C0 01 75 01 FE 00 00
+[11:30:31.306] Message from 0x301 (HK1) Read/Write ID 0xC0 0x01 (to 0x601/unknown, write) property VORLAUFSOLLTEMP (0x0004) raw value 244 (0x00F4) data C0 01 04 00 F4 00 00
+[11:30:35.835] Request (dropped) from 0x100 (Bedienteil) Read/Write ID 0x31 0x00 (to 0x180/Kessel, read) property FET_SOFTWARESTAND (0x019A) raw value 0 (0x0000) data 31 00 FA 01 9A 00 00
+[11:30:35.843] Message from 0x180 (Kessel) Read/Write ID 0x22 0x00 (to 0x100/Bedienteil, response) property FET_SOFTWARESTAND (0x019A) raw value 10 (0x000A) data 22 00 FA 01 9A 00 0A
+[11:30:56.319] Message from 0x301 (HK1) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property VORLAUFSOLLTEMP (0x0004) raw value 243 (0x00F3) data D2 00 FA 00 04 00 F3
+[11:30:59.499] Message from 0x601 (unknown) Read/Write ID 0x66 0x01 (to 0x301/HK1, system) property TBD_10 (0x00FE) raw value 256 (0x0100) data 66 01 FE 01 00 00 00
+[11:30:59.511] Message from 0x301 (HK1) Read/Write ID 0xC7 0x01 (to 0x601/unknown, system response) property TBD_10 (0x00FE) raw value 256 (0x0100) data C7 01 FE 01 00 00 00
+[11:30:59.537] Message from 0x301 (HK1) Read/Write ID 0x37 0x00 (to 0x180/Kessel, system response) property TBD_10 (0x00FE) raw value 256 (0x0100) data 37 00 FE 01 00 00 00
+[11:31:00.325] Message from 0x301 (HK1) Read/Write ID 0x30 0x00 (to 0x180/Kessel, write) property UNKNOWN (0x0002) raw value 243 (0x00F3) data 30 00 02 00 F3 00 00
+[11:31:00.338] Message from 0x301 (HK1) Read/Write ID 0x30 0x00 (to 0x180/Kessel, write) property UNKNOWN (0x0058) raw value 512 (0x0200) data 30 00 58 02 00 00 00
+[11:31:00.354] Message from 0x301 (HK1) Read/Write ID 0x30 0x00 (to 0x180/Kessel, write) property UNKNOWN (0x006E) raw value 512 (0x0200) data 30 00 6E 02 00 00 00
+[11:31:02.204] Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property UNKNOWN (0x0010) raw value 2 (0x0002) data 60 01 10 00 02 00 00
+[11:31:02.216] Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property UNKNOWN (0x000F) raw value 65136 (0xFE70) data 60 01 0F FE 70 00 00
+[11:31:02.227] Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property VORLAUFSOLLTEMP (0x0004) raw value 65136 (0xFE70) data 60 01 04 FE 70 00 00
+[11:31:02.239] Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property FEK_TBD_0052 (0x0052) raw value 0 (0x0000) data 60 01 52 00 00 00 00
+[11:31:02.250] Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property UNKNOWN (0x0056) raw value 0 (0x0000) data 60 01 56 00 00 00 00
+[11:31:02.264] Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property UNKNOWN (0x0057) raw value 0 (0x0000) data 60 01 57 00 00 00 00
+[11:31:02.276] Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property UNKNOWN (0x0028) raw value 300 (0x012C) data 60 01 28 01 2C 00 00
+[11:31:02.286] Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property UNKNOWN (0x005A) raw value 512 (0x0200) data 60 01 5A 02 00 00 00
+[11:31:02.347] Message from 0x301 (HK1) Read/Write ID 0xC0 0x01 (to 0x601/unknown, write) property UNKNOWN (0x0058) raw value 512 (0x0200) data C0 01 58 02 00 00 00
+[11:31:02.361] Message from 0x301 (HK1) Read/Write ID 0xC0 0x01 (to 0x601/unknown, write) property UNKNOWN (0x0029) raw value 2560 (0x0A00) data C0 01 29 0A 00 00 00
+[11:31:02.368] Message from 0x301 (HK1) Read/Write ID 0xC0 0x01 (to 0x601/unknown, write) property UNKNOWN (0x002A) raw value 7680 (0x1E00) data C0 01 2A 1E 00 00 00
+[11:31:02.379] Message from 0x301 (HK1) Read/Write ID 0xC0 0x01 (to 0x601/unknown, write) property RAUMEINFLUSS (0x010F) raw value 512 (0x0200) data C0 01 FA 01 0F 02 00
+[11:31:02.388] Message from 0x301 (HK1) Read/Write ID 0xC0 0x01 (to 0x601/unknown, write) property VERSTELLTE_RAUMSOLLTEMP (0x0012) raw value 210 (0x00D2) data C0 01 12 00 D2 00 00
+[11:31:02.399] Request (dropped) from 0x301 (HK1) Read/Write ID 0xC1 0x01 (to 0x601/unknown, read) property RAUMISTTEMP (0x0011) raw value 0 (0x0000) data C1 01 11 00 00 00 00
+[11:31:02.408] Request (dropped) from 0x301 (HK1) Read/Write ID 0xC1 0x01 (to 0x601/unknown, read) property VERSTELLTE_RAUMSOLLTEMP (0x0012) raw value 0 (0x0000) data C1 01 12 00 00 00 00
+[11:31:02.416] Message from 0x601 (unknown) Read/Write ID 0x62 0x01 (to 0x301/HK1, response) property RAUMISTTEMP (0x0011) raw value 65136 (0xFE70) data 62 01 11 FE 70 00 00
+[11:31:02.427] Request (dropped) from 0x301 (HK1) Read/Write ID 0xC1 0x01 (to 0x601/unknown, read) property UNKNOWN (0x000F) raw value 0 (0x0000) data C1 01 0F 00 00 00 00
+[11:31:02.436] Message from 0x601 (unknown) Read/Write ID 0x62 0x01 (to 0x301/HK1, response) property VERSTELLTE_RAUMSOLLTEMP (0x0012) raw value 65136 (0xFE70) data 62 01 12 FE 70 00 00
+[11:31:02.447] Request (dropped) from 0x301 (HK1) Read/Write ID 0xC1 0x01 (to 0x601/unknown, read) property VORLAUFSOLLTEMP (0x0004) raw value 0 (0x0000) data C1 01 04 00 00 00 00
+[11:31:02.456] Message from 0x601 (unknown) Read/Write ID 0x62 0x01 (to 0x301/HK1, response) property UNKNOWN (0x000F) raw value 65136 (0xFE70) data 62 01 0F FE 70 00 00
+[11:31:02.471] Message from 0x601 (unknown) Read/Write ID 0x62 0x01 (to 0x301/HK1, response) property VORLAUFSOLLTEMP (0x0004) raw value 65136 (0xFE70) data 62 01 04 FE 70 00 00
+[11:31:02.532] Message from 0x301 (HK1) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property FET_SOFTWARE (0x0199) raw value 416 (0x01A0) data D2 00 FA 01 99 01 A0
+[11:31:03.507] Message from 0x301 (HK1) Read/Write ID 0xC0 0x01 (to 0x601/unknown, write) property RAUMISTTEMP (0x0011) raw value 204 (0x00CC) data C0 01 11 00 CC 00 00
+[11:31:03.518] Message from 0x301 (HK1) Read/Write ID 0xC0 0x01 (to 0x601/unknown, write) property RAUMFEUCHTE (0x0075) raw value 509 (0x01FD) data C0 01 75 01 FD 00 00
+[11:31:06.341] Request (dropped) from 0x301 (HK1) Read/Write ID 0x31 0x00 (to 0x180/Kessel, read) property UNKNOWN (0x0009) raw value 0 (0x0000) data 31 00 09 00 00 00 00
+[11:31:06.349] Message from 0x180 (Kessel) Read/Write ID 0x62 0x01 (to 0x301/HK1, response) property UNKNOWN (0x0009) raw value 7947 (0x1F0B) data 62 01 09 1F 0B 00 00
+[11:31:10.331] Message from 0x301 (HK1) Read/Write ID 0xC0 0x01 (to 0x601/unknown, write) property VORLAUFSOLLTEMP (0x0004) raw value 243 (0x00F3) data C0 01 04 00 F3 00 00
+[11:31:18.717] Message from 0x301 (HK1) Read/Write ID 0xC0 0x01 (to 0x601/unknown, write) property RAUMISTTEMP (0x0011) raw value 204 (0x00CC) data C0 01 11 00 CC 00 00
+[11:31:19.571] Message from 0x301 (HK1) Read/Write ID 0xC0 0x01 (to 0x601/unknown, write) property RAUMFEUCHTE (0x0075) raw value 509 (0x01FD) data C0 01 75 01 FD 00 00
+[11:31:56.361] Message from 0x301 (HK1) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property VORLAUFSOLLTEMP (0x0004) raw value 243 (0x00F3) data D2 00 FA 00 04 00 F3
+[11:32:02.355] Message from 0x301 (HK1) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property FET_SOFTWARE (0x0199) raw value 416 (0x01A0) data D2 00 FA 01 99 01 A0
+[11:32:06.362] Request (dropped) from 0x301 (HK1) Read/Write ID 0x31 0x00 (to 0x180/Kessel, read) property UNKNOWN (0x0009) raw value 0 (0x0000) data 31 00 09 00 00 00 00
+[11:32:06.370] Message from 0x180 (Kessel) Read/Write ID 0x62 0x01 (to 0x301/HK1, response) property UNKNOWN (0x0009) raw value 8203 (0x200B) data 62 01 09 20 0B 00 00
+[11:32:18.769] Message from 0x301 (HK1) Read/Write ID 0xC0 0x01 (to 0x601/unknown, write) property RAUMISTTEMP (0x0011) raw value 204 (0x00CC) data C0 01 11 00 CC 00 00
+[11:32:19.609] Message from 0x301 (HK1) Read/Write ID 0xC0 0x01 (to 0x601/unknown, write) property RAUMFEUCHTE (0x0075) raw value 507 (0x01FB) data C0 01 75 01 FB 00 00
+[11:32:21.338] Request (dropped) from 0x100 (Bedienteil) Read/Write ID 0xC1 0x01 (to 0x601/unknown, read) property KOMF_TEMP (0x0005) raw value 0 (0x0000) data C1 01 05 00 00 00 00
+[11:32:21.346] Request (dropped) from 0x100 (Bedienteil) Read/Write ID 0xC1 0x01 (to 0x601/unknown, read) property ECO_TEMP (0x0008) raw value 0 (0x0000) data C1 01 08 00 00 00 00
+[11:32:21.370] Request (dropped) from 0x100 (Bedienteil) Read/Write ID 0xC1 0x01 (to 0x601/unknown, read) property UNKNOWN (0x4EA7) raw value 0 (0x0000) data C1 01 FA 4E A7 00 00
+[11:32:21.373] Request (dropped) from 0x100 (Bedienteil) Read/Write ID 0xC1 0x01 (to 0x601/unknown, read) property STEIGUNG_HK1 (0x010E) raw value 0 (0x0000) data C1 01 FA 01 0E 00 00
+[11:32:42.242] Request (dropped) from 0x100 (Bedienteil) Read/Write ID 0xC1 0x01 (to 0x601/unknown, read) property UNKNOWN (0x4EA7) raw value 0 (0x0000) data C1 01 FA 4E A7 00 00
+[11:32:57.396] Message from 0x301 (HK1) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property VORLAUFSOLLTEMP (0x0004) raw value 243 (0x00F3) data D2 00 FA 00 04 00 F3
+[11:33:02.396] Message from 0x301 (HK1) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property KOMF_TEMP (0x0005) raw value 210 (0x00D2) data D2 00 FA 00 05 00 D2
+[11:33:02.407] Message from 0x301 (HK1) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property ECO_TEMP (0x0008) raw value 199 (0x00C7) data D2 00 FA 00 08 00 C7
+[11:33:02.930] Request (dropped) from 0x100 (Bedienteil) Read/Write ID 0xC1 0x01 (to 0x601/unknown, read) property UNKNOWN (0x4EA7) raw value 0 (0x0000) data C1 01 FA 4E A7 00 00
+[11:33:03.409] Message from 0x301 (HK1) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property STEIGUNG_HK1 (0x010E) raw value 24 (0x0018) data D2 00 FA 01 0E 00 18
+[11:33:03.421] Message from 0x301 (HK1) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property RAUMEINFLUSS (0x010F) raw value 512 (0x0200) data D2 00 FA 01 0F 02 00
+[11:33:06.400] Request (dropped) from 0x301 (HK1) Read/Write ID 0x31 0x00 (to 0x180/Kessel, read) property UNKNOWN (0x0009) raw value 0 (0x0000) data 31 00 09 00 00 00 00
+[11:33:06.408] Message from 0x180 (Kessel) Read/Write ID 0x62 0x01 (to 0x301/HK1, response) property UNKNOWN (0x0009) raw value 8459 (0x210B) data 62 01 09 21 0B 00 00
+[11:33:08.593] Message from 0x301 (HK1) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property FET_SOFTWARE (0x0199) raw value 416 (0x01A0) data D2 00 FA 01 99 01 A0
+[11:33:19.842] Message from 0x301 (HK1) Read/Write ID 0xC0 0x01 (to 0x601/unknown, write) property RAUMISTTEMP (0x0011) raw value 205 (0x00CD) data C0 01 11 00 CD 00 00
+[11:33:20.692] Message from 0x301 (HK1) Read/Write ID 0xC0 0x01 (to 0x601/unknown, write) property RAUMFEUCHTE (0x0075) raw value 507 (0x01FB) data C0 01 75 01 FB 00 00
+[11:33:24.862] Request (dropped) from 0x100 (Bedienteil) Read/Write ID 0xC1 0x01 (to 0x601/unknown, read) property UNKNOWN (0x4EA7) raw value 0 (0x0000) data C1 01 FA 4E A7 00 00
+[11:33:47.080] Request (dropped) from 0x100 (Bedienteil) Read/Write ID 0xC1 0x01 (to 0x601/unknown, read) property UNKNOWN (0x4EA7) raw value 0 (0x0000) data C1 01 FA 4E A7 00 00
+[11:33:56.437] Message from 0x301 (HK1) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property VORLAUFSOLLTEMP (0x0004) raw value 243 (0x00F3) data D2 00 FA 00 04 00 F3
+[11:34:02.447] Message from 0x301 (HK1) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property FET_SOFTWARE (0x0199) raw value 416 (0x01A0) data D2 00 FA 01 99 01 A0
+[11:34:07.437] Request (dropped) from 0x301 (HK1) Read/Write ID 0x31 0x00 (to 0x180/Kessel, read) property UNKNOWN (0x0009) raw value 0 (0x0000) data 31 00 09 00 00 00 00
+[11:34:07.446] Message from 0x180 (Kessel) Read/Write ID 0x62 0x01 (to 0x301/HK1, response) property UNKNOWN (0x0009) raw value 8715 (0x220B) data 62 01 09 22 0B 00 00
+[11:34:09.317] Request (dropped) from 0x100 (Bedienteil) Read/Write ID 0xC1 0x01 (to 0x601/unknown, read) property UNKNOWN (0x4EA7) raw value 0 (0x0000) data C1 01 FA 4E A7 00 00
+[11:34:18.846] Message from 0x301 (HK1) Read/Write ID 0xC0 0x01 (to 0x601/unknown, write) property RAUMISTTEMP (0x0011) raw value 205 (0x00CD) data C0 01 11 00 CD 00 00
+[11:34:18.979] Message from 0x301 (HK1) Read/Write ID 0xC0 0x01 (to 0x601/unknown, write) property RAUMFEUCHTE (0x0075) raw value 506 (0x01FA) data C0 01 75 01 FA 00 00
+[11:34:27.887] Message from 0x301 (HK1) Read/Write ID 0xC0 0x01 (to 0x601/unknown, write) property RAUMFEUCHTE (0x0075) raw value 524 (0x020C) data C0 01 75 02 0C 00 00
+[11:34:31.527] Request (dropped) from 0x100 (Bedienteil) Read/Write ID 0xC1 0x01 (to 0x601/unknown, read) property UNKNOWN (0x4EA7) raw value 0 (0x0000) data C1 01 FA 4E A7 00 00
+[11:34:37.901] Message from 0x301 (HK1) Read/Write ID 0xC0 0x01 (to 0x601/unknown, write) property RAUMFEUCHTE (0x0075) raw value 516 (0x0204) data C0 01 75 02 04 00 00
+[11:34:53.738] Request (dropped) from 0x100 (Bedienteil) Read/Write ID 0xC1 0x01 (to 0x601/unknown, read) property UNKNOWN (0x4EA7) raw value 0 (0x0000) data C1 01 FA 4E A7 00 00
+[11:34:56.096] Message from 0x301 (HK1) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property VORLAUFSOLLTEMP (0x0004) raw value 243 (0x00F3) data D2 00 FA 00 04 00 F3
+[11:34:57.190] Message from 0x301 (HK1) Read/Write ID 0xC0 0x01 (to 0x601/unknown, write) property RAUMEINFLUSS (0x010F) raw value 1024 (0x0400) data C0 01 FA 01 0F 04 00
+[11:34:57.933] Message from 0x301 (HK1) Read/Write ID 0xC0 0x01 (to 0x601/unknown, write) property RAUMFEUCHTE (0x0075) raw value 525 (0x020D) data C0 01 75 02 0D 00 00
+[11:35:02.618] Message from 0x301 (HK1) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property FET_SOFTWARE (0x0199) raw value 416 (0x01A0) data D2 00 FA 01 99 01 A0
+[11:35:06.756] Request (dropped) from 0x301 (HK1) Read/Write ID 0x31 0x00 (to 0x180/Kessel, read) property UNKNOWN (0x0009) raw value 0 (0x0000) data 31 00 09 00 00 00 00
+[11:35:06.764] Message from 0x180 (Kessel) Read/Write ID 0x62 0x01 (to 0x301/HK1, response) property UNKNOWN (0x0009) raw value 8971 (0x230B) data 62 01 09 23 0B 00 00
+[11:35:09.489] Message from 0x301 (HK1) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property RAUMEINFLUSS (0x010F) raw value 1024 (0x0400) data D2 00 FA 01 0F 04 00
+[11:35:15.968] Request (dropped) from 0x100 (Bedienteil) Read/Write ID 0xC1 0x01 (to 0x601/unknown, read) property UNKNOWN (0x4EA7) raw value 0 (0x0000) data C1 01 FA 4E A7 00 00
+[11:35:18.137] Message from 0x301 (HK1) Read/Write ID 0xC0 0x01 (to 0x601/unknown, write) property RAUMFEUCHTE (0x0075) raw value 519 (0x0207) data C0 01 75 02 07 00 00
+[11:35:18.152] Message from 0x301 (HK1) Read/Write ID 0xC0 0x01 (to 0x601/unknown, write) property RAUMISTTEMP (0x0011) raw value 206 (0x00CE) data C0 01 11 00 CE 00 00
+[11:35:18.169] Message from 0x301 (HK1) Read/Write ID 0xC0 0x01 (to 0x601/unknown, write) property RAUMFEUCHTE (0x0075) raw value 519 (0x0207) data C0 01 75 02 07 00 00
+[11:35:28.563] Message from 0x301 (HK1) Read/Write ID 0xC0 0x01 (to 0x601/unknown, write) property RAUMFEUCHTE (0x0075) raw value 513 (0x0201) data C0 01 75 02 01 00 00
+[11:35:38.194] Request (dropped) from 0x100 (Bedienteil) Read/Write ID 0xC1 0x01 (to 0x601/unknown, read) property UNKNOWN (0x4EA7) raw value 0 (0x0000) data C1 01 FA 4E A7 00 00
+[11:35:47.963] Message from 0x301 (HK1) Read/Write ID 0xC0 0x01 (to 0x601/unknown, write) property RAUMFEUCHTE (0x0075) raw value 507 (0x01FB) data C0 01 75 01 FB 00 00
+[11:35:56.107] Message from 0x301 (HK1) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property VORLAUFSOLLTEMP (0x0004) raw value 244 (0x00F4) data D2 00 FA 00 04 00 F4
+[11:36:00.137] Message from 0x301 (HK1) Read/Write ID 0x66 0x01 (to 0x301/HK1, system) property ANMELDUNG (0x00FD) raw value 2048 (0x0800) data 66 01 FD 08 00 00 00
+[11:36:00.141][I][FEK:082]: Presence check for 0x301 (ANMELDUNG 0x0800), emulation off
+[11:36:00.149] Message from 0x301 (HK1) Read/Write ID 0x67 0x01 (to 0x301/HK1, system response) property ANMELDUNG (0x00FD) raw value 256 (0x0100) data 67 01 FD 01 00 00 00
+[11:36:00.153][I][FEK:082]: Presence check for 0x301 (ANMELDUNG 0x0100), emulation off
+[11:36:00.161] Message from 0x680 (ESPClient) Read/Write ID 0xD6 0x00 (to 0x680/ESPClient, system) property ANMELDUNG (0x00FD) raw value 2048 (0x0800) data D6 00 FD 08 00 00 00
+[11:36:00.416] Request (dropped) from 0x100 (Bedienteil) Read/Write ID 0xC1 0x01 (to 0x601/unknown, read) property UNKNOWN (0x4EA7) raw value 0 (0x0000) data C1 01 FA 4E A7 00 00
+[11:36:02.352] Message from 0x301 (HK1) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property FET_SOFTWARE (0x0199) raw value 416 (0x01A0) data D2 00 FA 01 99 01 A0
+[11:36:06.799] Request (dropped) from 0x301 (HK1) Read/Write ID 0x31 0x00 (to 0x180/Kessel, read) property UNKNOWN (0x0009) raw value 0 (0x0000) data 31 00 09 00 00 00 00
+[11:36:06.810] Message from 0x180 (Kessel) Read/Write ID 0x62 0x01 (to 0x301/HK1, response) property UNKNOWN (0x0009) raw value 9227 (0x240B) data 62 01 09 24 0B 00 00
+[11:36:18.216] Message from 0x301 (HK1) Read/Write ID 0xC0 0x01 (to 0x601/unknown, write) property RAUMISTTEMP (0x0011) raw value 207 (0x00CF) data C0 01 11 00 CF 00 00
+[11:36:22.629] Request (dropped) from 0x100 (Bedienteil) Read/Write ID 0xC1 0x01 (to 0x601/unknown, read) property UNKNOWN (0x4EA7) raw value 0 (0x0000) data C1 01 FA 4E A7 00 00
+[11:36:44.854] Request (dropped) from 0x100 (Bedienteil) Read/Write ID 0xC1 0x01 (to 0x601/unknown, read) property UNKNOWN (0x4EA7) raw value 0 (0x0000) data C1 01 FA 4E A7 00 00
+[11:36:56.118] Message from 0x301 (HK1) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property VORLAUFSOLLTEMP (0x0004) raw value 243 (0x00F3) data D2 00 FA 00 04 00 F3
+[11:37:02.365] Message from 0x301 (HK1) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property FET_SOFTWARE (0x0199) raw value 416 (0x01A0) data D2 00 FA 01 99 01 A0
+[11:37:06.836] Request (dropped) from 0x301 (HK1) Read/Write ID 0x31 0x00 (to 0x180/Kessel, read) property UNKNOWN (0x0009) raw value 0 (0x0000) data 31 00 09 00 00 00 00
+[11:37:06.844] Message from 0x180 (Kessel) Read/Write ID 0x62 0x01 (to 0x301/HK1, response) property UNKNOWN (0x0009) raw value 9483 (0x250B) data 62 01 09 25 0B 00 00
+[11:37:07.080] Request (dropped) from 0x100 (Bedienteil) Read/Write ID 0xC1 0x01 (to 0x601/unknown, read) property UNKNOWN (0x4EA7) raw value 0 (0x0000) data C1 01 FA 4E A7 00 00
+[11:37:18.244] Message from 0x301 (HK1) Read/Write ID 0x36 0x00 (to 0x180/Kessel, system) property TBD_10 (0x00FE) raw value 256 (0x0100) data 36 00 FE 01 00 00 00
+[11:37:18.257] Message from 0x301 (HK1) Read/Write ID 0xC6 0x01 (to 0x601/unknown, system) property TBD_10 (0x00FE) raw value 256 (0x0100) data C6 01 FE 01 00 00 00
+[11:37:18.279] Message from 0x301 (HK1) Read/Write ID 0xC0 0x01 (to 0x601/unknown, write) property RAUMISTTEMP (0x0011) raw value 208 (0x00D0) data C0 01 11 00 D0 00 00
+[11:37:18.285] Message from 0x301 (HK1) Read/Write ID 0xC0 0x01 (to 0x601/unknown, write) property RAUMFEUCHTE (0x0075) raw value 500 (0x01F4) data C0 01 75 01 F4 00 00
+[11:37:18.300] Message from 0x601 (unknown) Read/Write ID 0x67 0x01 (to 0x301/HK1, system response) property TBD_10 (0x00FE) raw value 256 (0x0100) data 67 01 FE 01 00 00 00
+[11:37:18.853] Message from 0x301 (HK1) Read/Write ID 0x30 0x00 (to 0x180/Kessel, write) property UNKNOWN (0x0002) raw value 242 (0x00F2) data 30 00 02 00 F2 00 00
+[11:37:18.856] Message from 0x301 (HK1) Read/Write ID 0x30 0x00 (to 0x180/Kessel, write) property UNKNOWN (0x0058) raw value 512 (0x0200) data 30 00 58 02 00 00 00
+[11:37:18.868] Message from 0x301 (HK1) Read/Write ID 0x30 0x00 (to 0x180/Kessel, write) property UNKNOWN (0x006E) raw value 512 (0x0200) data 30 00 6E 02 00 00 00
+[11:37:20.172] Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property UNKNOWN (0x0010) raw value 2 (0x0002) data 60 01 10 00 02 00 00
+[11:37:20.183] Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property UNKNOWN (0x000F) raw value 65136 (0xFE70) data 60 01 0F FE 70 00 00
+[11:37:20.191] Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property VORLAUFSOLLTEMP (0x0004) raw value 65136 (0xFE70) data 60 01 04 FE 70 00 00
+[11:37:20.203] Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property FEK_TBD_0052 (0x0052) raw value 0 (0x0000) data 60 01 52 00 00 00 00
+[11:37:20.215] Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property UNKNOWN (0x0056) raw value 0 (0x0000) data 60 01 56 00 00 00 00
+[11:37:20.226] Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property UNKNOWN (0x0057) raw value 0 (0x0000) data 60 01 57 00 00 00 00
+[11:37:20.238] Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property UNKNOWN (0x0028) raw value 300 (0x012C) data 60 01 28 01 2C 00 00
+[11:37:20.249] Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property UNKNOWN (0x005A) raw value 512 (0x0200) data 60 01 5A 02 00 00 00
+[11:37:20.852] Message from 0x301 (HK1) Read/Write ID 0xC0 0x01 (to 0x601/unknown, write) property UNKNOWN (0x0058) raw value 512 (0x0200) data C0 01 58 02 00 00 00
+[11:37:20.863] Message from 0x301 (HK1) Read/Write ID 0xC0 0x01 (to 0x601/unknown, write) property UNKNOWN (0x0029) raw value 2560 (0x0A00) data C0 01 29 0A 00 00 00
+[11:37:20.875] Message from 0x301 (HK1) Read/Write ID 0xC0 0x01 (to 0x601/unknown, write) property UNKNOWN (0x002A) raw value 7680 (0x1E00) data C0 01 2A 1E 00 00 00
+[11:37:20.887] Message from 0x301 (HK1) Read/Write ID 0xC0 0x01 (to 0x601/unknown, write) property RAUMEINFLUSS (0x010F) raw value 1024 (0x0400) data C0 01 FA 01 0F 04 00
+[11:37:20.905] Message from 0x301 (HK1) Read/Write ID 0xC0 0x01 (to 0x601/unknown, write) property VERSTELLTE_RAUMSOLLTEMP (0x0012) raw value 210 (0x00D2) data C0 01 12 00 D2 00 00
+[11:37:20.909] Request (dropped) from 0x301 (HK1) Read/Write ID 0xC1 0x01 (to 0x601/unknown, read) property RAUMISTTEMP (0x0011) raw value 0 (0x0000) data C1 01 11 00 00 00 00
+[11:37:20.915] Request (dropped) from 0x301 (HK1) Read/Write ID 0xC1 0x01 (to 0x601/unknown, read) property VERSTELLTE_RAUMSOLLTEMP (0x0012) raw value 0 (0x0000) data C1 01 12 00 00 00 00
+[11:37:20.925] Message from 0x601 (unknown) Read/Write ID 0x62 0x01 (to 0x301/HK1, response) property RAUMISTTEMP (0x0011) raw value 65136 (0xFE70) data 62 01 11 FE 70 00 00
+[11:37:20.926] Request (dropped) from 0x301 (HK1) Read/Write ID 0xC1 0x01 (to 0x601/unknown, read) property VORLAUFSOLLTEMP (0x0004) raw value 0 (0x0000) data C1 01 04 00 00 00 00
+[11:37:20.928] Message from 0x601 (unknown) Read/Write ID 0x62 0x01 (to 0x301/HK1, response) property UNKNOWN (0x000F) raw value 65136 (0xFE70) data 62 01 0F FE 70 00 00
+[11:37:20.938] Message from 0x601 (unknown) Read/Write ID 0x62 0x01 (to 0x301/HK1, response) property VORLAUFSOLLTEMP (0x0004) raw value 65136 (0xFE70) data 62 01 04 FE 70 00 00
+[11:37:22.089] Message from 0x301 (HK1) Read/Write ID 0xC0 0x01 (to 0x601/unknown, write) property RAUMISTTEMP (0x0011) raw value 208 (0x00D0) data C0 01 11 00 D0 00 00
+[11:37:22.107] Message from 0x301 (HK1) Read/Write ID 0xC0 0x01 (to 0x601/unknown, write) property RAUMFEUCHTE (0x0075) raw value 499 (0x01F3) data C0 01 75 01 F3 00 00
+[11:37:28.847] Message from 0x301 (HK1) Read/Write ID 0xC0 0x01 (to 0x601/unknown, write) property VORLAUFSOLLTEMP (0x0004) raw value 242 (0x00F2) data C0 01 04 00 F2 00 00
+[11:37:29.301] Request (dropped) from 0x100 (Bedienteil) Read/Write ID 0xC1 0x01 (to 0x601/unknown, read) property UNKNOWN (0x4EA7) raw value 0 (0x0000) data C1 01 FA 4E A7 00 00
+[11:37:38.032] Message from 0x301 (HK1) Read/Write ID 0xC0 0x01 (to 0x601/unknown, write) property RAUMFEUCHTE (0x0075) raw value 506 (0x01FA) data C0 01 75 01 FA 00 00
+[11:37:51.526] Request (dropped) from 0x100 (Bedienteil) Read/Write ID 0xC1 0x01 (to 0x601/unknown, read) property UNKNOWN (0x4EA7) raw value 0 (0x0000) data C1 01 FA 4E A7 00 00
+[11:37:56.091] Message from 0x301 (HK1) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property VORLAUFSOLLTEMP (0x0004) raw value 242 (0x00F2) data D2 00 FA 00 04 00 F2
+[11:37:58.054] Message from 0x301 (HK1) Read/Write ID 0x30 0x00 (to 0x180/Kessel, write) property UNKNOWN (0x0002) raw value 241 (0x00F1) data 30 00 02 00 F1 00 00
+[11:37:59.449] Message from 0x601 (unknown) Read/Write ID 0x66 0x01 (to 0x301/HK1, system) property TBD_10 (0x00FE) raw value 256 (0x0100) data 66 01 FE 01 00 00 00
+[11:37:59.460] Message from 0x301 (HK1) Read/Write ID 0xC7 0x01 (to 0x601/unknown, system response) property TBD_10 (0x00FE) raw value 256 (0x0100) data C7 01 FE 01 00 00 00
+[11:37:59.488] Message from 0x301 (HK1) Read/Write ID 0x37 0x00 (to 0x180/Kessel, system response) property TBD_10 (0x00FE) raw value 256 (0x0100) data 37 00 FE 01 00 00 00
+[11:37:59.875] Message from 0x301 (HK1) Read/Write ID 0x30 0x00 (to 0x180/Kessel, write) property UNKNOWN (0x0002) raw value 241 (0x00F1) data 30 00 02 00 F1 00 00
+[11:37:59.885] Message from 0x301 (HK1) Read/Write ID 0x30 0x00 (to 0x180/Kessel, write) property UNKNOWN (0x0058) raw value 512 (0x0200) data 30 00 58 02 00 00 00
+[11:37:59.897] Message from 0x301 (HK1) Read/Write ID 0x30 0x00 (to 0x180/Kessel, write) property UNKNOWN (0x006E) raw value 512 (0x0200) data 30 00 6E 02 00 00 00
+[11:38:01.269] Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property UNKNOWN (0x0010) raw value 2 (0x0002) data 60 01 10 00 02 00 00
+[11:38:01.269] Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property UNKNOWN (0x000F) raw value 65136 (0xFE70) data 60 01 0F FE 70 00 00
+[11:38:01.269] Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property VORLAUFSOLLTEMP (0x0004) raw value 65136 (0xFE70) data 60 01 04 FE 70 00 00
+[11:38:01.270] Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property FEK_TBD_0052 (0x0052) raw value 0 (0x0000) data 60 01 52 00 00 00 00
+[11:38:01.270] Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property UNKNOWN (0x0056) raw value 0 (0x0000) data 60 01 56 00 00 00 00
+[11:38:01.270] Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property UNKNOWN (0x0057) raw value 0 (0x0000) data 60 01 57 00 00 00 00
+[11:38:01.282] Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property UNKNOWN (0x0028) raw value 300 (0x012C) data 60 01 28 01 2C 00 00
+[11:38:01.293] Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property UNKNOWN (0x005A) raw value 512 (0x0200) data 60 01 5A 02 00 00 00
+[11:38:01.884] Message from 0x301 (HK1) Read/Write ID 0xC0 0x01 (to 0x601/unknown, write) property UNKNOWN (0x0058) raw value 512 (0x0200) data C0 01 58 02 00 00 00
+[11:38:01.885] Message from 0x301 (HK1) Read/Write ID 0xC0 0x01 (to 0x601/unknown, write) property UNKNOWN (0x0029) raw value 2560 (0x0A00) data C0 01 29 0A 00 00 00
+[11:38:01.886] Message from 0x301 (HK1) Read/Write ID 0xC0 0x01 (to 0x601/unknown, write) property UNKNOWN (0x002A) raw value 7680 (0x1E00) data C0 01 2A 1E 00 00 00
+[11:38:01.899] Message from 0x301 (HK1) Read/Write ID 0xC0 0x01 (to 0x601/unknown, write) property RAUMEINFLUSS (0x010F) raw value 1024 (0x0400) data C0 01 FA 01 0F 04 00
+[11:38:01.902] Message from 0x301 (HK1) Read/Write ID 0xC0 0x01 (to 0x601/unknown, write) property VERSTELLTE_RAUMSOLLTEMP (0x0012) raw value 210 (0x00D2) data C0 01 12 00 D2 00 00
+[11:38:01.913] Request (dropped) from 0x301 (HK1) Read/Write ID 0xC1 0x01 (to 0x601/unknown, read) property RAUMISTTEMP (0x0011) raw value 0 (0x0000) data C1 01 11 00 00 00 00
+[11:38:01.915] Request (dropped) from 0x301 (HK1) Read/Write ID 0xC1 0x01 (to 0x601/unknown, read) property VERSTELLTE_RAUMSOLLTEMP (0x0012) raw value 0 (0x0000) data C1 01 12 00 00 00 00
+[11:38:01.916] Message from 0x601 (unknown) Read/Write ID 0x62 0x01 (to 0x301/HK1, response) property RAUMISTTEMP (0x0011) raw value 65136 (0xFE70) data 62 01 11 FE 70 00 00
+[11:38:01.927] Request (dropped) from 0x301 (HK1) Read/Write ID 0xC1 0x01 (to 0x601/unknown, read) property UNKNOWN (0x000F) raw value 0 (0x0000) data C1 01 0F 00 00 00 00
+[11:38:01.936] Request (dropped) from 0x301 (HK1) Read/Write ID 0xC1 0x01 (to 0x601/unknown, read) property VORLAUFSOLLTEMP (0x0004) raw value 0 (0x0000) data C1 01 04 00 00 00 00
+[11:38:01.943] Message from 0x601 (unknown) Read/Write ID 0x62 0x01 (to 0x301/HK1, response) property VERSTELLTE_RAUMSOLLTEMP (0x0012) raw value 65136 (0xFE70) data 62 01 12 FE 70 00 00
+[11:38:01.956] Message from 0x601 (unknown) Read/Write ID 0x62 0x01 (to 0x301/HK1, response) property UNKNOWN (0x000F) raw value 65136 (0xFE70) data 62 01 0F FE 70 00 00
+[11:38:01.966] Message from 0x601 (unknown) Read/Write ID 0x62 0x01 (to 0x301/HK1, response) property VORLAUFSOLLTEMP (0x0004) raw value 65136 (0xFE70) data 62 01 04 FE 70 00 00
+[11:38:02.369] Message from 0x301 (HK1) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property FET_SOFTWARE (0x0199) raw value 416 (0x01A0) data D2 00 FA 01 99 01 A0
+[11:38:03.118] Message from 0x301 (HK1) Read/Write ID 0xC0 0x01 (to 0x601/unknown, write) property RAUMISTTEMP (0x0011) raw value 209 (0x00D1) data C0 01 11 00 D1 00 00
+[11:38:03.128] Message from 0x301 (HK1) Read/Write ID 0xC0 0x01 (to 0x601/unknown, write) property RAUMFEUCHTE (0x0075) raw value 501 (0x01F5) data C0 01 75 01 F5 00 00
+[11:38:09.880] Message from 0x301 (HK1) Read/Write ID 0xC0 0x01 (to 0x601/unknown, write) property VORLAUFSOLLTEMP (0x0004) raw value 241 (0x00F1) data C0 01 04 00 F1 00 00
+[11:38:13.778] Request (dropped) from 0x100 (Bedienteil) Read/Write ID 0xC1 0x01 (to 0x601/unknown, read) property UNKNOWN (0x4EA7) raw value 0 (0x0000) data C1 01 FA 4E A7 00 00
+[11:38:18.309] Message from 0x301 (HK1) Read/Write ID 0xC0 0x01 (to 0x601/unknown, write) property RAUMFEUCHTE (0x0075) raw value 500 (0x01F4) data C0 01 75 01 F4 00 00
+[11:38:22.168] Message from 0x301 (HK1) Read/Write ID 0xC0 0x01 (to 0x601/unknown, write) property RAUMEINFLUSS (0x010F) raw value 512 (0x0200) data C0 01 FA 01 0F 02 00
+[11:38:35.990] Request (dropped) from 0x100 (Bedienteil) Read/Write ID 0xC1 0x01 (to 0x601/unknown, read) property UNKNOWN (0x4EA7) raw value 0 (0x0000) data C1 01 FA 4E A7 00 00
+[11:38:48.085] Message from 0x301 (HK1) Read/Write ID 0xC0 0x01 (to 0x601/unknown, write) property RAUMFEUCHTE (0x0075) raw value 525 (0x020D) data C0 01 75 02 0D 00 00
+[11:39:20.440] Request (dropped) from 0x100 (Bedienteil) Read/Write ID 0xC1 0x01 (to 0x601/unknown, read) property UNKNOWN (0x4EA7) raw value 0 (0x0000) data C1 01 FA 4E A7 00 00
+[11:39:42.646] Request (dropped) from 0x100 (Bedienteil) Read/Write ID 0xC1 0x01 (to 0x601/unknown, read) property UNKNOWN (0x4EA7) raw value 0 (0x0000) data C1 01 FA 4E A7 00 00
+[11:40:04.892] Request (dropped) from 0x100 (Bedienteil) Read/Write ID 0xC1 0x01 (to 0x601/unknown, read) property UNKNOWN (0x4EA7) raw value 0 (0x0000) data C1 01 FA 4E A7 00 00
+[11:40:27.106] Request (dropped) from 0x100 (Bedienteil) Read/Write ID 0xC1 0x01 (to 0x601/unknown, read) property UNKNOWN (0x4EA7) raw value 0 (0x0000) data C1 01 FA 4E A7 00 00
+[11:40:35.795] Request (dropped) from 0x100 (Bedienteil) Read/Write ID 0x31 0x00 (to 0x180/Kessel, read) property FET_SOFTWARESTAND (0x019A) raw value 0 (0x0000) data 31 00 FA 01 9A 00 00
+[11:40:35.797] Message from 0x180 (Kessel) Read/Write ID 0x22 0x00 (to 0x100/Bedienteil, response) property FET_SOFTWARESTAND (0x019A) raw value 10 (0x000A) data 22 00 FA 01 9A 00 0A
+[11:40:49.543] Request (dropped) from 0x100 (Bedienteil) Read/Write ID 0xC1 0x01 (to 0x601/unknown, read) property UNKNOWN (0x4EA7) raw value 0 (0x0000) data C1 01 FA 4E A7 00 00
+[11:41:11.762] Request (dropped) from 0x100 (Bedienteil) Read/Write ID 0xC1 0x01 (to 0x601/unknown, read) property UNKNOWN (0x4EA7) raw value 0 (0x0000) data C1 01 FA 4E A7 00 00
+[11:41:33.987] Request (dropped) from 0x100 (Bedienteil) Read/Write ID 0xC1 0x01 (to 0x601/unknown, read) property UNKNOWN (0x4EA7) raw value 0 (0x0000) data C1 01 FA 4E A7 00 00
+[11:41:56.195] Request (dropped) from 0x100 (Bedienteil) Read/Write ID 0xC1 0x01 (to 0x601/unknown, read) property UNKNOWN (0x4EA7) raw value 0 (0x0000) data C1 01 FA 4E A7 00 00
+[11:42:18.433] Request (dropped) from 0x100 (Bedienteil) Read/Write ID 0xC1 0x01 (to 0x601/unknown, read) property UNKNOWN (0x4EA7) raw value 0 (0x0000) data C1 01 FA 4E A7 00 00
+[11:42:40.640] Request (dropped) from 0x100 (Bedienteil) Read/Write ID 0xC1 0x01 (to 0x601/unknown, read) property UNKNOWN (0x4EA7) raw value 0 (0x0000) data C1 01 FA 4E A7 00 00
+[11:44:00.115] Message from 0x301 (HK1) Read/Write ID 0x66 0x01 (to 0x301/HK1, system) property ANMELDUNG (0x00FD) raw value 2048 (0x0800) data 66 01 FD 08 00 00 00
+[11:44:00.119][I][FEK:082]: Presence check for 0x301 (ANMELDUNG 0x0800), emulation off
+[11:44:00.128] Message from 0x680 (ESPClient) Read/Write ID 0xD6 0x00 (to 0x680/ESPClient, system) property ANMELDUNG (0x00FD) raw value 2048 (0x0800) data D6 00 FD 08 00 00 00
+[11:44:56.106] Message from 0x301 (HK1) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property VORLAUFSOLLTEMP (0x0004) raw value 241 (0x00F1) data D2 00 FA 00 04 00 F1
+[11:44:59.471] Message from 0x601 (unknown) Read/Write ID 0x66 0x01 (to 0x301/HK1, system) property TBD_10 (0x00FE) raw value 256 (0x0100) data 66 01 FE 01 00 00 00
+[11:45:02.358] Message from 0x301 (HK1) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property FET_SOFTWARE (0x0199) raw value 391 (0x0187) data D2 00 FA 01 99 01 87
+[11:45:02.362][I][FEK:100]: No FEK installed: HK1 is the WPM2's (software 391)
+[11:45:02.367][I][FEK:428]: Starting the FEK emulation
+[11:45:02.370][I][FEK:455]: Registering as FEK on 0x301
+[11:45:02.371][V][text_sensor:033]: 'Heizungssteuerung aktiv': Received new state FEK Emulation
+[11:45:02.376][V][binary_sensor:041]: 'FEK installiert' >> OFF
+[11:45:02.380][D][FEK:539]: Sending as 0x301: 66 01 FD 09 00 00 00
+[11:45:12.371][D][FEK:539]: Sending as 0x301: 36 00 FE 01 00 00 00
+[11:45:12.398] Message from 0x180 (Kessel) Read/Write ID 0x67 0x01 (to 0x301/HK1, system response) property TBD_10 (0x00FE) raw value 256 (0x0100) data 67 01 FE 01 00 00 00
+[11:45:12.408][D][FEK:539]: Sending as 0x301: C6 01 FE 01 00 00 00
+[11:45:12.439] Message from 0x601 (unknown) Read/Write ID 0x67 0x01 (to 0x301/HK1, system response) property TBD_10 (0x00FE) raw value 256 (0x0100) data 67 01 FE 01 00 00 00
+[11:45:13.375][I][FEK:481]: Sending flow setpoint 24.2 °C (outdoor 9.2 °C, room 20.6 °C)
+[11:45:13.398][D][FEK:539]: Sending as 0x301: 30 00 02 00 F2 00 00
+[11:45:13.430][D][FEK:539]: Sending as 0x301: 30 00 58 02 00 00 00
+[11:45:13.458][D][FEK:539]: Sending as 0x301: 30 00 6E 01 00 00 00
+[11:45:14.178] Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property UNKNOWN (0x0010) raw value 2 (0x0002) data 60 01 10 00 02 00 00
+[11:45:14.178] Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property UNKNOWN (0x000F) raw value 65136 (0xFE70) data 60 01 0F FE 70 00 00
+[11:45:14.185] Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property VORLAUFSOLLTEMP (0x0004) raw value 65136 (0xFE70) data 60 01 04 FE 70 00 00
+[11:45:14.202] Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property FEK_TBD_0052 (0x0052) raw value 0 (0x0000) data 60 01 52 00 00 00 00
+[11:45:14.218] Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property UNKNOWN (0x0056) raw value 0 (0x0000) data 60 01 56 00 00 00 00
+[11:45:14.220] Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property UNKNOWN (0x0057) raw value 0 (0x0000) data 60 01 57 00 00 00 00
+[11:45:14.230] Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property UNKNOWN (0x0028) raw value 300 (0x012C) data 60 01 28 01 2C 00 00
+[11:45:14.250] Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property UNKNOWN (0x005A) raw value 512 (0x0200) data 60 01 5A 02 00 00 00
+[11:45:15.413][D][FEK:539]: Sending as 0x301: C0 01 58 02 00 00 00
+[11:45:15.442][D][FEK:539]: Sending as 0x301: C0 01 29 0A 00 00 00
+[11:45:15.472][D][FEK:539]: Sending as 0x301: C0 01 2A 1E 00 00 00
+[11:45:15.503][D][FEK:539]: Sending as 0x301: C0 01 FA 01 0F 02 00
+[11:45:15.532][D][FEK:539]: Sending as 0x301: C0 01 12 00 D2 00 00
+[11:45:15.562][D][FEK:539]: Sending as 0x301: C0 01 11 00 CF 00 00
+[11:45:15.592][D][FEK:539]: Sending as 0x301: C0 01 75 02 14 00 00
+[11:45:23.405][D][FEK:539]: Sending as 0x301: C0 01 04 00 F2 00 00

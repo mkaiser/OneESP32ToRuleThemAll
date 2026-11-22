@@ -1,0 +1,125 @@
+[16:27:32.558][V][Communication:229]: Request (dropped) from 0x480 (Manager) Read/Write ID 0xE1 0x00 (to 0x700/MFG) property TBD_04 (0xFE4C) raw value 0 (0x0000)
+[16:27:32.558][D][Communication:235]: Message from 0x700 (MFG) Read/Write ID 0x92 0x00 (to 0x480/Manager) property TBD_04 (0xFE4C) raw value 18 (0x0012)
+[16:27:32.559][V][sensor:119]: 'TBD_04' >> 18 
+[16:27:32.559][V][Communication:229]: Request (dropped) from 0x480 (Manager) Read/Write ID 0xE1 0x00 (to 0x700/MFG) property TBD_19 (0xFDF4) raw value 0 (0x0000)
+[16:27:32.559][V][Communication:229]: Request (dropped) from 0x480 (Manager) Read/Write ID 0xE1 0x00 (to 0x700/MFG) property TBD_TEMP_01 (0xFDF3) raw value 0 (0x0000)
+[16:27:32.559][D][Communication:235]: Message from 0x700 (MFG) Read/Write ID 0x92 0x00 (to 0x480/Manager) property TBD_19 (0xFDF4) raw value 231 (0x00E7)
+[16:27:32.559][V][sensor:119]: 'TBD_19' >> 231 
+[16:27:32.559][V][Communication:229]: Request (dropped) from 0x480 (Manager) Read/Write ID 0xE1 0x00 (to 0x700/MFG) property VORLAUFISTTEMPNHZ (0xFDF5) raw value 0 (0x0000)
+[16:27:32.560][D][Communication:235]: Message from 0x700 (MFG) Read/Write ID 0x92 0x00 (to 0x480/Manager) property TBD_TEMP_01 (0xFDF3) raw value 227 (0x00E3)
+[16:27:32.560][V][Communication:229]: Request (dropped) from 0x480 (Manager) Read/Write ID 0xE1 0x00 (to 0x700/MFG) property STROMAUFNAHME (0xFE07) raw value 0 (0x0000)
+[16:27:32.560][D][Communication:235]: Message from 0x700 (MFG) Read/Write ID 0x92 0x00 (to 0x480/Manager) property VORLAUFISTTEMPNHZ (0xFDF5) raw value 231 (0x00E7)
+[16:27:32.560][V][Communication:229]: Request (dropped) from 0x480 (Manager) Read/Write ID 0xE1 0x00 (to 0x700/MFG) property TBD_TEMP_03 (0xFE09) raw value 0 (0x0000)
+[16:27:32.560][D][Communication:235]: Message from 0x700 (MFG) Read/Write ID 0x92 0x00 (to 0x480/Manager) property STROMAUFNAHME (0xFE07) raw value 0 (0x0000)
+[16:27:32.560][V][Communication:229]: Request (dropped) from 0x480 (Manager) Read/Write ID 0xE1 0x00 (to 0x700/MFG) property VERSORGUNGSSPANNUNG (0xFE0A) raw value 0 (0x0000)
+[16:27:32.560][D][Communication:235]: Message from 0x700 (MFG) Read/Write ID 0x92 0x00 (to 0x480/Manager) property TBD_TEMP_03 (0xFE09) raw value 185 (0x00B9)
+[16:27:32.561][D][Communication:235]: Message from 0x700 (MFG) Read/Write ID 0x92 0x00 (to 0x480/Manager) property VERSORGUNGSSPANNUNG (0xFE0A) raw value 225 (0x00E1)
+[16:27:33.569][I][ACTION:176]: Sending data (0x31 0x00 0xfa 0x01 0xb0 0x00 0x00)
+[16:27:33.594][D][Communication:235]: Message from 0x180 (Kessel) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient) property QUELLENTEMP_MIN (0x01B0) raw value 65446 (0xFFA6)
+[16:27:33.603][D][Communication:235]: Message from 0x480 (Manager) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient) property BETRIEBS_STATUS_WPM (0x4E5E) raw value 0 (0x0000)
+[16:27:33.604][V][text_sensor:100]: 'DEBUG_BETRIEB' >> '0000000000000000'
+[16:27:33.868][D][Communication:235]: Message from 0x480 (Manager) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient) property PROGRAMMSCHALTER (0x0112) raw value 1024 (0x0400)
+[16:27:34.431][V][Communication:229]: Request (dropped) from 0x100 (unknown) Read/Write ID 0x31 0x00 (to 0x180/Kessel) property AUSSENTEMP (0x000C) raw value 0 (0x0000)
+[16:27:34.444][D][Communication:235]: Message from 0x180 (Kessel) Read/Write ID 0x22 0x00 (to 0x100/unknown) property AUSSENTEMP (0x000C) raw value 77 (0x004D)
+[16:27:34.452][V][sensor:119]: 'Aussentemperatur' >> 7.7 °C
+[16:27:37.088][V][Communication:229]: Request (dropped) from 0x100 (unknown) Read/Write ID 0x31 0x00 (to 0x180/Kessel) property SPEICHERISTTEMP (0x000E) raw value 0 (0x0000)
+[16:27:37.100][D][Communication:235]: Message from 0x180 (Kessel) Read/Write ID 0x22 0x00 (to 0x100/unknown) property SPEICHERISTTEMP (0x000E) raw value 451 (0x01C3)
+[16:27:37.384][V][Communication:229]: Request (dropped) from 0x480 (Manager) Read/Write ID 0xE1 0x00 (to 0x700/MFG) property TBD_04 (0xFE4C) raw value 0 (0x0000)
+[16:27:37.389][D][Communication:235]: Message from 0x700 (MFG) Read/Write ID 0x92 0x00 (to 0x480/Manager) property TBD_04 (0xFE4C) raw value 18 (0x0012)
+[16:27:37.397][V][sensor:119]: 'TBD_04' >> 18 
+[16:27:37.405][V][Communication:229]: Request (dropped) from 0x480 (Manager) Read/Write ID 0xE1 0x00 (to 0x700/MFG) property TBD_19 (0xFDF4) raw value 0 (0x0000)
+[16:27:37.413][V][Communication:229]: Request (dropped) from 0x480 (Manager) Read/Write ID 0xE1 0x00 (to 0x700/MFG) property TBD_TEMP_01 (0xFDF3) raw value 0 (0x0000)
+[16:27:37.421][D][Communication:235]: Message from 0x700 (MFG) Read/Write ID 0x92 0x00 (to 0x480/Manager) property TBD_19 (0xFDF4) raw value 231 (0x00E7)
+[16:27:37.429][V][sensor:119]: 'TBD_19' >> 231 
+[16:27:37.437][V][Communication:229]: Request (dropped) from 0x480 (Manager) Read/Write ID 0xE1 0x00 (to 0x700/MFG) property VORLAUFISTTEMPNHZ (0xFDF5) raw value 0 (0x0000)
+[16:27:37.445][D][Communication:235]: Message from 0x700 (MFG) Read/Write ID 0x92 0x00 (to 0x480/Manager) property TBD_TEMP_01 (0xFDF3) raw value 227 (0x00E3)
+[16:27:37.453][V][Communication:229]: Request (dropped) from 0x480 (Manager) Read/Write ID 0xE1 0x00 (to 0x700/MFG) property STROMAUFNAHME (0xFE07) raw value 0 (0x0000)
+[16:27:37.463][D][Communication:235]: Message from 0x700 (MFG) Read/Write ID 0x92 0x00 (to 0x480/Manager) property VORLAUFISTTEMPNHZ (0xFDF5) raw value 231 (0x00E7)
+[16:27:37.469][V][Communication:229]: Request (dropped) from 0x480 (Manager) Read/Write ID 0xE1 0x00 (to 0x700/MFG) property TBD_TEMP_03 (0xFE09) raw value 0 (0x0000)
+[16:27:37.477][V][Communication:229]: Request (dropped) from 0x480 (Manager) Read/Write ID 0xE1 0x00 (to 0x700/MFG) property VERSORGUNGSSPANNUNG (0xFE0A) raw value 0 (0x0000)
+[16:27:37.485][D][Communication:235]: Message from 0x700 (MFG) Read/Write ID 0x92 0x00 (to 0x480/Manager) property TBD_TEMP_03 (0xFE09) raw value 185 (0x00B9)
+[16:27:40.634][V][Communication:229]: Request (dropped) from 0x100 (unknown) Read/Write ID 0x31 0x00 (to 0x180/Kessel) property RUECKLAUFISTTEMP (0x0016) raw value 0 (0x0000)
+[16:27:40.645][D][Communication:235]: Message from 0x180 (Kessel) Read/Write ID 0x22 0x00 (to 0x100/unknown) property RUECKLAUFISTTEMP (0x0016) raw value 231 (0x00E7)
+[16:27:41.358][D][Communication:235]: Message from 0x480 (Manager) Read/Write ID 0xE0 0x00 (to 0x700/MFG) property TBD_06 (0xFE1D) raw value 0 (0x0000)
+[16:27:41.365][V][sensor:119]: 'TBD_06_WPM2' >> 0 
+[16:27:41.373][D][Communication:235]: Message from 0x700 (MFG) Read/Write ID 0x92 0x00 (to 0x480/Manager) property TBD_06 (0xFE1D) raw value 1 (0x0001)
+[16:27:41.380][V][sensor:119]: 'TBD_06_MFG' >> 1 
+[16:27:42.362][V][Communication:229]: Request (dropped) from 0x480 (Manager) Read/Write ID 0xE1 0x00 (to 0x700/MFG) property TBD_04 (0xFE4C) raw value 0 (0x0000)
+[16:27:42.362][D][Communication:235]: Message from 0x700 (MFG) Read/Write ID 0x92 0x00 (to 0x480/Manager) property TBD_04 (0xFE4C) raw value 18 (0x0012)
+[16:27:42.369][V][sensor:119]: 'TBD_04' >> 18 
+[16:27:42.371][V][Communication:229]: Request (dropped) from 0x480 (Manager) Read/Write ID 0xE1 0x00 (to 0x700/MFG) property TBD_19 (0xFDF4) raw value 0 (0x0000)
+[16:27:42.378][D][Communication:235]: Message from 0x700 (MFG) Read/Write ID 0x92 0x00 (to 0x480/Manager) property TBD_19 (0xFDF4) raw value 231 (0x00E7)
+[16:27:42.386][V][sensor:119]: 'TBD_19' >> 231 
+[16:27:42.397][V][Communication:229]: Request (dropped) from 0x480 (Manager) Read/Write ID 0xE1 0x00 (to 0x700/MFG) property TBD_TEMP_01 (0xFDF3) raw value 0 (0x0000)
+[16:27:42.406][D][Communication:235]: Message from 0x700 (MFG) Read/Write ID 0x92 0x00 (to 0x480/Manager) property TBD_TEMP_01 (0xFDF3) raw value 227 (0x00E3)
+[16:27:42.408][V][Communication:229]: Request (dropped) from 0x480 (Manager) Read/Write ID 0xE1 0x00 (to 0x700/MFG) property VORLAUFISTTEMPNHZ (0xFDF5) raw value 0 (0x0000)
+[16:27:42.408][D][Communication:235]: Message from 0x700 (MFG) Read/Write ID 0x92 0x00 (to 0x480/Manager) property VORLAUFISTTEMPNHZ (0xFDF5) raw value 231 (0x00E7)
+[16:27:42.422][V][Communication:229]: Request (dropped) from 0x480 (Manager) Read/Write ID 0xE1 0x00 (to 0x700/MFG) property STROMAUFNAHME (0xFE07) raw value 0 (0x0000)
+[16:27:42.422][D][Communication:235]: Message from 0x700 (MFG) Read/Write ID 0x92 0x00 (to 0x480/Manager) property STROMAUFNAHME (0xFE07) raw value 0 (0x0000)
+[16:27:42.431][V][Communication:229]: Request (dropped) from 0x480 (Manager) Read/Write ID 0xE1 0x00 (to 0x700/MFG) property TBD_TEMP_03 (0xFE09) raw value 0 (0x0000)
+[16:27:42.431][V][Communication:229]: Request (dropped) from 0x480 (Manager) Read/Write ID 0xE1 0x00 (to 0x700/MFG) property VERSORGUNGSSPANNUNG (0xFE0A) raw value 0 (0x0000)
+[16:27:42.434][D][Communication:235]: Message from 0x700 (MFG) Read/Write ID 0x92 0x00 (to 0x480/Manager) property TBD_TEMP_03 (0xFE09) raw value 185 (0x00B9)
+[16:27:42.434][D][Communication:235]: Message from 0x480 (Manager) Read/Write ID 0xE0 0x00 (to 0x700/MFG) property TBD_02 (0xFE1C) raw value 100 (0x0064)
+[16:27:42.442][V][sensor:119]: 'TBD_02_WPM2' >> 100 
+[16:27:42.465][D][Communication:235]: Message from 0x700 (MFG) Read/Write ID 0x92 0x00 (to 0x480/Manager) property VERSORGUNGSSPANNUNG (0xFE0A) raw value 225 (0x00E1)
+[16:27:42.465][D][Communication:235]: Message from 0x700 (MFG) Read/Write ID 0x92 0x00 (to 0x480/Manager) property TBD_02 (0xFE1C) raw value 100 (0x0064)
+[16:27:42.465][V][sensor:119]: 'TBD_02_MFG' >> 100 
+[16:27:44.350][D][Communication:235]: Message from 0x480 (Manager) Read/Write ID 0xE0 0x00 (to 0x700/MFG) property TBD_08 (0xFE1B) raw value 100 (0x0064)
+[16:27:44.357][V][sensor:119]: 'TBD_08_WPM2' >> 100 
+[16:27:44.367][D][Communication:235]: Message from 0x700 (MFG) Read/Write ID 0x92 0x00 (to 0x480/Manager) property TBD_08 (0xFE1B) raw value 100 (0x0064)
+[16:27:44.375][V][sensor:119]: 'TBD_08_MFG' >> 100 
+[16:27:45.073][V][Communication:229]: Request (dropped) from 0x100 (unknown) Read/Write ID 0x31 0x00 (to 0x180/Kessel) property AUSSENTEMP (0x000C) raw value 0 (0x0000)
+[16:27:45.085][D][Communication:235]: Message from 0x180 (Kessel) Read/Write ID 0x22 0x00 (to 0x100/unknown) property AUSSENTEMP (0x000C) raw value 78 (0x004E)
+[16:27:45.092][V][sensor:119]: 'Aussentemperatur' >> 7.8 °C
+[16:27:47.424][V][Communication:229]: Request (dropped) from 0x480 (Manager) Read/Write ID 0xE1 0x00 (to 0x700/MFG) property TBD_04 (0xFE4C) raw value 0 (0x0000)
+[16:27:47.432][D][Communication:235]: Message from 0x700 (MFG) Read/Write ID 0x92 0x00 (to 0x480/Manager) property TBD_04 (0xFE4C) raw value 18 (0x0012)
+[16:27:47.440][V][sensor:119]: 'TBD_04' >> 18 
+[16:27:47.448][V][Communication:229]: Request (dropped) from 0x480 (Manager) Read/Write ID 0xE1 0x00 (to 0x700/MFG) property TBD_19 (0xFDF4) raw value 0 (0x0000)
+[16:27:47.522][D][Communication:235]: Message from 0x700 (MFG) Read/Write ID 0x92 0x00 (to 0x480/Manager) property TBD_19 (0xFDF4) raw value 231 (0x00E7)
+[16:27:47.522][V][sensor:119]: 'TBD_19' >> 231 
+[16:27:47.522][V][Communication:229]: Request (dropped) from 0x480 (Manager) Read/Write ID 0xE1 0x00 (to 0x700/MFG) property TBD_TEMP_01 (0xFDF3) raw value 0 (0x0000)
+[16:27:47.522][D][Communication:235]: Message from 0x700 (MFG) Read/Write ID 0x92 0x00 (to 0x480/Manager) property TBD_TEMP_01 (0xFDF3) raw value 227 (0x00E3)
+[16:27:47.536][V][Communication:229]: Request (dropped) from 0x480 (Manager) Read/Write ID 0xE1 0x00 (to 0x700/MFG) property VORLAUFISTTEMPNHZ (0xFDF5) raw value 0 (0x0000)
+[16:27:47.536][D][Communication:235]: Message from 0x700 (MFG) Read/Write ID 0x92 0x00 (to 0x480/Manager) property VORLAUFISTTEMPNHZ (0xFDF5) raw value 231 (0x00E7)
+[16:27:47.536][V][Communication:229]: Request (dropped) from 0x480 (Manager) Read/Write ID 0xE1 0x00 (to 0x700/MFG) property STROMAUFNAHME (0xFE07) raw value 0 (0x0000)
+[16:27:47.536][D][Communication:235]: Message from 0x700 (MFG) Read/Write ID 0x92 0x00 (to 0x480/Manager) property STROMAUFNAHME (0xFE07) raw value 0 (0x0000)
+[16:27:47.537][V][Communication:229]: Request (dropped) from 0x480 (Manager) Read/Write ID 0xE1 0x00 (to 0x700/MFG) property TBD_TEMP_03 (0xFE09) raw value 0 (0x0000)
+[16:27:47.537][D][Communication:235]: Message from 0x700 (MFG) Read/Write ID 0x92 0x00 (to 0x480/Manager) property TBD_TEMP_03 (0xFE09) raw value 185 (0x00B9)
+[16:27:47.537][V][Communication:229]: Request (dropped) from 0x480 (Manager) Read/Write ID 0xE1 0x00 (to 0x700/MFG) property VERSORGUNGSSPANNUNG (0xFE0A) raw value 0 (0x0000)
+[16:27:47.537][D][Communication:235]: Message from 0x700 (MFG) Read/Write ID 0x92 0x00 (to 0x480/Manager) property VERSORGUNGSSPANNUNG (0xFE0A) raw value 225 (0x00E1)
+[16:27:48.420][D][Communication:235]: Message from 0x480 (Manager) Read/Write ID 0xE0 0x00 (to 0x700/MFG) property TBD_07 (0xFE1E) raw value 0 (0x0000)
+[16:27:48.427][V][sensor:119]: 'TBD_07_WPM2' >> 0 
+[16:27:48.435][D][Communication:235]: Message from 0x700 (MFG) Read/Write ID 0x92 0x00 (to 0x480/Manager) property TBD_07 (0xFE1E) raw value 0 (0x0000)
+[16:27:48.443][V][sensor:119]: 'TBD_07_MFG' >> 0 
+[16:27:48.614][V][Communication:229]: Request (dropped) from 0x100 (unknown) Read/Write ID 0x31 0x00 (to 0x180/Kessel) property SPEICHERISTTEMP (0x000E) raw value 0 (0x0000)
+[16:27:48.626][D][Communication:235]: Message from 0x180 (Kessel) Read/Write ID 0x22 0x00 (to 0x100/unknown) property SPEICHERISTTEMP (0x000E) raw value 451 (0x01C3)
+[16:27:51.274][V][Communication:229]: Request (dropped) from 0x100 (unknown) Read/Write ID 0x31 0x00 (to 0x180/Kessel) property RUECKLAUFISTTEMP (0x0016) raw value 0 (0x0000)
+[16:27:51.289][D][Communication:235]: Message from 0x180 (Kessel) Read/Write ID 0x22 0x00 (to 0x100/unknown) property RUECKLAUFISTTEMP (0x0016) raw value 231 (0x00E7)
+[16:27:51.401][D][Communication:235]: Message from 0x480 (Manager) Read/Write ID 0xE0 0x00 (to 0x700/MFG) property TBD_06 (0xFE1D) raw value 0 (0x0000)
+[16:27:51.408][V][sensor:119]: 'TBD_06_WPM2' >> 0 
+[16:27:51.416][D][Communication:235]: Message from 0x700 (MFG) Read/Write ID 0x92 0x00 (to 0x480/Manager) property TBD_06 (0xFE1D) raw value 1 (0x0001)
+[16:27:51.424][V][sensor:119]: 'TBD_06_MFG' >> 1 
+[16:27:52.396][V][Communication:229]: Request (dropped) from 0x480 (Manager) Read/Write ID 0xE1 0x00 (to 0x700/MFG) property TBD_04 (0xFE4C) raw value 0 (0x0000)
+[16:27:52.404][D][Communication:235]: Message from 0x700 (MFG) Read/Write ID 0x92 0x00 (to 0x480/Manager) property TBD_04 (0xFE4C) raw value 18 (0x0012)
+[16:27:52.411][V][sensor:119]: 'TBD_04' >> 18 
+[16:27:52.420][V][Communication:229]: Request (dropped) from 0x480 (Manager) Read/Write ID 0xE1 0x00 (to 0x700/MFG) property TBD_19 (0xFDF4) raw value 0 (0x0000)
+[16:27:52.427][D][Communication:235]: Message from 0x700 (MFG) Read/Write ID 0x92 0x00 (to 0x480/Manager) property TBD_19 (0xFDF4) raw value 231 (0x00E7)
+[16:27:52.435][V][sensor:119]: 'TBD_19' >> 231 
+[16:27:52.444][V][Communication:229]: Request (dropped) from 0x480 (Manager) Read/Write ID 0xE1 0x00 (to 0x700/MFG) property TBD_TEMP_01 (0xFDF3) raw value 0 (0x0000)
+[16:27:52.451][D][Communication:235]: Message from 0x700 (MFG) Read/Write ID 0x92 0x00 (to 0x480/Manager) property TBD_TEMP_01 (0xFDF3) raw value 227 (0x00E3)
+[16:27:52.461][V][Communication:229]: Request (dropped) from 0x480 (Manager) Read/Write ID 0xE1 0x00 (to 0x700/MFG) property VORLAUFISTTEMPNHZ (0xFDF5) raw value 0 (0x0000)
+[16:27:52.469][D][Communication:235]: Message from 0x700 (MFG) Read/Write ID 0x92 0x00 (to 0x480/Manager) property VORLAUFISTTEMPNHZ (0xFDF5) raw value 231 (0x00E7)
+[16:27:52.477][V][Communication:229]: Request (dropped) from 0x480 (Manager) Read/Write ID 0xE1 0x00 (to 0x700/MFG) property STROMAUFNAHME (0xFE07) raw value 0 (0x0000)
+[16:27:52.485][V][Communication:229]: Request (dropped) from 0x480 (Manager) Read/Write ID 0xE1 0x00 (to 0x700/MFG) property TBD_TEMP_03 (0xFE09) raw value 0 (0x0000)
+[16:27:52.494][V][Communication:229]: Request (dropped) from 0x480 (Manager) Read/Write ID 0xE1 0x00 (to 0x700/MFG) property VERSORGUNGSSPANNUNG (0xFE0A) raw value 0 (0x0000)
+[16:27:52.502][D][Communication:235]: Message from 0x700 (MFG) Read/Write ID 0x92 0x00 (to 0x480/Manager) property VERSORGUNGSSPANNUNG (0xFE0A) raw value 225 (0x00E1)
+[16:27:53.043][D][Communication:235]: Message from 0x100 (unknown) Read/Write ID 0x96 0x00 (to 0x4A0/unknown) property TBD_10 (0x00FE) raw value 256 (0x0100)
+[16:27:53.056][D][Communication:235]: Message from 0x480 (Manager) Read/Write ID 0x27 0x00 (to 0x120/unknown) property TBD_10 (0x00FE) raw value 256 (0x0100)
+[16:27:53.060][V][sensor:119]: 'TBD_10_Manager' >> 256 
+[16:27:53.936][D][Communication:235]: Message from 0x100 (unknown) Read/Write ID 0x90 0x00 (to 0x480/Manager) property TBD_11 (0x4E8B) raw value 2 (0x0002)
+[16:27:54.379][D][Communication:235]: Message from 0x480 (Manager) Read/Write ID 0x20 0x00 (to 0x100/unknown) property TBD_12 (0x1388) raw value 0 (0x0000)
+[16:27:54.386][V][sensor:119]: 'TBD_12' >> 0 
+[16:27:54.394][D][Communication:235]: Message from 0x480 (Manager) Read/Write ID 0x20 0x00 (to 0x100/unknown) property TBD_13 (0x080E) raw value 0 (0x0000)
+[16:27:54.401][V][sensor:119]: 'TBD_13' >> 0 
+[16:27:56.589][V][Communication:229]: Request (dropped) from 0x100 (unknown) Read/Write ID 0x31 0x00 (to 0x180/Kessel) property AUSSENTEMP (0x000C) raw value 0 (0x0000)
+[16:27:56.602][D][Communication:235]: Message from 0x180 (Kessel) Read/Write ID 0x22 0x00 (to 0x100/unknown) property AUSSENTEMP (0x000C) raw value 78 (0x004E)

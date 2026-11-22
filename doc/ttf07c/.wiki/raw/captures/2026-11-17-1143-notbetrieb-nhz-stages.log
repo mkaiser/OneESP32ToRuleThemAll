@@ -1,0 +1,58 @@
+# Notbetrieb / NHZ test 2026-11-17 11:43-12:29 (log clock = local), heatpump-ttf07c, emulation on.
+# Writes (maintainer's request): Programmschalter -> Notbetrieb 11:43:32 (value 0x0000); FEK Emulation Vorlauf min 15 -> 32 at 11:59:14, -> 35 at 12:19:52.
+# NHZ fuses off until ~12:14:20 (maintainer), fuse 1 off 12:16:31-12:17:31; compressor and NHZ fuses off from ~12:28.
+# Power (HA, sensor.luftungsraum_sh10rt_load_power): ~490 W -> ~9440 W at 12:14:21 (all fuses on, NHZ1+2); fuse 1 off: 6380 W (-3.0 kW, phase A only); heat demand ended 12:17:57 -> ~300-430 W.
+
+11:43:53 0x601 -> 0x301 write 0x0056 UNKNOWN 0x0000 
+11:43:54 0x601 -> 0x301 write 0x005A UNKNOWN 0x0200 
+11:47:33 0x180 -> 0x379 write 0x0A20 BETRIEBS_STATUS 0x0020 0000000000100000
+11:47:34 0x480 -> 0x100 write 0x4E5E BETRIEBS_STATUS_WPM 0x0001 0000000000000001
+11:47:53 0x480 -> 0x680 response 0x4E5E BETRIEBS_STATUS_WPM 0x0001 0000000000000001
+11:52:33 0x180 -> 0x379 write 0x0A20 BETRIEBS_STATUS 0x0000 0000000000000000
+11:52:34 0x480 -> 0x100 write 0x4E5E BETRIEBS_STATUS_WPM 0x0000 0000000000000000
+11:52:53 0x480 -> 0x680 response 0x4E5E BETRIEBS_STATUS_WPM 0x0000 0000000000000000
+12:01:06 0x180 -> 0x379 write 0x0A20 BETRIEBS_STATUS 0x0041 0000000001000001
+12:01:09 0x601 -> 0x301 write 0x0052 FEK_TBD_0052 0x0100 
+12:01:10 0x480 -> 0x100 write 0x4E5E BETRIEBS_STATUS_WPM 0x0090 0000000010010000
+12:01:24 0x480 -> 0x680 response 0x4E5E BETRIEBS_STATUS_WPM 0x0090 0000000010010000
+12:03:04 0x180 -> 0x379 write 0x0A20 BETRIEBS_STATUS 0x0042 0000000001000010
+12:03:05 0x480 -> 0x100 write 0x4E5E BETRIEBS_STATUS_WPM 0x0080 0000000010000000
+12:03:09 0x480 -> 0x100 write 0x4E5E BETRIEBS_STATUS_WPM 0x00A0 0000000010100000
+12:03:23 0x480 -> 0x680 response 0x4E5E BETRIEBS_STATUS_WPM 0x00A0 0000000010100000
+12:05:03 0x180 -> 0x379 write 0x0A20 BETRIEBS_STATUS 0x0043 0000000001000011
+12:05:05 0x480 -> 0x100 write 0x4E5E BETRIEBS_STATUS_WPM 0x00B0 0000000010110000
+12:05:23 0x480 -> 0x680 response 0x4E5E BETRIEBS_STATUS_WPM 0x00B0 0000000010110000
+12:11:33 0x180 -> 0x379 write 0x0A20 BETRIEBS_STATUS 0x0063 0000000001100011
+12:11:34 0x480 -> 0x100 write 0x4E5E BETRIEBS_STATUS_WPM 0x00B1 0000000010110001
+12:11:53 0x480 -> 0x680 response 0x4E5E BETRIEBS_STATUS_WPM 0x00B1 0000000010110001
+12:16:33 0x180 -> 0x379 write 0x0A20 BETRIEBS_STATUS 0x0043 0000000001000011
+12:16:34 0x480 -> 0x100 write 0x4E5E BETRIEBS_STATUS_WPM 0x00B0 0000000010110000
+12:16:53 0x480 -> 0x680 response 0x4E5E BETRIEBS_STATUS_WPM 0x00B0 0000000010110000
+12:17:57 0x601 -> 0x301 write 0x0052 FEK_TBD_0052 0x0000 
+12:17:57 0x180 -> 0x379 write 0x0A20 BETRIEBS_STATUS 0x0041 0000000001000001
+12:17:57 0x480 -> 0x100 write 0x4E5E BETRIEBS_STATUS_WPM 0x0000 0000000000000000
+12:18:03 0x180 -> 0x379 write 0x0A20 BETRIEBS_STATUS 0x0040 0000000001000000
+12:18:03 0x180 -> 0x379 write 0x0A20 BETRIEBS_STATUS 0x0000 0000000000000000
+12:18:23 0x480 -> 0x680 response 0x4E5E BETRIEBS_STATUS_WPM 0x0000 0000000000000000
+
+[11:43:32.260][V][select:067]: 'PROGRAMMSCHALTER' - Setting
+[11:43:32.263][V][select:119]: 'PROGRAMMSCHALTER' - Set selected option to: Notbetrieb
+[11:43:32.271][V][select:028]: 'PROGRAMMSCHALTER' >> Notbetrieb (0)
+[11:43:32.276][V][mqtt:553]: Publish(topic='analytics/v1/<device-hash>/events/status/PROGRAMMSCHALTER' retain=1 qos=0)
+[11:43:32.306][D][Communication:287]: sendData(node=Manager, property=PROGRAMMSCHALTER (0x0112), value=0)
+[11:43:33.316][D][Communication:253]: Message from 0x480 (Manager) Read/Write ID 0x20 0x00 (to 0x100/Bedienteil, write) property PROGRAMMSCHALTER (0x0112) raw value 0 (0x0000) data 20 00 FA 01 12 00 00
+[11:47:00.887][D][Communication:253]: Message from 0x100 (Bedienteil) Read/Write ID 0x90 0x00 (to 0x480/Manager, write) property TBD_11 (0x4E8B) raw value 2 (0x0002) data 90 00 FA 4E 8B 00 02
+[11:48:26.055][D][Communication:253]: Message from 0x100 (Bedienteil) Read/Write ID 0x90 0x00 (to 0x480/Manager, write) property TBD_11 (0x4E8B) raw value 2 (0x0002) data 90 00 FA 4E 8B 00 02
+[11:54:00.749][D][Communication:253]: Message from 0x100 (Bedienteil) Read/Write ID 0x90 0x00 (to 0x480/Manager, write) property TBD_11 (0x4E8B) raw value 2 (0x0002) data 90 00 FA 4E 8B 00 02
+[11:55:25.923][D][Communication:253]: Message from 0x100 (Bedienteil) Read/Write ID 0x90 0x00 (to 0x480/Manager, write) property TBD_11 (0x4E8B) raw value 2 (0x0002) data 90 00 FA 4E 8B 00 02
+[11:59:14.359][V][number:025]: 'FEK Emulation Vorlauf min' >> 32.00
+[12:01:01.588][D][Communication:253]: Message from 0x100 (Bedienteil) Read/Write ID 0x90 0x00 (to 0x480/Manager, write) property TBD_11 (0x4E8B) raw value 2 (0x0002) data 90 00 FA 4E 8B 00 02
+[12:02:26.729][D][Communication:253]: Message from 0x100 (Bedienteil) Read/Write ID 0x90 0x00 (to 0x480/Manager, write) property TBD_11 (0x4E8B) raw value 2 (0x0002) data 90 00 FA 4E 8B 00 02
+[12:08:01.219][D][Communication:253]: Message from 0x100 (Bedienteil) Read/Write ID 0x90 0x00 (to 0x480/Manager, write) property TBD_11 (0x4E8B) raw value 2 (0x0002) data 90 00 FA 4E 8B 00 02
+[12:10:27.696][D][Communication:253]: Message from 0x100 (Bedienteil) Read/Write ID 0x90 0x00 (to 0x480/Manager, write) property TBD_11 (0x4E8B) raw value 2 (0x0002) data 90 00 FA 4E 8B 00 02
+[12:15:00.540][D][Communication:253]: Message from 0x100 (Bedienteil) Read/Write ID 0x90 0x00 (to 0x480/Manager, write) property TBD_11 (0x4E8B) raw value 2 (0x0002) data 90 00 FA 4E 8B 00 02
+[12:17:26.703][D][Communication:253]: Message from 0x100 (Bedienteil) Read/Write ID 0x90 0x00 (to 0x480/Manager, write) property TBD_11 (0x4E8B) raw value 2 (0x0002) data 90 00 FA 4E 8B 00 02
+[12:19:52.485][V][number:025]: 'FEK Emulation Vorlauf min' >> 35.00
+[12:22:00.404][D][Communication:253]: Message from 0x100 (Bedienteil) Read/Write ID 0x90 0x00 (to 0x480/Manager, write) property TBD_11 (0x4E8B) raw value 2 (0x0002) data 90 00 FA 4E 8B 00 02
+[12:24:26.715][D][Communication:253]: Message from 0x100 (Bedienteil) Read/Write ID 0x90 0x00 (to 0x480/Manager, write) property TBD_11 (0x4E8B) raw value 2 (0x0002) data 90 00 FA 4E 8B 00 02
+[12:29:00.779][D][Communication:253]: Message from 0x100 (Bedienteil) Read/Write ID 0x90 0x00 (to 0x480/Manager, write) property TBD_11 (0x4E8B) raw value 2 (0x0002) data 90 00 FA 4E 8B 00 02

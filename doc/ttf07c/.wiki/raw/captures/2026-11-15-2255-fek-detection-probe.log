@@ -1,0 +1,18 @@
+# Source: ESP log 2026-11-15 22:55-22:58 (local), FEK unplugged. Read requests sent by hand from the ESP (0x680) via the HA action can_send_raw_data: 0x0199/0x019A from HK1 (61 01 FA 01 99/9A 00 00), Manager (91 00 ...) and Kessel (31 00 ...). Then the boot log of the firmware with FEK detection (23:02).
+[22:57:57.943][I][ACTION:176]: Sending data (0x91 0x00 0xfa 0x01 0x99 0x00 0x00)
+[22:57:57.968][D][Communication:253]: Message from 0x480 (Manager) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property UNKNOWN (0x0199) raw value 391 (0x0187) data D2 00 FA 01 99 01 87
+[22:58:00.914][I][ACTION:176]: Sending data (0x31 0x00 0xfa 0x01 0x99 0x00 0x00)
+[22:58:00.938][D][Communication:253]: Message from 0x180 (Kessel) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property UNKNOWN (0x0199) raw value 391 (0x0187) data D2 00 FA 01 99 01 87
+[22:58:03.985][I][ACTION:176]: Sending data (0x91 0x00 0xfa 0x01 0x9a 0x00 0x00)
+[22:58:04.009][D][Communication:253]: Message from 0x480 (Manager) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property TBD_15 (0x019A) raw value 10 (0x000A) data D2 00 FA 01 9A 00 0A
+[22:55:43.082][I][ACTION:176]: Sending data (0x61 0x01 0xfa 0x01 0x99 0x00 0x00)
+[22:55:43.106][D][Communication:253]: Message from 0x301 (HK1) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property UNKNOWN (0x0199) raw value 391 (0x0187) data D2 00 FA 01 99 01 87
+[22:55:46.062][I][ACTION:176]: Sending data (0x61 0x01 0xfa 0x01 0x9a 0x00 0x00)
+[22:55:46.080][D][Communication:253]: Message from 0x301 (HK1) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property TBD_15 (0x019A) raw value 10 (0x000A) data D2 00 FA 01 9A 00 0A
+[23:03:07.333][V][Communication:247]: Request (dropped) from 0x100 (Bedienteil) Read/Write ID 0x31 0x00 (to 0x180/Kessel, read) property FET_SOFTWARESTAND (0x019A) raw value 0 (0x0000) data 31 00 FA 01 9A 00 00
+[23:03:07.333][D][Communication:253]: Message from 0x180 (Kessel) Read/Write ID 0x22 0x00 (to 0x100/Bedienteil, response) property FET_SOFTWARESTAND (0x019A) raw value 10 (0x000A) data 22 00 FA 01 9A 00 0A
+[23:03:14.727][D][Communication:253]: Message from 0x480 (Manager) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property FET_SOFTWARE (0x0199) raw value 391 (0x0187) data D2 00 FA 01 99 01 87
+[23:03:14.987][D][Communication:253]: Message from 0x301 (HK1) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property FET_SOFTWARE (0x0199) raw value 391 (0x0187) data D2 00 FA 01 99 01 87
+[23:03:14.987][I][FEK:100]: No FEK installed: HK1 is the WPM2's (software 391)
+[23:03:46.406][I][QUEUE:127]: Requesting data from HK1 for FET_SOFTWARE
+[23:03:46.516][D][Communication:253]: Message from 0x301 (HK1) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property FET_SOFTWARE (0x0199) raw value 391 (0x0187) data D2 00 FA 01 99 01 87

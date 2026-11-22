@@ -1,0 +1,67 @@
+[16:52:18.063][C][template.sensor:017]: Template Sensor 'CAN HK1 0x301 Frames'
+[16:52:18.092][C][template.sensor:017]: Template Sensor 'CAN 0x601 Frames'
+[16:52:33.150][D][Communication:253]: Message from 0x301 (HK1) Read/Write ID 0xC0 0x01 (to 0x601/unknown, write) property RAUMISTTEMP (0x0011) raw value 218 (0x00DA) data C0 01 11 00 DA 00 00
+[16:52:33.167][D][Communication:253]: Message from 0x301 (HK1) Read/Write ID 0xC0 0x01 (to 0x601/unknown, write) property RAUMFEUCHTE (0x0075) raw value 484 (0x01E4) data C0 01 75 01 E4 00 00
+[16:53:09.778][V][sensor:071]: 'CAN HK1 0x301 Frames': Received new state 654.000000
+[16:53:09.782][V][sensor:119]: 'CAN HK1 0x301 Frames' >> 654 1/h
+[16:53:09.794][V][sensor:071]: 'CAN 0x601 Frames': Received new state 199.000000
+[16:53:09.800][V][sensor:119]: 'CAN 0x601 Frames' >> 199 1/h
+[16:53:59.177][D][Communication:253]: Message from 0x601 (unknown) Read/Write ID 0x66 0x01 (to 0x301/HK1, system) property SYSTEM_PRAESENZ (0x00FE) raw value 256 (0x0100) data 66 01 FE 01 00 00 00
+[16:54:09.778][V][sensor:071]: 'CAN HK1 0x301 Frames': Received new state 645.000000
+[16:54:09.782][V][sensor:119]: 'CAN HK1 0x301 Frames' >> 645 1/h
+[16:54:09.794][V][sensor:071]: 'CAN 0x601 Frames': Received new state 200.000000
+[16:54:09.800][V][sensor:119]: 'CAN 0x601 Frames' >> 200 1/h
+[16:54:30.872][D][Communication:253]: Message from 0x601 (unknown) Read/Write ID 0x66 0x01 (to 0x301/HK1, system) property SYSTEM_PRAESENZ (0x00FE) raw value 256 (0x0100) data 66 01 FE 01 00 00 00
+[16:55:09.778][V][sensor:071]: 'CAN HK1 0x301 Frames': Received new state 639.000000
+[16:55:09.782][V][sensor:119]: 'CAN HK1 0x301 Frames' >> 639 1/h
+[16:55:09.793][V][sensor:071]: 'CAN 0x601 Frames': Received new state 201.000000
+[16:55:09.797][V][sensor:119]: 'CAN 0x601 Frames' >> 201 1/h
+[16:56:09.785][V][sensor:071]: 'CAN HK1 0x301 Frames': Received new state 633.000000
+[16:56:09.785][V][sensor:119]: 'CAN HK1 0x301 Frames' >> 633 1/h
+[16:56:09.786][V][sensor:071]: 'CAN 0x601 Frames': Received new state 201.000000
+[16:56:09.786][V][sensor:119]: 'CAN 0x601 Frames' >> 201 1/h
+[16:57:09.777][V][sensor:071]: 'CAN HK1 0x301 Frames': Received new state 627.000000
+[16:57:09.781][V][sensor:119]: 'CAN HK1 0x301 Frames' >> 627 1/h
+[16:57:09.793][V][sensor:071]: 'CAN 0x601 Frames': Received new state 201.000000
+[16:57:09.797][V][sensor:119]: 'CAN 0x601 Frames' >> 201 1/h
+[16:57:59.891][D][Communication:253]: Message from 0x301 (HK1) Read/Write ID 0x66 0x01 (to 0x301/HK1, system) property ANMELDUNG (0x00FD) raw value 2048 (0x0800) data 66 01 FD 08 00 00 00
+[16:57:59.896][I][FEK:126]: ANMELDUNG 0x0800 on 0x301 (presence check), emulation off
+[16:58:09.781][V][sensor:071]: 'CAN HK1 0x301 Frames': Received new state 607.000000
+[16:58:09.781][V][sensor:119]: 'CAN HK1 0x301 Frames' >> 607 1/h
+[16:58:09.791][V][sensor:071]: 'CAN 0x601 Frames': Received new state 189.000000
+[16:58:09.794][V][sensor:119]: 'CAN 0x601 Frames' >> 189 1/h
+[16:58:13.599][D][Communication:253]: Message from 0x301 (HK1) Read/Write ID 0xD2 0x00 (to 0x680/ESPClient, response) property FET_SOFTWARE (0x0199) raw value 391 (0x0187) data D2 00 FA 01 99 01 87
+[16:58:13.610][I][FEK:155]: No FEK installed: HK1 is the WPM2's (software 391)
+[16:58:13.622][I][FEK:617]: Starting the FEK emulation
+[16:58:13.622][I][FEK:644]: Registering as FEK on 0x301
+[16:58:13.626][D][FEK:813]: Sending as 0x301: 66 01 FD 09 00 00 00
+[16:58:23.631][D][FEK:813]: Sending as 0x301: 36 00 FE 01 00 00 00
+[16:58:23.655][D][Communication:253]: Message from 0x180 (Kessel) Read/Write ID 0x67 0x01 (to 0x301/HK1, system response) property SYSTEM_PRAESENZ (0x00FE) raw value 256 (0x0100) data 67 01 FE 01 00 00 00
+[16:58:23.660][D][FEK:813]: Sending as 0x301: C6 01 FE 01 00 00 00
+[16:58:23.695][D][Communication:253]: Message from 0x601 (unknown) Read/Write ID 0x67 0x01 (to 0x301/HK1, system response) property SYSTEM_PRAESENZ (0x00FE) raw value 256 (0x0100) data 67 01 FE 01 00 00 00
+[16:58:24.618][I][FEK:671]: Sending flow setpoint 25.5 °C (outdoor 9.9 °C, room 21.2 °C)
+[16:58:24.638][D][FEK:813]: Sending as 0x301: 30 00 02 00 FF 00 00
+[16:58:24.667][D][FEK:813]: Sending as 0x301: 30 00 58 02 00 00 00
+[16:58:24.697][D][FEK:813]: Sending as 0x301: 30 00 6E 01 00 00 00
+[16:58:24.852][D][Communication:253]: Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property UNKNOWN (0x0010) raw value 2 (0x0002) data 60 01 10 00 02 00 00
+[16:58:24.864][D][Communication:253]: Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property VORLAUFISTTEMP_HK1 (0x000F) raw value 65136 (0xFE70) data 60 01 0F FE 70 00 00
+[16:58:24.875][D][Communication:253]: Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property VORLAUFSOLLTEMP (0x0004) raw value 65136 (0xFE70) data 60 01 04 FE 70 00 00
+[16:58:24.894][D][Communication:253]: Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property FEK_TBD_0052 (0x0052) raw value 0 (0x0000) data 60 01 52 00 00 00 00
+[16:58:24.898][D][Communication:253]: Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property UNKNOWN (0x0056) raw value 0 (0x0000) data 60 01 56 00 00 00 00
+[16:58:24.901][D][Communication:253]: Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property UNKNOWN (0x0057) raw value 0 (0x0000) data 60 01 57 00 00 00 00
+[16:58:24.915][D][Communication:253]: Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property SOLLWERT_MAX_HK1 (0x0028) raw value 300 (0x012C) data 60 01 28 01 2C 00 00
+[16:58:24.918][D][Communication:253]: Message from 0x601 (unknown) Read/Write ID 0x60 0x01 (to 0x301/HK1, write) property UNKNOWN (0x005A) raw value 512 (0x0200) data 60 01 5A 02 00 00 00
+[16:58:26.660][D][FEK:813]: Sending as 0x301: C0 01 58 02 00 00 00
+[16:58:26.690][D][FEK:813]: Sending as 0x301: C0 01 29 0A 00 00 00
+[16:58:26.720][D][FEK:813]: Sending as 0x301: C0 01 2A 1E 00 00 00
+[16:58:26.750][D][FEK:813]: Sending as 0x301: C0 01 FA 01 0F 02 00
+[16:58:26.780][D][FEK:813]: Sending as 0x301: C0 01 12 00 DC 00 00
+[16:58:26.810][D][FEK:813]: Sending as 0x301: C0 01 11 00 D4 00 00
+[16:58:26.840][D][FEK:813]: Sending as 0x301: C0 01 75 02 0D 00 00
+[16:58:34.644][D][FEK:813]: Sending as 0x301: C0 01 04 00 FF 00 00
+[16:58:35.148][V][Communication:247]: Request (dropped) from 0x100 (Bedienteil) Read/Write ID 0x61 0x01 (to 0x301/HK1, read) property FET_SOFTWARE (0x0199) raw value 0 (0x0000) data 61 01 FA 01 99 00 00
+[16:58:35.152][D][FEK:253]: Read of 0x0199 from 0x100: answered 416
+[16:58:35.156][D][FEK:813]: Sending as 0x301: 22 00 FA 01 99 01 A0
+[16:58:36.040][V][Communication:247]: Request (dropped) from 0x100 (Bedienteil) Read/Write ID 0x61 0x01 (to 0x301/HK1, read) property FET_SOFTWARESTAND (0x019A) raw value 0 (0x0000) data 61 01 FA 01 9A 00 00
+[16:58:36.044][D][FEK:253]: Read of 0x019a from 0x100: answered 3
+[16:58:36.048][D][FEK:813]: Sending as 0x301: 22 00 FA 01 9A 00 03
